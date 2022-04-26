@@ -1,7 +1,7 @@
 # Проект «Большое путешествие»
 
-* Студент: [Денис Перцев](https://up.htmlacademy.ru/ecmascript/17/user/2021361).
-* Наставник: `Неизвестно`.
+- Студент: [Денис Перцев](https://up.htmlacademy.ru/ecmascript/17/user/2021361).
+- Наставник: [Максим Волков](https://htmlacademy.ru/profile/id1508839).
 
 ---
 
