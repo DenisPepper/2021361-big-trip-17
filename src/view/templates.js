@@ -152,7 +152,7 @@ export const createEditPointFormTempalte = () => `<form class="event event--edit
 </section>
 </form>`;
 
-export const createNewPointFormTemplate = () => `<form class="event event--edit" action="#" method="post">
+export const createAddPointFormTemplate = () => `<form class="event event--edit" action="#" method="post">
 <header class="event__header">
   <div class="event__type-wrapper">
     <label class="event__type  event__type-btn" for="event-type-toggle-1">
