@@ -1,4 +1,4 @@
-import { createFiltersFormTemplate } from './templates.js';
+import { createFiltersFormTemplate } from '../templates/filters-form.js';
 import { createElement } from '../render.js';
 
 export default class FiltersForm {

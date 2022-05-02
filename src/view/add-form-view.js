@@ -1,4 +1,4 @@
-import { createAddPointFormTemplate } from './templates.js';
+import { createAddPointFormTemplate } from '../templates/add-form.js';
 import { createElement } from '../render.js';
 
 export default class AddPointForm {

@@ -1,4 +1,4 @@
-import { createEditPointFormTempalte } from './templates.js';
+import { createEditPointFormTempalte } from '../templates/edit-form.js';
 import { createElement } from '../render.js';
 
 export default class EditForm {

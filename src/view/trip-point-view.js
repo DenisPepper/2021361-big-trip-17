@@ -1,4 +1,4 @@
-import { createTripPointTemplate } from './templates.js';
+import { createTripPointTemplate } from '../templates/point-in-list.js';
 import { createElement } from '../render.js';
 
 export default class TripPoint {
