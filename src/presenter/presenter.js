@@ -8,14 +8,14 @@ import { POINTS_COUNT } from '../const';
 
 export default class Presentor {
   init = (containers) => {
-    const {tripControlsContainer, tripEventsContainer} = containers;
-    render(new FiltersForm(), tripControlsContainer);
-    render(new SortForm(), tripEventsContainer);
-    render(new EditForm(), tripEventsContainer);
-    render(new AddPointForm(), tripEventsContainer);
+    const {controlsContainer, eventsContainer} = containers;
+    render(new FiltersForm(), controlsContainer);
+    render(new SortForm(), eventsContainer);
+    render(new EditForm(), eventsContainer);
+    render(new AddPointForm(), eventsContainer);
     let count = 0;
     while (count < POINTS_COUNT) {
-      render(new TripPoint(), tripEventsContainer);
+      render(new TripPoint(), eventsContainer);
       count++;
     }
   };
