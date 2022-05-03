@@ -8,12 +8,12 @@ const POINT_NAME = 'Маршрутная точка (ДЕМО)';
 
 const getPrice = () => getRandomInteger(MIN_PRICE, MAX_PRICE);
 
-export const getDemoPoint = (count = 0) => ({
+export const getDemoPoint = (index = 0) => ({
   basePrice: getPrice(),
   dateFrom: '2019-07-10T22:55:56.845Z',
   dateTo: '2019-07-11T11:22:13.375Z',
   destination: 0,
-  id: count,
+  id: index,
   isFavorite: false,
   offers: [1, 2],
   type: POINT_TYPE,
