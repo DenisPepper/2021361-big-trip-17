@@ -1,2 +1,12 @@
 export const POINTS_COUNT = 3;
-
+export const POINT_TYPES = [
+  'taxi',
+  'bus',
+  'train',
+  'ship',
+  'drive',
+  'flight',
+  'check-in',
+  'sightseeing',
+  'restaurant',
+];

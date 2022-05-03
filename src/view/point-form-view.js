@@ -4,22 +4,20 @@ import { createElement } from '../render.js';
 export default class PointForm {
   #point;
   #offers;
-  #destination;
+  #destinations;
 
-  constructor(point, offers, destination) {
+  constructor(point, offers, destinations) {
     this.#point = point;
     this.#offers = offers;
-    this.#destination = destination;
+    this.#destinations = destinations;
   }
 
-  getTemplate = (point, offers, destination) =>
-    createPointFormTempalte(point, offers, destination);
+  getTemplate = () =>
+    createPointFormTempalte(this.#point, this.#offers, this.#destinations);
 
   getElement = () => {
     if (!this.element) {
-      this.element = createElement(
-        this.getTemplate(this.#point, this.#offers, this.#destination)
-      );
+      this.element = createElement(this.getTemplate());
     }
     return this.element;
   };

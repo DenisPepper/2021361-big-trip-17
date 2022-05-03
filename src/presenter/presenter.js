@@ -7,14 +7,14 @@ import { POINTS_COUNT } from '../const';
 
 export default class Presentor {
   init = (data, containers) => {
-    //const { points, offers, destinations } = data;
+    const { points, offers, destinations } = data;
     const { controlsContainer, eventsContainer } = containers;
 
     render(new FiltersForm(), controlsContainer);
 
     render(new SortForm(), eventsContainer);
 
-    render(new PointForm(data), eventsContainer);
+    render(new PointForm(points[0], offers, destinations), eventsContainer);
 
     Array.from({ length: POINTS_COUNT }, () =>
       render(new PointRow(), eventsContainer)
