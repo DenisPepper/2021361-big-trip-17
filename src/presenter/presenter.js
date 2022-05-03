@@ -7,7 +7,8 @@ import { render } from '../render';
 import { POINTS_COUNT } from '../const';
 
 export default class Presentor {
-  init = (containers) => {
+  init = (data, containers) => {
+    const { points, offers, destinations} = data;
     const { controlsContainer, eventsContainer } = containers;
     render(new FiltersForm(), controlsContainer);
     render(new SortForm(), eventsContainer);
