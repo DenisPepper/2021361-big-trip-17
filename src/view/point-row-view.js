@@ -1,8 +1,8 @@
-import { createTripPointTemplate } from '../templates/point-in-list.js';
+import { createPointRowTemplate } from '../templates/point-row-templ';
 import { createElement } from '../render.js';
 
 export default class PointRow {
-  getTemplate = () => createTripPointTemplate();
+  getTemplate = () => createPointRowTemplate();
 
   getElement = () => {
     if (!this.element) {
