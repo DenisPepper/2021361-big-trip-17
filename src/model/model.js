@@ -9,9 +9,9 @@ const getMock = () => ({
   destinations: getDemoDestinations(),
 });
 
-export default class PointModel {
-  #mock = getMock();
-  get mock() {
-    return this.#mock;
+export default class Model {
+  #data = getMock();
+  get data() {
+    return this.#data;
   }
 }
