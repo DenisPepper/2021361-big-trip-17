@@ -5,6 +5,12 @@ import PointRow from '../view/point-row-view';
 import { render } from '../render';
 import { POINTS_COUNT } from '../const';
 
+const renderPoints = (callback) => {
+  for (let i = 0; i < POINTS_COUNT; i++) {
+    callback.apply(this, [i]);
+  }
+};
+
 export default class Presentor {
   init = (data, containers) => {
     const { points, offers, destinations } = data;
@@ -16,8 +22,10 @@ export default class Presentor {
 
     render(new PointForm(points[0], offers, destinations), eventsContainer);
 
-    for (let i = 0; i < POINTS_COUNT; i++) {
-      render(new PointRow(points[i], offers, destinations), eventsContainer);
-    }
+    const eventsListContainer = document.createElement('ul');
+    eventsListContainer.classList.add('trip-events__list');
+    eventsContainer.append(eventsListContainer);
+
+    renderPoints((...rest) => render(new PointRow(points[rest[0]], offers, destinations), eventsListContainer));
   };
 }
