@@ -16,8 +16,8 @@ export default class Presentor {
 
     render(new PointForm(points[0], offers, destinations), eventsContainer);
 
-    Array.from({ length: POINTS_COUNT }, () =>
-      render(new PointRow(), eventsContainer)
-    );
+    for (let i = 0; i < POINTS_COUNT; i++) {
+      render(new PointRow(points[i], offers, destinations), eventsContainer);
+    }
   };
 }

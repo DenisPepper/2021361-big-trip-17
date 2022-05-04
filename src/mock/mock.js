@@ -88,7 +88,7 @@ export const getDemoDestinations = () => {
 export const getDemoPoint = (index = 0) => ({
   basePrice: getPrice(),
   dateFrom: '2022-05-01T22:55:56.845Z',
-  dateTo: '2022-05-10T11:22:13.375Z',
+  dateTo: '2022-05-02T11:22:13.375Z',
   destination: getRandomInteger(0, getDemoDestinations().length - 1),
   id: index,
   isFavorite: false,
