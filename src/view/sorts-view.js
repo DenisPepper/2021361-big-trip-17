@@ -1,8 +1,8 @@
-import { createSortFormTemplate } from './templates.js';
+import { createSortsFormTemplate } from '../templates/sorts-form-templ';
 import { createElement } from '../render.js';
 
 export default class SortForm {
-  getTemplate = () => createSortFormTemplate();
+  getTemplate = () => createSortsFormTemplate();
 
   getElement = () => {
     if (!this.element) {
