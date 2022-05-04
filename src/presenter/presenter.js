@@ -20,8 +20,6 @@ export default class Presentor {
 
     render(new SortForm(), eventsContainer);
 
-    render(new PointForm(points[0], offers, destinations), eventsContainer);
-
     const eventsListContainer = document.createElement('ul');
     eventsListContainer.classList.add('trip-events__list');
     eventsContainer.append(eventsListContainer);
