@@ -7,15 +7,12 @@ import { render } from '../render';
 import { POINTS_COUNT } from '../const';
 
 export default class Presentor {
-  #points = [];
-  #offers = [];
-  #destinations = [];
+  #model;
   #pointsListView;
 
-  constructor(points, offers, destinations) {
-    this.#points = points;
-    this.#offers = offers;
-    this.#destinations = destinations;
+  constructor(model) {
+    this.#model = model;
+    model.getData();
   }
 
   init = () => {
@@ -30,16 +27,20 @@ export default class Presentor {
     render(this.#pointsListView, eventsContainer);
 
     for (let i = 0; i < POINTS_COUNT; i++) {
-      this.#renderPoint(this.#points[i]);
+      this.#renderPoint(this.#model.points[i]);
     }
   };
 
   #renderPoint = (point) => {
-    const pointRowView = new PointRow(point, this.#offers, this.#destinations);
+    const pointRowView = new PointRow(
+      point,
+      this.#model.offers,
+      this.#model.destinations
+    );
     const pointFormView = new PointForm(
       point,
-      this.#offers,
-      this.#destinations
+      this.#model.offers,
+      this.#model.destinations
     );
 
     const openPointForm = () => {

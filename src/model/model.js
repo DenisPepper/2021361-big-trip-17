@@ -10,8 +10,40 @@ const getMock = () => ({
 });
 
 export default class Model {
-  #data = getMock();
-  get data() {
-    return this.#data;
+  #points = [];
+  #offers = [];
+  #destinations = [];
+  static #instance;
+
+  static create() {
+    if (!this.#instance) {
+      this.#instance = new Model();
+    }
+    return this.#instance;
+  }
+
+  constructor() {
+    if (Model.#instance) {
+      throw new Error('can not use multiple instances of a class');
+    }
+  }
+
+  getData = () => {
+    const { points, offers, destinations } = getMock();
+    this.#points = points;
+    this.#offers = offers;
+    this.#destinations = destinations;
+  };
+
+  get points() {
+    return this.#points;
+  }
+
+  get offers() {
+    return this.#offers;
+  }
+
+  get destinations() {
+    return this.#destinations;
   }
 }
