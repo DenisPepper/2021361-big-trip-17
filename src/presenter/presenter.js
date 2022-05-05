@@ -29,16 +29,61 @@ export default class Presentor {
 
     render(this.#pointsListView, eventsContainer);
 
-    render(
-      new PointForm(this.#points[0], this.#offers, this.#destinations),
-      this.#pointsListView.element
+    for (let i = 0; i < POINTS_COUNT; i++) {
+      this.#renderPoint(this.#points[i]);
+    }
+  };
+
+  #renderPoint = (point) => {
+    const pointRowView = new PointRow(point, this.#offers, this.#destinations);
+    const pointFormView = new PointForm(
+      point,
+      this.#offers,
+      this.#destinations
     );
 
-    for (let i = 0; i < POINTS_COUNT; i++) {
-      render(
-        new PointRow(this.#points[i], this.#offers, this.#destinations),
-        this.#pointsListView.element
+    const openPointForm = () => {
+      this.#pointsListView.element.replaceChild(
+        pointFormView.element,
+        pointRowView.element
       );
-    }
+    };
+
+    const closePointForm = () => {
+      this.#pointsListView.element.replaceChild(
+        pointRowView.element,
+        pointFormView.element
+      );
+    };
+
+    const onEscKeyDown = (evt) => {
+      if (evt.key === 'Escape' || evt.key === 'Esc') {
+        evt.preventDefault();
+        closePointForm();
+        document.removeEventListener('keydown', onEscKeyDown);
+      }
+    };
+
+    pointRowView.element
+      .querySelector('.event__rollup-btn')
+      .addEventListener('click', () => {
+        openPointForm();
+        document.addEventListener('keydown', onEscKeyDown);
+      });
+
+    pointFormView.element
+      .querySelector('.event__rollup-btn')
+      .addEventListener('click', () => {
+        closePointForm();
+        document.removeEventListener('keydown', onEscKeyDown);
+      });
+
+    pointFormView.element.addEventListener('submit', (evt) => {
+      evt.preventDefault();
+      closePointForm();
+      document.removeEventListener('keydown', onEscKeyDown);
+    });
+
+    render(pointRowView, this.#pointsListView.element);
   };
 }
