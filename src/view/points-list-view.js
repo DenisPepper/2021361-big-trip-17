@@ -1,11 +1,10 @@
-import { createFiltersFormTemplate } from '../templates/filters-form-templ';
 import { createElement } from '../render.js';
 
-export default class FiltersForm {
+export default class PointsList {
   #element;
 
   get template() {
-    return createFiltersFormTemplate();
+    return '<ul class="trip-events__list"></ul>';
   }
 
   get element() {

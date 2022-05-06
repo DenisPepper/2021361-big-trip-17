@@ -58,7 +58,7 @@ export const createPointRowTemplate = (point, offers, destinations) => {
     </p>
     <h4 class="visually-hidden">Offers:</h4>
     <ul class="event__selected-offers">
-        ${getOffersList(typeOffersObject, point.offers)}
+    ${typeOffersObject === undefined ? '' : getOffersList(typeOffersObject, point.offers)}
     </ul>
     <button class="event__favorite-btn 
     ${isFavorite(point.isFavorite)}" type="button">

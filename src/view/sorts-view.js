@@ -2,16 +2,22 @@ import { createSortsFormTemplate } from '../templates/sorts-form-templ';
 import { createElement } from '../render.js';
 
 export default class SortForm {
-  getTemplate = () => createSortsFormTemplate();
+  #element;
 
-  getElement = () => {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get template() {
+    return createSortsFormTemplate();
+  }
+
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
-    return this.element;
-  };
+    return this.#element;
+  }
+
+  getElement = () => this.element;
 
   removeElement = () => {
-    this.element = null;
+    this.#element = null;
   };
 }

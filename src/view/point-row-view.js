@@ -5,6 +5,7 @@ export default class PointRow {
   #point;
   #offers;
   #destinations;
+  #element;
 
   constructor(point, offers, destinations) {
     this.#point = point;
@@ -12,17 +13,24 @@ export default class PointRow {
     this.#destinations = destinations;
   }
 
-  getTemplate = () =>
-    createPointRowTemplate(this.#point, this.#offers, this.#destinations);
+  get template() {
+    return createPointRowTemplate(
+      this.#point,
+      this.#offers,
+      this.#destinations
+    );
+  }
 
-  getElement = () => {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
-    return this.element;
-  };
+    return this.#element;
+  }
+
+  getElement = () => this.element;
 
   removeElement = () => {
-    this.element = null;
+    this.#element = null;
   };
 }
