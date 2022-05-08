@@ -1,5 +1,5 @@
 import Presentor from './presenter/presenter';
 import Model from './model/model';
 
-const presentor = new Presentor(Model.create());
+const presentor = new Presentor(new Model());
 presentor.init();
