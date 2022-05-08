@@ -13,22 +13,13 @@ export default class Model {
   #points = [];
   #offers = [];
   #destinations = [];
-  static #instance;
-
-  static create() {
-    if (!this.#instance) {
-      this.#instance = new Model();
-    }
-    return this.#instance;
-  }
-
-  constructor() {
-    if (Model.#instance) {
-      throw new Error('can not use multiple instances of a class');
-    }
-  }
+  #loaded = false;
 
   getData = () => {
+    if (this.#loaded) {
+      return;
+    }
+    this.#loaded = true;
     const { points, offers, destinations } = getMock();
     this.#points = points;
     this.#offers = offers;
@@ -36,14 +27,17 @@ export default class Model {
   };
 
   get points() {
+    this.getData();
     return this.#points;
   }
 
   get offers() {
+    this.getData();
     return this.#offers;
   }
 
   get destinations() {
+    this.getData();
     return this.#destinations;
   }
 }
