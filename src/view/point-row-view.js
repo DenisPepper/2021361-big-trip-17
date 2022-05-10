@@ -1,13 +1,13 @@
 import { createPointRowTemplate } from '../templates/point-row-templ';
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view';
 
-export default class PointRow {
+export default class PointRow extends AbstractView {
   #point;
   #offers;
   #destinations;
-  #element;
 
   constructor(point, offers, destinations) {
+    super();
     this.#point = point;
     this.#offers = offers;
     this.#destinations = destinations;
@@ -21,16 +21,5 @@ export default class PointRow {
     );
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
-  }
-
   getElement = () => this.element;
-
-  removeElement = () => {
-    this.#element = null;
-  };
 }
