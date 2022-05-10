@@ -5,6 +5,4 @@ export default class SortForm extends AbstractView {
   get template() {
     return createSortsFormTemplate();
   }
-
-  getElement = () => this.element;
 }

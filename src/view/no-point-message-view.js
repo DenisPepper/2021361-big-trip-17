@@ -5,6 +5,4 @@ export default class NoPointsMessage extends AbstractView {
   get template() {
     return createNoPointMessageTemplate();
   }
-
-  getElement = () => this.element;
 }

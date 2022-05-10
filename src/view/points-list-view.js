@@ -5,6 +5,4 @@ export default class PointsList extends AbstractView {
   get template() {
     return createPointListTemplate();
   }
-
-  getElement = () => this.element;
 }

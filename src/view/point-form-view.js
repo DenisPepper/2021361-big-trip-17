@@ -20,6 +20,4 @@ export default class PointForm extends AbstractView {
       this.#destinations
     );
   }
-
-  getElement = () => this.element;
 }

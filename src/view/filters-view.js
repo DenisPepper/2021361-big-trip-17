@@ -5,6 +5,4 @@ export default class FiltersForm extends AbstractView {
   get template() {
     return createFiltersFormTemplate();
   }
-
-  getElement = () => this.element;
 }

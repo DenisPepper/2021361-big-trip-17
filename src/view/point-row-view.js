@@ -20,6 +20,4 @@ export default class PointRow extends AbstractView {
       this.#destinations
     );
   }
-
-  getElement = () => this.element;
 }

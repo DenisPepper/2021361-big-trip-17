@@ -4,8 +4,8 @@ import SortForm from '../view/sorts-view';
 import PointRow from '../view/point-row-view';
 import PointsList from '../view/points-list-view';
 import NoPointsMessage from '../view/no-point-message-view';
-import { render } from '../render';
 import { POINTS_COUNT } from '../const';
+import { render } from '../framework/render';
 
 export default class Presentor {
   #model;
