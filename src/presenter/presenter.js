@@ -10,28 +10,36 @@ import { render } from '../framework/render';
 export default class Presentor {
   #model;
   #pointsListView;
+  #controlsContainer;
+  #eventsContainer;
+  #filtersFormView;
+  #sortFormView;
+  #noPointsMessage;
 
   constructor(model) {
+    this.#pointsListView = new PointsList();
     this.#model = model;
     model.getData();
   }
 
   init = () => {
-    const controlsContainer = document.querySelector('.trip-controls__filters');
-    const eventsContainer = document.querySelector('.trip-events');
-    this.#pointsListView = new PointsList();
+    this.#controlsContainer = document.querySelector('.trip-controls__filters');
+    this.#eventsContainer = document.querySelector('.trip-events');
+    this.#filtersFormView = new FiltersForm();
+    this.#sortFormView = new SortForm();
+    this.#noPointsMessage = new NoPointsMessage();
 
-    render(new FiltersForm(), controlsContainer);
+    render(this.#filtersFormView, this.#controlsContainer);
 
-    render(new SortForm(), eventsContainer);
+    render(this.#sortFormView, this.#eventsContainer);
 
     if (this.#model.points.length > 0) {
-      render(this.#pointsListView, eventsContainer);
+      render(this.#pointsListView, this.#eventsContainer);
       for (let i = 0; i < POINTS_COUNT; i++) {
         this.#renderPoint(this.#model.points[i]);
       }
     } else {
-      render(new NoPointsMessage(), eventsContainer);
+      render(this.#noPointsMessage, this.#eventsContainer);
     }
   };
 
@@ -47,45 +55,26 @@ export default class Presentor {
       this.#model.destinations
     );
 
-    const openPointForm = () => {
-      this.#pointsListView.element.replaceChild(
-        pointFormView.element,
-        pointRowView.element
-      );
-    };
-
-    const closePointForm = () => {
-      this.#pointsListView.element.replaceChild(
-        pointRowView.element,
-        pointFormView.element
-      );
-    };
-
     const onEscKeyDown = (evt) => {
       if (evt.key === 'Escape' || evt.key === 'Esc') {
         evt.preventDefault();
-        closePointForm();
+        this.#pointsListView.closePointForm(pointFormView, pointRowView);
         document.removeEventListener('keydown', onEscKeyDown);
       }
     };
 
-    pointRowView.element
-      .querySelector('.event__rollup-btn')
-      .addEventListener('click', () => {
-        openPointForm();
-        document.addEventListener('keydown', onEscKeyDown);
-      });
+    pointRowView.setEditClickHandler(() => {
+      this.#pointsListView.openPointForm(pointFormView, pointRowView);
+      document.addEventListener('keydown', onEscKeyDown);
+    });
 
-    pointFormView.element
-      .querySelector('.event__rollup-btn')
-      .addEventListener('click', () => {
-        closePointForm();
-        document.removeEventListener('keydown', onEscKeyDown);
-      });
+    pointFormView.setCloseClickHandler(() => {
+      this.#pointsListView.closePointForm(pointFormView, pointRowView);
+      document.removeEventListener('keydown', onEscKeyDown);
+    });
 
-    pointFormView.element.addEventListener('submit', (evt) => {
-      evt.preventDefault();
-      closePointForm();
+    pointFormView.setSaveClickHandler(() => {
+      this.#pointsListView.closePointForm(pointFormView, pointRowView);
       document.removeEventListener('keydown', onEscKeyDown);
     });
 

@@ -5,6 +5,9 @@ export default class PointRow extends AbstractView {
   #point;
   #offers;
   #destinations;
+  _events = {
+    editClick: null,
+  };
 
   constructor(point, offers, destinations) {
     super();
@@ -20,4 +23,15 @@ export default class PointRow extends AbstractView {
       this.#destinations
     );
   }
+
+  setEditClickHandler = (callback) => {
+    this._events.editClick = callback;
+    this.element
+      .querySelector('.event__rollup-btn')
+      .addEventListener('click', this.#editClickHandler);
+  };
+
+  #editClickHandler = () => {
+    this._events.editClick();
+  };
 }
