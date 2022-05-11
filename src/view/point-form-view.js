@@ -5,7 +5,7 @@ export default class PointForm extends AbstractView {
   #point;
   #offers;
   #destinations;
-  _events = {
+  _callback = {
     closeClick: null,
     saveClick: null,
   };
@@ -26,23 +26,23 @@ export default class PointForm extends AbstractView {
   }
 
   setCloseClickHandler = (callback) => {
-    this._events.closeClick = callback;
+    this._callback.closeClick = callback;
     this.element
       .querySelector('.event__rollup-btn')
       .addEventListener('click', this.#closeClickHandler);
   };
 
   setSaveClickHandler = (callback) => {
-    this._events.saveClick = callback;
+    this._callback.saveClick = callback;
     this.element.addEventListener('submit', this.#saveClickHandler);
   };
 
   #closeClickHandler = () => {
-    this._events.closeClick();
+    this._callback.closeClick();
   };
 
   #saveClickHandler = (evt) => {
     evt.preventDefault();
-    this._events.saveClick();
+    this._callback.saveClick();
   };
 }
