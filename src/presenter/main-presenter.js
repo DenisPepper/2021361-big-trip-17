@@ -1,34 +1,38 @@
 import PointForm from '../view/point-form-view';
-import FiltersForm from '../view/filters-view';
-import SortForm from '../view/sorts-view';
 import PointRow from '../view/point-row-view';
-import PointsList from '../view/points-list-view';
-import NoPointsMessage from '../view/no-point-message-view';
 import { POINTS_COUNT } from '../const';
 import { render } from '../framework/render';
 
-export default class Presentor {
+export default class MainPresenter {
   #model;
   #pointsListView;
   #controlsContainer;
   #eventsContainer;
   #filtersFormView;
   #sortFormView;
-  #noPointsMessage;
+  #noPointsMessageView;
 
-  constructor(model) {
-    this.#pointsListView = new PointsList();
+  constructor(args) {
+    const {
+      model,
+      pointsListView,
+      controlsContainer,
+      eventsContainer,
+      filtersFormView,
+      sortFormView,
+      noPointsMessageView,
+    } = args;
     this.#model = model;
+    this.#pointsListView = pointsListView;
+    this.#controlsContainer = controlsContainer;
+    this.#eventsContainer = eventsContainer;
+    this.#filtersFormView = filtersFormView;
+    this.#sortFormView = sortFormView;
+    this.#noPointsMessageView = noPointsMessageView;
     model.getData();
   }
 
   init = () => {
-    this.#controlsContainer = document.querySelector('.trip-controls__filters');
-    this.#eventsContainer = document.querySelector('.trip-events');
-    this.#filtersFormView = new FiltersForm();
-    this.#sortFormView = new SortForm();
-    this.#noPointsMessage = new NoPointsMessage();
-
     render(this.#filtersFormView, this.#controlsContainer);
 
     render(this.#sortFormView, this.#eventsContainer);
@@ -39,7 +43,7 @@ export default class Presentor {
         this.#renderPoint(this.#model.points[i]);
       }
     } else {
-      render(this.#noPointsMessage, this.#eventsContainer);
+      render(this.#noPointsMessageView, this.#eventsContainer);
     }
   };
 
