@@ -1,6 +1,6 @@
+import PointPresenter from './point-presenter';
 import PointForm from '../view/point-form-view';
 import PointRow from '../view/point-row-view';
-import { POINTS_COUNT } from '../const';
 import { render } from '../framework/render';
 
 export default class MainPresenter {
@@ -34,54 +34,36 @@ export default class MainPresenter {
 
   init = () => {
     render(this.#filtersFormView, this.#controlsContainer);
-
     render(this.#sortFormView, this.#eventsContainer);
-
-    if (this.#model.points.length > 0) {
-      render(this.#pointsListView, this.#eventsContainer);
-      for (let i = 0; i < POINTS_COUNT; i++) {
-        this.#renderPoint(this.#model.points[i]);
-      }
-    } else {
+    if (this.#model.points.length === 0) {
       render(this.#noPointsMessageView, this.#eventsContainer);
+    } else {
+      render(this.#pointsListView, this.#eventsContainer);
     }
   };
 
-  #renderPoint = (point) => {
-    const pointRowView = new PointRow(
-      point,
-      this.#model.offers,
-      this.#model.destinations
-    );
-    const pointFormView = new PointForm(
-      point,
-      this.#model.offers,
-      this.#model.destinations
-    );
+  renderPointsList = () => {
+    this.#model.points.forEach((point) => {
+      const pointRowView = new PointRow(
+        point,
+        this.#model.offers,
+        this.#model.destinations
+      );
 
-    const onEscKeyDown = (evt) => {
-      if (evt.key === 'Escape' || evt.key === 'Esc') {
-        evt.preventDefault();
-        this.#pointsListView.closePointForm(pointFormView, pointRowView);
-        document.removeEventListener('keydown', onEscKeyDown);
-      }
-    };
+      const pointFormView = new PointForm(
+        point,
+        this.#model.offers,
+        this.#model.destinations
+      );
 
-    pointRowView.setEditClickHandler(() => {
-      this.#pointsListView.openPointForm(pointFormView, pointRowView);
-      document.addEventListener('keydown', onEscKeyDown);
+      const pointPresenter = new PointPresenter({
+        point,
+        pointRowView,
+        pointFormView,
+        pointsListView: this.#pointsListView,
+      });
+
+      pointPresenter.renderPoint();
     });
-
-    pointFormView.setCloseClickHandler(() => {
-      this.#pointsListView.closePointForm(pointFormView, pointRowView);
-      document.removeEventListener('keydown', onEscKeyDown);
-    });
-
-    pointFormView.setSaveClickHandler(() => {
-      this.#pointsListView.closePointForm(pointFormView, pointRowView);
-      document.removeEventListener('keydown', onEscKeyDown);
-    });
-
-    render(pointRowView, this.#pointsListView.element);
   };
 }
