@@ -1,22 +1,16 @@
-import { createElement } from '../render.js';
+import { createPointListTemplate } from '../templates/point-list-templ';
+import AbstractView from '../framework/view/abstract-view';
 
-export default class PointsList {
-  #element;
-
+export default class PointsList extends AbstractView {
   get template() {
-    return '<ul class="trip-events__list"></ul>';
+    return createPointListTemplate();
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
-  }
+  closePointForm = (pointFormView, pointRowView) => {
+    this.element.replaceChild(pointRowView.element, pointFormView.element);
+  };
 
-  getElement = () => this.element;
-
-  removeElement = () => {
-    this.#element = null;
+  openPointForm = (pointFormView, pointRowView) => {
+    this.element.replaceChild(pointFormView.element, pointRowView.element);
   };
 }

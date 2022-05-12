@@ -1,13 +1,17 @@
 import { createPointFormTempalte } from '../templates/point-form-templ';
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view';
 
-export default class PointForm {
+export default class PointForm extends AbstractView {
   #point;
   #offers;
   #destinations;
-  #element;
+  _callback = {
+    closeClick: null,
+    saveClick: null,
+  };
 
   constructor(point, offers, destinations) {
+    super();
     this.#point = point;
     this.#offers = offers;
     this.#destinations = destinations;
@@ -21,16 +25,24 @@ export default class PointForm {
     );
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-    return this.#element;
-  }
+  setCloseClickHandler = (callback) => {
+    this._callback.closeClick = callback;
+    this.element
+      .querySelector('.event__rollup-btn')
+      .addEventListener('click', this.#closeClickHandler);
+  };
 
-  getElement = () => this.element;
+  setSaveClickHandler = (callback) => {
+    this._callback.saveClick = callback;
+    this.element.addEventListener('submit', this.#saveClickHandler);
+  };
 
-  removeElement = () => {
-    this.#element = null;
+  #closeClickHandler = () => {
+    this._callback.closeClick();
+  };
+
+  #saveClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.saveClick();
   };
 }
