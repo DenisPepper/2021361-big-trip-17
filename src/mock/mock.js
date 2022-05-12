@@ -17,6 +17,8 @@ const OFFERS_DESC = [
   'Travel by train',
 ];
 
+const getFavorite = () => getRandomInteger(0, 1) === 0;
+
 const getPrice = () => getRandomInteger(MIN_PRICE, MAX_PRICE);
 
 export const getDemoOffers = () => {
@@ -50,7 +52,7 @@ export const getDemoPoint = (index = 0) => ({
   dateTo: '2022-05-02T11:22:13.375Z',
   destination: getRandomInteger(0, DEST_NAMES.length - 1),
   id: index,
-  isFavorite: false,
+  isFavorite: getFavorite(),
   offers: [1, 3],
   type: POINT_TYPES[getRandomInteger(0, POINT_TYPES.length - 1)],
 });
