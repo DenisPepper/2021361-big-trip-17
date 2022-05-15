@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { MINUTES_IN_HOUR, MINUTES_IN_DAY } from './const';
+import { MINUTES_IN_HOUR, MINUTES_IN_DAY, DECIMAL } from './const';
 
 export const getRandomInteger = (min, max) => {
   if (!Number.isInteger(min) || !Number.isInteger(max)) {
@@ -35,20 +35,20 @@ export const getTimeInterval = (dateFrom, dateTo) => {
   let days = 0;
   let hours = 0;
   let minutes = 0;
-  let formatString = '';
-  const interval = parseInt(dayjs(dateTo).diff(dayjs(dateFrom), 'minute'), 10);
+  let format = '';
+  const interval = parseInt(dayjs(dateTo).diff(dayjs(dateFrom), 'minute'), DECIMAL);
   if (interval < MINUTES_IN_HOUR) {
     hours = interval;
-    formatString = 'mm[M]';
+    format = 'mm[M]';
   } else if (interval >= MINUTES_IN_HOUR && interval < MINUTES_IN_DAY) {
     hours = Math.floor(interval / MINUTES_IN_HOUR);
     minutes = interval - hours * MINUTES_IN_HOUR;
-    formatString = 'HH[H] mm[M]';
+    format = 'HH[H] mm[M]';
   } else if (interval >= MINUTES_IN_DAY) {
     days = Math.floor(interval / MINUTES_IN_DAY);
     hours = Math.floor((interval - days * MINUTES_IN_DAY) / MINUTES_IN_HOUR);
     minutes = interval - days * MINUTES_IN_DAY - hours * MINUTES_IN_HOUR;
-    formatString = 'DD[D] HH[H] mm[M]';
+    format = 'DD[D] HH[H] mm[M]';
   }
   return dayjs()
     .set('year', 0)
@@ -56,5 +56,5 @@ export const getTimeInterval = (dateFrom, dateTo) => {
     .set('date', days)
     .set('hour', hours)
     .set('minute', minutes)
-    .format(formatString);
+    .format(format);
 };
