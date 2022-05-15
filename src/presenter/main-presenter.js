@@ -42,7 +42,7 @@ export default class MainPresenter {
     }
   };
 
-  refreshPointsList = () => {
+  renderPointsList = () => {
     this.#model.points.forEach((point) => {
       const pointRowView = new PointRow(
         point,

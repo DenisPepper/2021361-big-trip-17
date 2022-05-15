@@ -15,4 +15,4 @@ const mainPresenter = new MainPresenter({
   noPointsMessageView: new NoPointsMessage(),
 });
 mainPresenter.init();
-mainPresenter.refreshPointsList();
+mainPresenter.renderPointsList();
