@@ -4,7 +4,7 @@ import PointRow from '../view/point-row-view';
 import { render } from '../framework/render';
 
 export default class MainPresenter {
-  #model;
+  #model = null;
   #pointsListView;
   #controlsContainer;
   #eventsContainer;
@@ -29,7 +29,6 @@ export default class MainPresenter {
     this.#filtersFormView = filtersFormView;
     this.#sortFormView = sortFormView;
     this.#noPointsMessageView = noPointsMessageView;
-    model.getData();
   }
 
   init = () => {
@@ -43,6 +42,10 @@ export default class MainPresenter {
   };
 
   renderPointsList = () => {
+    if (this.#model === null) {
+      return;
+    }
+
     this.#model.points.forEach((point) => {
       const pointRowView = new PointRow(
         point,

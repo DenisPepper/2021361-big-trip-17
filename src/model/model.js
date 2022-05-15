@@ -15,7 +15,7 @@ export default class Model {
   #destinations = [];
   #loaded = false;
 
-  getData = () => {
+  #getData = () => {
     if (this.#loaded) {
       return;
     }
@@ -27,17 +27,17 @@ export default class Model {
   };
 
   get points() {
-    this.getData();
+    this.#getData();
     return this.#points;
   }
 
   get offers() {
-    this.getData();
+    this.#getData();
     return this.#offers;
   }
 
   get destinations() {
-    this.getData();
+    this.#getData();
     return this.#destinations;
   }
 }
