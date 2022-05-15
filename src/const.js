@@ -1,6 +1,6 @@
 export const POINTS_COUNT = 3;
-export const HOUR = 60;
-export const DAY = 1440;
+export const MINUTES_IN_HOUR = 60;
+export const MINUTES_IN_DAY = 1440;
 export const POINT_TYPES = [
   'taxi',
   'bus',
