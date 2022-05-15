@@ -1,6 +1,4 @@
 import PointPresenter from './point-presenter';
-import PointForm from '../view/point-form-view';
-import PointRow from '../view/point-row-view';
 import { render } from '../framework/render';
 
 export default class MainPresenter {
@@ -31,42 +29,50 @@ export default class MainPresenter {
     this.#noPointsMessageView = noPointsMessageView;
   }
 
+  get points() {
+    if (this.#model === null) {
+      return [];
+    }
+    return this.#model.points;
+  }
+
+  get offers() {
+    if (this.#model === null) {
+      return [];
+    }
+    return this.#model.offers;
+  }
+
+  get destinations() {
+    if (this.#model === null) {
+      return [];
+    }
+    return this.#model.destinations;
+  }
+
   init = () => {
     render(this.#filtersFormView, this.#controlsContainer);
     render(this.#sortFormView, this.#eventsContainer);
-    if (this.#model.points.length === 0) {
-      render(this.#noPointsMessageView, this.#eventsContainer);
-    } else {
-      render(this.#pointsListView, this.#eventsContainer);
-    }
+  };
+
+  addPointToPointList = (point, pointRowView, pointFormView) => {
+    const pointPresenter = new PointPresenter({
+      point,
+      pointRowView,
+      pointFormView,
+      pointsListView: this.#pointsListView,
+    });
+    pointPresenter.renderPoint();
   };
 
   renderPointsList = () => {
     if (this.#model === null) {
       return;
     }
-
-    this.#model.points.forEach((point) => {
-      const pointRowView = new PointRow(
-        point,
-        this.#model.offers,
-        this.#model.destinations
-      );
-
-      const pointFormView = new PointForm(
-        point,
-        this.#model.offers,
-        this.#model.destinations
-      );
-
-      const pointPresenter = new PointPresenter({
-        point,
-        pointRowView,
-        pointFormView,
-        pointsListView: this.#pointsListView,
-      });
-
-      pointPresenter.renderPoint();
-    });
+    if (this.#model.points.length === 0) {
+      render(this.#noPointsMessageView, this.#eventsContainer);
+    } else {
+      render(this.#pointsListView, this.#eventsContainer);
+    }
   };
 }
