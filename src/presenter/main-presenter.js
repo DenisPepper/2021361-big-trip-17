@@ -14,6 +14,7 @@ export default class MainPresenter {
   #filtersFormView = null;
   #sortFormView = null;
   #noPointsMessageView = null;
+  #pointPresenters = new Map();
 
   constructor(args) {
     const {
@@ -100,6 +101,7 @@ export default class MainPresenter {
       pointFormView,
       pointsListView: this.#pointsListView,
     });
+    this.#pointPresenters.set(point.id, pointPresenter);
     pointPresenter.renderPoint();
   };
 
