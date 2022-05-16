@@ -16,18 +16,22 @@ const mainPresenter = new MainPresenter({
   sortFormView: new SortForm(),
   noPointsMessageView: new NoPointsMessage(),
 });
+
+const addAllPointsToList = () => {
+  mainPresenter.points.forEach((point) => {
+    const pointRowView = new PointRow(
+      point,
+      mainPresenter.offers,
+      mainPresenter.destinations
+    );
+    const pointFormView = new PointForm(
+      point,
+      mainPresenter.offers,
+      mainPresenter.destinations
+    );
+    mainPresenter.addPointToPointList(point, pointRowView, pointFormView);
+  });
+};
+
 mainPresenter.init();
-mainPresenter.points.forEach((point) => {
-  const pointRowView = new PointRow(
-    point,
-    mainPresenter.offers,
-    mainPresenter.destinations
-  );
-  const pointFormView = new PointForm(
-    point,
-    mainPresenter.offers,
-    mainPresenter.destinations
-  );
-  mainPresenter.addPointToPointList(point, pointRowView, pointFormView);
-});
-mainPresenter.renderPointsList();
+mainPresenter.renderPointsList(addAllPointsToList);

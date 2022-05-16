@@ -4,9 +4,7 @@ import PointsList from '..//view/points-list-view';
 import FiltersForm from '../view/filters-view';
 import SortForm from '../view/sorts-view';
 import NoPointsMessage from '../view/no-point-message-view';
-import PointForm from '../view/point-form-view';
-import PointRow from '../view/point-row-view';
-import { render } from '../framework/render';
+import { render, remove } from '../framework/render';
 
 export default class MainPresenter {
   #model = null;
@@ -105,13 +103,18 @@ export default class MainPresenter {
     pointPresenter.renderPoint();
   };
 
-  renderPointsList = () => {
+  clearPointsList = () => {
+    remove(this.#pointsListView);
+  };
+
+  renderPointsList = (addAllPointsToList) => {
     if (this.#model === null) {
       return;
     }
     if (this.#model.points.length === 0) {
       render(this.#noPointsMessageView, this.#eventsContainer);
     } else {
+      addAllPointsToList.apply();
       render(this.#pointsListView, this.#eventsContainer);
     }
   };
