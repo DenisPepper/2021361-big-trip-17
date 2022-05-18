@@ -1,11 +1,13 @@
 import { render } from '../framework/render';
 
 export default class PointPresenter {
-  #point;
-  #pointsListView;
-  #pointRowView;
-  #pointFormView;
-  #updatePointRowView;
+  #point = null;
+  #pointsListView = null;
+  #pointRowView = null;
+  #pointFormView = null;
+  #updatePointRowView = null;
+  #closeCurrentEditView = null;
+  #resetCurrentPointPresenter = null;
 
   constructor(args) {
     const { point, pointRowView, pointFormView, pointsListView } = args;
@@ -29,12 +31,13 @@ export default class PointPresenter {
   #setFavoriteClickHandler = () => {
     this.#pointRowView.setFavoriteClickHandler(() => {
       this.#point.isFavorite = !this.#point.isFavorite;
-      this.#updatePointRowView(this.#point);
+      this.#updatePointRowView(this);
     });
   };
 
   #setEditClickHandler = () => {
     this.#pointRowView.setEditClickHandler(() => {
+      this.#closeCurrentEditView(this);
       this.#pointsListView.openPointForm(
         this.#pointFormView,
         this.#pointRowView
@@ -45,6 +48,7 @@ export default class PointPresenter {
 
   #setCloseClickHandler = () => {
     this.#pointFormView.setCloseClickHandler(() => {
+      this.#resetCurrentPointPresenter();
       this.#pointsListView.closePointForm(
         this.#pointFormView,
         this.#pointRowView
@@ -75,8 +79,22 @@ export default class PointPresenter {
     this.#setSaveClickHandler();
   }
 
-  init = (updatePointRowView) => {
+  get pointFormView() {
+    return this.#pointFormView;
+  }
+
+  get point() {
+    return this.#point;
+  }
+
+  init = (
+    updatePointRowView,
+    closeCurrentEditView,
+    resetCurrentPointPresenter
+  ) => {
     this.#updatePointRowView = updatePointRowView;
+    this.#closeCurrentEditView = closeCurrentEditView;
+    this.#resetCurrentPointPresenter = resetCurrentPointPresenter;
     this.#setFavoriteClickHandler();
     this.#setEditClickHandler();
     this.#setCloseClickHandler();

@@ -15,6 +15,7 @@ export default class MainPresenter {
   #filtersFormView = null;
   #sortFormView = null;
   #noPointsMessageView = null;
+  #currentpointPresenter = null;
   #pointPresenters = new Map();
 
   constructor(args) {
@@ -88,10 +89,25 @@ export default class MainPresenter {
     render(this.#sortFormView, this.#eventsContainer);
   };
 
-  updatePointRowView = (point) => {
-    const pointPresenter = this.#pointPresenters.get(point.id);
+  closeCurrentEditView = (pointPresenter) => {
+    if (this.#currentpointPresenter === null) {
+      this.#currentpointPresenter = pointPresenter;
+    } else {
+      replace(
+        this.#currentpointPresenter.pointRowView,
+        this.#currentpointPresenter.pointFormView
+      );
+      this.#currentpointPresenter = pointPresenter;
+    }
+  };
+
+  resetCurrentPointPresenter = () => {
+    this.#currentpointPresenter = null;
+  };
+
+  updatePointRowView = (pointPresenter) => {
     const pointRowView = new PointRow(
-      point,
+      pointPresenter.point,
       this.#model.offers,
       this.#model.destinations
     );
@@ -112,7 +128,7 @@ export default class MainPresenter {
       });
       this.#pointPresenters.set(point.id, pointPresenter);
     }
-    pointPresenter.init(this.updatePointRowView);
+    pointPresenter.init(this.updatePointRowView, this.closeCurrentEditView, this.resetCurrentPointPresenter);
     pointPresenter.renderPoint();
   };
 
