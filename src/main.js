@@ -34,4 +34,4 @@ const mainPresenter = new MainPresenter({
 }; */
 
 mainPresenter.init();
-mainPresenter.renderPointsList();
+//mainPresenter.renderPointsList();

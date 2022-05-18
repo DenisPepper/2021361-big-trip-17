@@ -13,4 +13,8 @@ export const POINT_TYPES = [
   'sightseeing',
   'restaurant',
 ];
-
+export const Filters = {
+  EVERYTHING: 'everything',
+  FUTURE: 'future',
+  PAST: 'past',
+};
