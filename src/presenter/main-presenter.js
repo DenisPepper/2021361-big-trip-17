@@ -4,7 +4,8 @@ import PointsList from '..//view/points-list-view';
 import FiltersForm from '../view/filters-view';
 import SortForm from '../view/sorts-view';
 import NoPointsMessage from '../view/no-point-message-view';
-import { render, remove } from '../framework/render';
+import { render, remove, replace } from '../framework/render';
+import PointRow from '../view/point-row-view';
 
 export default class MainPresenter {
   #model = null;
@@ -59,13 +60,6 @@ export default class MainPresenter {
 
     this.#controlsContainer = controlsContainer;
     this.#eventsContainer = eventsContainer;
-    /*
-    if (controlsContainer instanceof ______) {
-    } else {
-    }
-    if (eventsContainer instanceof ______) {
-    } else {
-    }*/
   }
 
   get points() {
@@ -94,14 +88,31 @@ export default class MainPresenter {
     render(this.#sortFormView, this.#eventsContainer);
   };
 
-  addPointToPointList = (point, pointRowView, pointFormView) => {
-    const pointPresenter = new PointPresenter({
+  updatePointRowView = (point) => {
+    const pointPresenter = this.#pointPresenters.get(point.id);
+    const pointRowView = new PointRow(
       point,
-      pointRowView,
-      pointFormView,
-      pointsListView: this.#pointsListView,
-    });
-    this.#pointPresenters.set(point.id, pointPresenter);
+      this.#model.offers,
+      this.#model.destinations
+    );
+    replace(pointRowView, pointPresenter.pointRowView);
+    pointPresenter.pointRowView = pointRowView;
+  };
+
+  addPointToPointList = (point, pointRowView, pointFormView) => {
+    let pointPresenter;
+    if (this.#pointPresenters.has(point.id)) {
+      pointPresenter = this.#pointPresenters.get(point.id);
+    } else {
+      pointPresenter = new PointPresenter({
+        point,
+        pointRowView,
+        pointFormView,
+        pointsListView: this.#pointsListView,
+      });
+      this.#pointPresenters.set(point.id, pointPresenter);
+    }
+    pointPresenter.init(this.updatePointRowView);
     pointPresenter.renderPoint();
   };
 
@@ -109,14 +120,14 @@ export default class MainPresenter {
     remove(this.#pointsListView);
   };
 
-  renderPointsList = (addAllPointsToList) => {
+  renderPointsList = (callback) => {
     if (this.#model === null) {
       return;
     }
     if (this.#model.points.length === 0) {
       render(this.#noPointsMessageView, this.#eventsContainer);
     } else {
-      addAllPointsToList.apply();
+      callback.apply();
       render(this.#pointsListView, this.#eventsContainer);
     }
   };
