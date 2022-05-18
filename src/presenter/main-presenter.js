@@ -4,8 +4,11 @@ import PointsList from '..//view/points-list-view';
 import FiltersForm from '../view/filters-view';
 import SortForm from '../view/sorts-view';
 import NoPointsMessage from '../view/no-point-message-view';
-import { render, remove, replace } from '../framework/render';
 import PointRow from '../view/point-row-view';
+import PointForm from '../view/point-form-view';
+import { render, remove, replace } from '../framework/render';
+import { Filters } from '../const';
+import Filter from '../filter';
 
 export default class MainPresenter {
   #model = null;
@@ -16,9 +19,8 @@ export default class MainPresenter {
   #sortFormView = null;
   #noPointsMessageView = null;
   #currentpointPresenter = null;
-  #pointPresenters = new Map();
-  #currentFilter = null;
-  #currentSort = null;
+  //#pointPresenters = new Map();
+  #currentFilter = Filters.EVERYTHING;
 
   constructor(args) {
     const {
@@ -88,13 +90,20 @@ export default class MainPresenter {
 
   whenChangeFilters = (value) => {
     this.#currentFilter = value;
+    this.#applayCurrentFilter();
   };
 
   init = () => {
     this.#filtersFormView.setFiltersClickHandler(this.whenChangeFilters);
     render(this.#filtersFormView, this.#controlsContainer);
     render(this.#sortFormView, this.#eventsContainer);
+    this.#applayCurrentFilter();
     this.#renderPointsList();
+  };
+
+  #applayCurrentFilter = () => {
+    const points = Filter.run(this.#currentFilter, this.points);
+    this.#addPointsToPointList(points);
   };
 
   closeCurrentEditView = (pointPresenter) => {
@@ -123,19 +132,25 @@ export default class MainPresenter {
     pointPresenter.pointRowView = pointRowView;
   };
 
-  addPointToPointsList = (point, pointRowView, pointFormView) => {
-    let pointPresenter;
-    if (this.#pointPresenters.has(point.id)) {
-      pointPresenter = this.#pointPresenters.get(point.id);
-    } else {
-      pointPresenter = new PointPresenter({
+  #addPointsToPointList = (points) => {
+    this.#clearPointsList();
+    points.forEach((point) =>
+      this.#addPointToPointsList(
         point,
-        pointRowView,
-        pointFormView,
-        pointsListView: this.#pointsListView,
-      });
-      this.#pointPresenters.set(point.id, pointPresenter);
-    }
+        new PointRow(point, this.offers, this.destinations),
+        new PointForm(point, this.offers, this.destinations)
+      )
+    );
+    this.#renderPointsList();
+  };
+
+  #addPointToPointsList = (point, pointRowView, pointFormView) => {
+    const pointPresenter = new PointPresenter({
+      point,
+      pointRowView,
+      pointFormView,
+      pointsListView: this.#pointsListView,
+    });
     pointPresenter.init(
       this.updatePointRowView,
       this.closeCurrentEditView,
@@ -144,7 +159,7 @@ export default class MainPresenter {
     pointPresenter.renderPoint();
   };
 
-  clearPointsList = () => {
+  #clearPointsList = () => {
     remove(this.#pointsListView);
   };
 
