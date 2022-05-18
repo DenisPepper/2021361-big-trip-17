@@ -6,14 +6,20 @@ export default class PointRow extends AbstractView {
   #offers;
   #destinations;
   _callback = {
-    editClick: null,
+    rollupButtonClick: null,
+    favoriteButtonClick: null,
   };
+
+  rollupButton = null;
+  favoriteButton = null;
 
   constructor(point, offers, destinations) {
     super();
     this.#point = point;
     this.#offers = offers;
     this.#destinations = destinations;
+    this.rollupButton = this.element.querySelector('.event__rollup-btn');
+    this.favoriteButton = this.element.querySelector('.event__favorite-btn');
   }
 
   get template() {
@@ -25,13 +31,21 @@ export default class PointRow extends AbstractView {
   }
 
   setEditClickHandler = (callback) => {
-    this._callback.editClick = callback;
-    this.element
-      .querySelector('.event__rollup-btn')
-      .addEventListener('click', this.#editClickHandler);
+    this._callback.rollupButtonClick = callback;
+    this.rollupButton.addEventListener('click', this.#editClickHandler);
   };
 
   #editClickHandler = () => {
-    this._callback.editClick();
+    this._callback.rollupButtonClick();
   };
+
+  setFavoriteClickHandler = (callback) => {
+    this._callback.favoriteButtonClick = callback;
+    this.favoriteButton.addEventListener('click', this.#favoriteClickHandler);
+  };
+
+  #favoriteClickHandler = () => {
+    this._callback.favoriteButtonClick();
+  };
+
 }
