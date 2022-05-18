@@ -6,6 +6,13 @@ export default class FiltersForm extends AbstractView {
     setFiltersClick: null,
   };
 
+  #filterEverything = this.element.querySelector('#filter-everything');
+
+  constructor() {
+    super();
+    this.#filterEverything.checked = true;
+  }
+
   get template() {
     return createFiltersFormTemplate();
   }

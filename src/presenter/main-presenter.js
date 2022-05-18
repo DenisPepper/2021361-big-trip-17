@@ -91,9 +91,9 @@ export default class MainPresenter {
   };
 
   init = () => {
+    this.#filtersFormView.setFiltersClickHandler(this.whenChangeFilters);
     render(this.#filtersFormView, this.#controlsContainer);
     render(this.#sortFormView, this.#eventsContainer);
-    this.#filtersFormView.setFiltersClickHandler(this.whenChangeFilters);
     this.#renderPointsList();
   };
 
