@@ -98,7 +98,6 @@ export default class MainPresenter {
     render(this.#filtersFormView, this.#controlsContainer);
     render(this.#sortFormView, this.#eventsContainer);
     this.#applayCurrentFilter();
-    this.#renderPointsList();
   };
 
   #applayCurrentFilter = () => {
@@ -133,7 +132,13 @@ export default class MainPresenter {
   };
 
   #addPointsToPointList = (points) => {
-    this.#clearPointsList();
+    remove(this.#pointsListView);
+    if (points.length === 0) {
+      remove(this.#sortFormView);
+      this.#noPointsMessageView.message = this.#currentFilter;
+      render(this.#noPointsMessageView, this.#eventsContainer);
+      return;
+    }
     points.forEach((point) =>
       this.#addPointToPointsList(
         point,
@@ -141,7 +146,9 @@ export default class MainPresenter {
         new PointForm(point, this.offers, this.destinations)
       )
     );
-    this.#renderPointsList();
+    remove(this.#noPointsMessageView);
+    render(this.#sortFormView, this.#eventsContainer);
+    render(this.#pointsListView, this.#eventsContainer);
   };
 
   #addPointToPointsList = (point, pointRowView, pointFormView) => {
@@ -157,21 +164,5 @@ export default class MainPresenter {
       this.resetCurrentPointPresenter
     );
     pointPresenter.renderPoint();
-  };
-
-  #clearPointsList = () => {
-    remove(this.#pointsListView);
-  };
-
-  #hasPoints = () => this.#model.points.length === 0;
-
-  #selectView = () =>
-    this.#hasPoints() ? this.#noPointsMessageView : this.#pointsListView;
-
-  #renderPointsList = () => {
-    if (this.#model === null) {
-      return;
-    }
-    render(this.#selectView(), this.#eventsContainer);
   };
 }
