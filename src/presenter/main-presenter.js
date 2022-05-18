@@ -128,7 +128,11 @@ export default class MainPresenter {
       });
       this.#pointPresenters.set(point.id, pointPresenter);
     }
-    pointPresenter.init(this.updatePointRowView, this.closeCurrentEditView, this.resetCurrentPointPresenter);
+    pointPresenter.init(
+      this.updatePointRowView,
+      this.closeCurrentEditView,
+      this.resetCurrentPointPresenter
+    );
     pointPresenter.renderPoint();
   };
 
@@ -136,15 +140,15 @@ export default class MainPresenter {
     remove(this.#pointsListView);
   };
 
-  renderPointsList = (callback) => {
+  #hasPoints = () => this.#model.points.length === 0;
+
+  #selectView = () =>
+    this.#hasPoints() ? this.#noPointsMessageView : this.#pointsListView;
+
+  renderPointsList = () => {
     if (this.#model === null) {
       return;
     }
-    if (this.#model.points.length === 0) {
-      render(this.#noPointsMessageView, this.#eventsContainer);
-    } else {
-      callback.apply();
-      render(this.#pointsListView, this.#eventsContainer);
-    }
+    render(this.#selectView, this.#eventsContainer);
   };
 }

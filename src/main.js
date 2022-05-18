@@ -17,7 +17,7 @@ const mainPresenter = new MainPresenter({
   noPointsMessageView: new NoPointsMessage(),
 });
 
-const addAllPointsToList = () => {
+/* const addAllPointsToList = () => {
   mainPresenter.points.forEach((point) => {
     const pointRowView = new PointRow(
       point,
@@ -31,7 +31,7 @@ const addAllPointsToList = () => {
     );
     mainPresenter.addPointToPointList(point, pointRowView, pointFormView);
   });
-};
+}; */
 
 mainPresenter.init();
-mainPresenter.renderPointsList(addAllPointsToList);
+mainPresenter.renderPointsList();
