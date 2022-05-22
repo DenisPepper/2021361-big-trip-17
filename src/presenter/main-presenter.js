@@ -109,6 +109,7 @@ export default class MainPresenter {
     if (this.#currentpointPresenter === null) {
       this.#currentpointPresenter = pointPresenter;
     } else {
+      this.#currentpointPresenter.removeOnEscClickHandler();
       replace(
         this.#currentpointPresenter.pointRowView,
         this.#currentpointPresenter.pointFormView
