@@ -90,14 +90,14 @@ export default class MainPresenter {
 
   whenChangeFilters = (value) => {
     this.#currentFilter = value;
-    this.#addPointsToPointList(filtrate(this.#currentFilter, this.points));
+    this.#renderPointList(filtrate(this.#currentFilter, this.points));
   };
 
   init = () => {
     this.#filtersFormView.setFiltersClickHandler(this.whenChangeFilters);
     render(this.#filtersFormView, this.#controlsContainer);
     render(this.#sortFormView, this.#eventsContainer);
-    this.#addPointsToPointList(filtrate(this.#currentFilter, this.points));
+    this.#renderPointList(filtrate(this.#currentFilter, this.points));
   };
 
   closeCurrentEditView = (pointPresenter) => {
@@ -127,7 +127,7 @@ export default class MainPresenter {
     pointPresenter.pointRowView = pointRowView;
   };
 
-  #addPointsToPointList = (points) => {
+  #renderPointList = (points) => {
     remove(this.#pointsListView);
     if (points.length === 0) {
       remove(this.#sortFormView);
