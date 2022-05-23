@@ -1,6 +1,6 @@
 import AbstractView from '../framework/view/abstract-view';
 import { createNoPointMessageTemplate } from '../templates/no-point-message-templ';
-import { Filters } from '../const';
+import { Filters } from '../settings';
 
 export default class NoPointsMessage extends AbstractView {
   #message = null;

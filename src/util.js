@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { MINUTES_IN_HOUR, MINUTES_IN_DAY, DECIMAL } from './const';
+import { MINUTES_IN_HOUR, MINUTES_IN_DAY, DECIMAL } from './settings';
 
 export const getRandomInteger = (min, max) => {
   if (!Number.isInteger(min) || !Number.isInteger(max)) {

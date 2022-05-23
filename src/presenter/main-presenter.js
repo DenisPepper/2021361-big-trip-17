@@ -7,8 +7,8 @@ import NoPointsMessage from '../view/no-point-message-view';
 import PointRow from '../view/point-row-view';
 import PointForm from '../view/point-form-view';
 import { render, remove, replace } from '../framework/render';
-import { Filters } from '../const';
-import { getFilteredPoints } from '../filter';
+import { Filters } from '../settings';
+import { filtrate } from '../filter';
 
 export default class MainPresenter {
   #model = null;
@@ -90,19 +90,14 @@ export default class MainPresenter {
 
   whenChangeFilters = (value) => {
     this.#currentFilter = value;
-    this.#applayCurrentFilter();
+    this.#addPointsToPointList(filtrate(this.#currentFilter, this.points));
   };
 
   init = () => {
     this.#filtersFormView.setFiltersClickHandler(this.whenChangeFilters);
     render(this.#filtersFormView, this.#controlsContainer);
     render(this.#sortFormView, this.#eventsContainer);
-    this.#applayCurrentFilter();
-  };
-
-  #applayCurrentFilter = () => {
-    const points = getFilteredPoints(this.#currentFilter, this.points);
-    this.#addPointsToPointList(points);
+    this.#addPointsToPointList(filtrate(this.#currentFilter, this.points));
   };
 
   closeCurrentEditView = (pointPresenter) => {

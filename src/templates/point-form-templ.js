@@ -1,4 +1,4 @@
-import { POINT_TYPES } from '../const';
+import { POINT_TYPES } from '../settings';
 import { firstCharToUpperCase, formatDateTimePointForm } from '../util';
 
 const getEventTypeList = (pointType = '') => {

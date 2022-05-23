@@ -1,5 +1,5 @@
 import { getRandomInteger } from '../util';
-import { POINT_TYPES } from '../const';
+import { POINT_TYPES } from '../settings';
 
 const PHOTO_COUNT = 1000;
 const PICTURE_COUNT = 3;
