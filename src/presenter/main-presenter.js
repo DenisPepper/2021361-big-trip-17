@@ -8,7 +8,7 @@ import PointRow from '../view/point-row-view';
 import PointForm from '../view/point-form-view';
 import { render, remove, replace } from '../framework/render';
 import { Filters } from '../const';
-import Filter from '../filter';
+import { getFilteredPoints } from '../filter';
 
 export default class MainPresenter {
   #model = null;
@@ -101,7 +101,7 @@ export default class MainPresenter {
   };
 
   #applayCurrentFilter = () => {
-    const points = Filter.run(this.#currentFilter, this.points);
+    const points = getFilteredPoints(this.#currentFilter, this.points);
     this.#addPointsToPointList(points);
   };
 

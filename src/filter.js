@@ -1,29 +1,18 @@
 import { Filters } from './const';
 import dayjs from 'dayjs';
 
-export default class Filter {
-  static run = (filter, points) => {
-    let result = [];
-    const currentDate = dayjs();
-    switch (filter) {
-      case Filters.EVERYTHING:
-        result = points;
-        break;
-      case Filters.FUTURE:
-        result = points.filter(
-          (point) =>
-            currentDate.isBefore(dayjs(point.dateFrom)) ||
-            currentDate.isBefore(dayjs(point.dateTo))
-        );
-        break;
-      case Filters.PAST:
-        result = points.filter(
-          (point) =>
-            currentDate.isAfter(dayjs(point.dateTo)) ||
-            currentDate.isAfter(dayjs(point.dateFrom))
-        );
-        break;
-    }
-    return result;
-  };
-}
+const nullPredicate = () => true;
+
+const settings = {
+  [Filters.FUTURE]: (currentDate) => (point) => currentDate.isBefore(dayjs(point.dateFrom)) || currentDate.isBefore(dayjs(point.dateTo)),
+  [Filters.PAST]: (currentDate) => (point) => currentDate.isAfter(dayjs(point.dateTo)) || currentDate.isAfter(dayjs(point.dateFrom)),
+};
+
+const getFilterRule = (filter, currentDate) => {
+  const filterRule = settings[filter];
+  return filterRule === undefined ? nullPredicate : filterRule(currentDate);
+};
+
+
+export const getFilteredPoints = (filter, points, currentDate = dayjs()) =>
+  points.filter(getFilterRule(filter, currentDate));
