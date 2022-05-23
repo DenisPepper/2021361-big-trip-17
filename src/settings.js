@@ -24,3 +24,8 @@ export const filterSettings = {
   [Filters.FUTURE]: (currentDate) => (point) => currentDate.isBefore(dayjs(point.dateFrom)) || currentDate.isBefore(dayjs(point.dateTo)),
   [Filters.PAST]: (currentDate) => (point) => currentDate.isAfter(dayjs(point.dateTo)) || currentDate.isAfter(dayjs(point.dateFrom)),
 };
+export const noPointsMessages = {
+  [Filters.EVERYTHING] : 'Click New Event to create your first point',
+  [Filters.FUTURE] : 'There are no future events now',
+  [Filters.PAST] : 'There are no past events now',
+};
