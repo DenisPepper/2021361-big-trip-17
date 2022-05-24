@@ -19,7 +19,7 @@ export default class FiltersForm extends AbstractView {
 
   setFiltersClickHandler = (callback) => {
     this._callback.setFiltersClick = callback;
-    this.element.addEventListener('change', this.#FiltersClickHandler);
+    this.element.addEventListener('input', this.#FiltersClickHandler);
   };
 
   #FiltersClickHandler = (evt) => {

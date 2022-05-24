@@ -28,6 +28,9 @@ export default class PointPresenter {
     }
   };
 
+  removeOnEscClickHandler = () =>
+    document.removeEventListener('keydown', this.#onEscKeyDown);
+
   #setFavoriteClickHandler = () => {
     this.#pointRowView.setFavoriteClickHandler(() => {
       this.#point.isFavorite = !this.#point.isFavorite;

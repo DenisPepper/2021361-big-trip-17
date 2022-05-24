@@ -1,5 +1,5 @@
 import { getDemoPoint, getDemoOffers, getDemoDestinations } from '../mock/mock';
-import { POINTS_COUNT } from '../const';
+import { POINTS_COUNT } from '../settings';
 
 const getMock = () => ({
   points: Array.from({ length: POINTS_COUNT }, (element, index) =>
