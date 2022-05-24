@@ -1,10 +1,10 @@
-import { filterSettings } from './settings';
+import { FilterSettings } from './settings';
 import dayjs from 'dayjs';
 
 const nullPredicate = () => true;
 
 const getRule = (filter, currentDate) => {
-  const filterRule = filterSettings[filter];
+  const filterRule = FilterSettings[filter];
   return filterRule === undefined ? nullPredicate : filterRule(currentDate);
 };
 

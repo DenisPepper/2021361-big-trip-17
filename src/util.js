@@ -31,12 +31,14 @@ export const formaTime = (date) => dayjs(date).format('HH:mm');
 
 export const getDayOf = (date) => dayjs(date).format('MMM D');
 
+export const getDateDiffInMinute = (dateFrom, dateTo) => parseInt(dayjs(dateTo).diff(dayjs(dateFrom), 'minute'), DECIMAL);
+
 export const getTimeInterval = (dateFrom, dateTo) => {
   let days = 0;
   let hours = 0;
   let minutes = 0;
   let format = '';
-  const interval = parseInt(dayjs(dateTo).diff(dayjs(dateFrom), 'minute'), DECIMAL);
+  const interval = getDateDiffInMinute(dateFrom, dateTo);
   if (interval < MINUTES_IN_HOUR) {
     hours = interval;
     format = 'mm[M]';

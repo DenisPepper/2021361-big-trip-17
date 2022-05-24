@@ -9,6 +9,8 @@ import PointForm from '../view/point-form-view';
 import { render, remove, replace } from '../framework/render';
 import { Filters } from '../settings';
 import { filtrate } from '../filter';
+import { Sorts } from '../settings';
+import { sorting } from '../sort';
 
 export default class MainPresenter {
   #model = null;
@@ -21,6 +23,7 @@ export default class MainPresenter {
   #currentpointPresenter = null;
   //#pointPresenters = new Map();
   #currentFilter = Filters.EVERYTHING;
+  #currentSort = Sorts.DAY;
 
   constructor(args) {
     const {
@@ -88,16 +91,24 @@ export default class MainPresenter {
     return this.#model.destinations;
   }
 
-  whenChangeFilters = (value) => {
+  #whenChangeFilters = (value) => {
     this.#currentFilter = value;
-    this.#renderPointList(filtrate(this.#currentFilter, this.points));
+    this.#currentSort = Sorts.DAY;
+    this.#sortFormView.init(this.#whenChangeSorts);
+    this.#renderPointsList();
+  };
+
+  #whenChangeSorts = (value) => {
+    this.#currentSort = value;
+    this.#renderPointsList();
   };
 
   init = () => {
-    this.#filtersFormView.setFiltersClickHandler(this.whenChangeFilters);
+    this.#filtersFormView.setFiltersClickHandler(this.#whenChangeFilters);
+    this.#sortFormView.init(this.#whenChangeSorts);
     render(this.#filtersFormView, this.#controlsContainer);
     render(this.#sortFormView, this.#eventsContainer);
-    this.#renderPointList(filtrate(this.#currentFilter, this.points));
+    this.#renderPointsList();
   };
 
   closeCurrentEditView = (pointPresenter) => {
@@ -127,7 +138,12 @@ export default class MainPresenter {
     pointPresenter.pointRowView = pointRowView;
   };
 
-  #renderPointList = (points) => {
+  #filter = (filter, points) => filtrate(filter, points);
+
+  #sort = (sort, points) => sorting(sort, points);
+
+  #renderPointsList = () => {
+    let points = this.#filter(this.#currentFilter, this.points);
     remove(this.#pointsListView);
     if (points.length === 0) {
       remove(this.#sortFormView);
@@ -135,6 +151,7 @@ export default class MainPresenter {
       render(this.#noPointsMessageView, this.#eventsContainer);
       return;
     }
+    points = this.#sort(this.#currentSort, points);
     points.forEach((point) =>
       this.#addPointToPointsList(
         point,
@@ -143,6 +160,9 @@ export default class MainPresenter {
       )
     );
     remove(this.#noPointsMessageView);
+    if (!this.#eventsContainer.contains(this.#sortFormView.element)) {
+      this.#sortFormView.init(this.#whenChangeSorts);
+    }
     render(this.#sortFormView, this.#eventsContainer);
     render(this.#pointsListView, this.#eventsContainer);
   };
