@@ -23,8 +23,8 @@ export default class MainPresenter {
   #noPointsMessageView = null;
   #currentpointPresenter = null;
   //#pointPresenters = new Map();
-  #currentFilter = Filters.EVERYTHING;
-  #currentSort = Sorts.DAY;
+  #currentFilter = null;
+  #currentSort = null;
 
   constructor(args) {
     const {
@@ -105,6 +105,8 @@ export default class MainPresenter {
   };
 
   init = () => {
+    this.#currentFilter = Filters.EVERYTHING;
+    this.#currentSort = Sorts.DAY;
     this.#filtersFormView.setFiltersClickHandler(this.#whenChangeFilters);
     this.#sortFormView.init(this.#whenChangeSorts);
     render(this.#filtersFormView, this.#controlsContainer);
@@ -112,7 +114,7 @@ export default class MainPresenter {
     this.#renderPointsList();
   };
 
-  closeCurrentEditView = (pointPresenter) => {
+  #closeCurrentEditView = (pointPresenter) => {
     if (this.#currentpointPresenter === null) {
       this.#currentpointPresenter = pointPresenter;
     } else {
@@ -125,11 +127,11 @@ export default class MainPresenter {
     }
   };
 
-  resetCurrentPointPresenter = () => {
+  #resetCurrentPointPresenter = () => {
     this.#currentpointPresenter = null;
   };
 
-  updatePointRowView = (pointPresenter) => {
+  #updatePointRowView = (pointPresenter) => {
     const pointRowView = new PointRow(
       pointPresenter.point,
       this.#model.offers,
@@ -197,9 +199,9 @@ export default class MainPresenter {
       pointsListView: this.#pointsListView,
     });
     pointPresenter.init(
-      this.updatePointRowView,
-      this.closeCurrentEditView,
-      this.resetCurrentPointPresenter
+      this.#updatePointRowView,
+      this.#closeCurrentEditView,
+      this.#resetCurrentPointPresenter
     );
     pointPresenter.renderPoint();
   };
