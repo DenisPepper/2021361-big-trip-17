@@ -8,9 +8,10 @@ import PointRow from '../view/point-row-view';
 import PointForm from '../view/point-form-view';
 import { render, remove, replace } from '../framework/render';
 import { Filters } from '../settings';
-import { filtrate } from '../filter';
+import { FilterSettings } from '../settings';
 import { Sorts } from '../settings';
 import { SortSettings } from '../settings';
+import dayjs from 'dayjs';
 
 export default class MainPresenter {
   #model = null;
@@ -138,7 +139,12 @@ export default class MainPresenter {
     pointPresenter.pointRowView = pointRowView;
   };
 
-  #filter = (filter, points) => filtrate(filter, points);
+  #getFilterSettings = () => {
+    const nullPredicate = () => true;
+    const currentDate = dayjs();
+    const filterRule = FilterSettings[this.#currentFilter];
+    return filterRule === undefined ? nullPredicate : filterRule(currentDate);
+  };
 
   #getSortSettings = () => {
     const defaultCompare = () => 0;
@@ -152,7 +158,7 @@ export default class MainPresenter {
   };
 
   #renderPointsList = () => {
-    const points = this.#filter(this.#currentFilter, this.points);
+    const points = this.points.filter(this.#getFilterSettings());
 
     remove(this.#pointsListView);
 
@@ -161,9 +167,7 @@ export default class MainPresenter {
       return;
     }
 
-    points
-      .sort(this.#getSortSettings())
-      .forEach(this.#renderPoint);
+    points.sort(this.#getSortSettings()).forEach(this.#renderPoint);
 
     if (this.#eventsContainer.contains(this.#noPointsMessageView.element)) {
       remove(this.#noPointsMessageView);
