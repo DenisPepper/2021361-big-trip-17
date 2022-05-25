@@ -1,13 +1,11 @@
 import { createPointRowTemplate } from '../templates/point-row-templ';
-import AbstractStatefulView from '../framework/view/abstract-view';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 
 export default class PointRow extends AbstractStatefulView {
-  #point;
   #offers;
   #destinations;
   _callback = {
-    rollupButtonClick: null,
-    favoriteButtonClick: null,
+    rollupButtonClick: () => {},
   };
 
   rollupButton = null;
@@ -15,7 +13,7 @@ export default class PointRow extends AbstractStatefulView {
 
   constructor(point, offers, destinations) {
     super();
-    this.#point = point;
+    this.state = point;
     this.#offers = offers;
     this.#destinations = destinations;
     this.init();
@@ -24,31 +22,42 @@ export default class PointRow extends AbstractStatefulView {
   init = () => {
     this.rollupButton = this.element.querySelector('.event__rollup-btn');
     this.favoriteButton = this.element.querySelector('.event__favorite-btn');
+    this.rollupButton.addEventListener('click', this.#editClickHandler);
+    this.favoriteButton.addEventListener('click', this.#favoriteClickHandler);
   };
+
+  get state() {
+    const point = { ...this._state };
+    return point;
+  }
+
+  set state(point) {
+    this._state = { ...point };
+  }
 
   get template() {
     return createPointRowTemplate(
-      this.#point,
+      this._state,
       this.#offers,
       this.#destinations
     );
   }
 
-  setEditClickHandler = (callback) => {
+  _restoreHandlers = () => {
+    this.init();
+  };
+
+  setEditClickCallback = (callback) => {
     this._callback.rollupButtonClick = callback;
-    this.rollupButton.addEventListener('click', this.#editClickHandler);
   };
 
   #editClickHandler = () => {
     this._callback.rollupButtonClick();
   };
 
-  setFavoriteClickHandler = (callback) => {
-    this._callback.favoriteButtonClick = callback;
-    this.favoriteButton.addEventListener('click', this.#favoriteClickHandler);
-  };
-
   #favoriteClickHandler = () => {
-    this._callback.favoriteButtonClick();
+    this.updateElement({
+      isFavorite: !this._state.isFavorite,
+    });
   };
 }

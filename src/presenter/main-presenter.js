@@ -122,16 +122,6 @@ export default class MainPresenter {
     this.#currentpointPresenter = null;
   };
 
-  #updatePointRowView = (pointPresenter) => {
-    const pointRowView = new PointRow(
-      pointPresenter.point,
-      this.#model.offers,
-      this.#model.destinations
-    );
-    replace(pointRowView, pointPresenter.pointRowView);
-    pointPresenter.pointRowView = pointRowView;
-  };
-
   #getFilterSettings = () => {
     const nullPredicate = () => true;
     const currentDate = dayjs();
@@ -190,7 +180,6 @@ export default class MainPresenter {
       pointsListView: this.#pointsListView,
     });
     pointPresenter.init(
-      this.#updatePointRowView,
       this.#closeCurrentEditView,
       this.#resetCurrentPointPresenter
     );
