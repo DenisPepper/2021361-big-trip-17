@@ -5,6 +5,7 @@ export const POINTS_COUNT = 3;
 export const DECIMAL = 10;
 export const MINUTES_IN_HOUR = 60;
 export const MINUTES_IN_DAY = 1440;
+export const TIMEOUT_DELAY = 500;
 export const POINT_TYPES = [
   'taxi',
   'bus',
@@ -40,4 +41,5 @@ export const SortSettings = {
   [Sorts.TIME] : (a, b) => getDateDiffInMinute(b.dateFrom, b.dateTo) - getDateDiffInMinute(a.dateFrom, a.dateTo),
   [Sorts.DAY] : (a, b) => dayjs(b.dateFrom) - (dayjs(a.dateFrom)),
 };
+
 

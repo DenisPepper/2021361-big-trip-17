@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { MINUTES_IN_HOUR, MINUTES_IN_DAY, DECIMAL } from './settings';
+import { MINUTES_IN_HOUR, MINUTES_IN_DAY, DECIMAL, TIMEOUT_DELAY } from './settings';
 
 export const getRandomInteger = (min, max) => {
   if (!Number.isInteger(min) || !Number.isInteger(max)) {
@@ -59,4 +59,12 @@ export const getTimeInterval = (dateFrom, dateTo) => {
     .set('hour', hours)
     .set('minute', minutes)
     .format(format);
+};
+
+export const debounce = (callback) => {
+  let timeoutId;
+  return (...rest) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => callback.apply(null, rest), TIMEOUT_DELAY);
+  };
 };

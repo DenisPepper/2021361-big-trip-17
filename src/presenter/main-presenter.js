@@ -8,9 +8,10 @@ import PointRow from '../view/point-row-view';
 import PointForm from '../view/point-form-view';
 import { render, remove, replace } from '../framework/render';
 import { Filters } from '../settings';
-import { filtrate } from '../filter';
+import { FilterSettings } from '../settings';
 import { Sorts } from '../settings';
-import { sorting } from '../sort';
+import { SortSettings } from '../settings';
+import dayjs from 'dayjs';
 
 export default class MainPresenter {
   #model = null;
@@ -22,8 +23,8 @@ export default class MainPresenter {
   #noPointsMessageView = null;
   #currentpointPresenter = null;
   //#pointPresenters = new Map();
-  #currentFilter = Filters.EVERYTHING;
-  #currentSort = Sorts.DAY;
+  #currentFilter = null;
+  #currentSort = null;
 
   constructor(args) {
     const {
@@ -71,24 +72,15 @@ export default class MainPresenter {
   }
 
   get points() {
-    if (this.#model === null) {
-      return [];
-    }
-    return this.#model.points;
+    return this.#model === null ? [] : this.#model.points;
   }
 
   get offers() {
-    if (this.#model === null) {
-      return [];
-    }
-    return this.#model.offers;
+    return this.#model === null ? [] : this.#model.offers;
   }
 
   get destinations() {
-    if (this.#model === null) {
-      return [];
-    }
-    return this.#model.destinations;
+    return this.#model === null ? [] : this.#model.destinations;
   }
 
   #whenChangeFilters = (value) => {
@@ -104,6 +96,8 @@ export default class MainPresenter {
   };
 
   init = () => {
+    this.#currentFilter = Filters.EVERYTHING;
+    this.#currentSort = Sorts.DAY;
     this.#filtersFormView.setFiltersClickHandler(this.#whenChangeFilters);
     this.#sortFormView.init(this.#whenChangeSorts);
     render(this.#filtersFormView, this.#controlsContainer);
@@ -111,7 +105,7 @@ export default class MainPresenter {
     this.#renderPointsList();
   };
 
-  closeCurrentEditView = (pointPresenter) => {
+  #closeCurrentEditView = (pointPresenter) => {
     if (this.#currentpointPresenter === null) {
       this.#currentpointPresenter = pointPresenter;
     } else {
@@ -124,47 +118,58 @@ export default class MainPresenter {
     }
   };
 
-  resetCurrentPointPresenter = () => {
+  #resetCurrentPointPresenter = () => {
     this.#currentpointPresenter = null;
   };
 
-  updatePointRowView = (pointPresenter) => {
-    const pointRowView = new PointRow(
-      pointPresenter.point,
-      this.#model.offers,
-      this.#model.destinations
-    );
-    replace(pointRowView, pointPresenter.pointRowView);
-    pointPresenter.pointRowView = pointRowView;
+  #getFilterSettings = () => {
+    const nullPredicate = () => true;
+    const currentDate = dayjs();
+    const filterRule = FilterSettings[this.#currentFilter];
+    return filterRule === undefined ? nullPredicate : filterRule(currentDate);
   };
 
-  #filter = (filter, points) => filtrate(filter, points);
+  #getSortSettings = () => {
+    const defaultCompare = () => 0;
+    return SortSettings[this.#currentSort] || defaultCompare;
+  };
 
-  #sort = (sort, points) => sorting(sort, points);
+  #showNoPointsMessage = () => {
+    remove(this.#sortFormView);
+    this.#noPointsMessageView.message = this.#currentFilter;
+    render(this.#noPointsMessageView, this.#eventsContainer);
+  };
 
   #renderPointsList = () => {
-    let points = this.#filter(this.#currentFilter, this.points);
+    const points = this.points.filter(this.#getFilterSettings());
+
     remove(this.#pointsListView);
+
     if (points.length === 0) {
-      remove(this.#sortFormView);
-      this.#noPointsMessageView.message = this.#currentFilter;
-      render(this.#noPointsMessageView, this.#eventsContainer);
+      this.#showNoPointsMessage();
       return;
     }
-    points = this.#sort(this.#currentSort, points);
-    points.forEach((point) =>
-      this.#addPointToPointsList(
-        point,
-        new PointRow(point, this.offers, this.destinations),
-        new PointForm(point, this.offers, this.destinations)
-      )
-    );
-    remove(this.#noPointsMessageView);
+
+    points.sort(this.#getSortSettings()).forEach(this.#renderPoint);
+
+    if (this.#eventsContainer.contains(this.#noPointsMessageView.element)) {
+      remove(this.#noPointsMessageView);
+    }
+
     if (!this.#eventsContainer.contains(this.#sortFormView.element)) {
       this.#sortFormView.init(this.#whenChangeSorts);
     }
+
     render(this.#sortFormView, this.#eventsContainer);
     render(this.#pointsListView, this.#eventsContainer);
+  };
+
+  #renderPoint = (point) => {
+    this.#addPointToPointsList(
+      point,
+      new PointRow(point, this.offers, this.destinations),
+      new PointForm(point, this.offers, this.destinations)
+    );
   };
 
   #addPointToPointsList = (point, pointRowView, pointFormView) => {
@@ -175,9 +180,8 @@ export default class MainPresenter {
       pointsListView: this.#pointsListView,
     });
     pointPresenter.init(
-      this.updatePointRowView,
-      this.closeCurrentEditView,
-      this.resetCurrentPointPresenter
+      this.#closeCurrentEditView,
+      this.#resetCurrentPointPresenter
     );
     pointPresenter.renderPoint();
   };
