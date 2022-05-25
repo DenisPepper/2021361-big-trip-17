@@ -1,8 +1,9 @@
 import { createPointFormTempalte } from '../templates/point-form-templ';
+import { debounce } from '../util';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 
 export default class PointForm extends AbstractStatefulView {
-  #point;
+  _state;
   #offers;
   #destinations;
   _callback = {
@@ -12,6 +13,7 @@ export default class PointForm extends AbstractStatefulView {
 
   rollupButton = null;
   eventTypeGroup = null;
+  eventDestination = null;
 
   constructor(point, offers, destinations) {
     super();
@@ -27,8 +29,14 @@ export default class PointForm extends AbstractStatefulView {
     this.element.addEventListener('submit', this.#saveClickHandler);
     this.eventTypeGroup = this.element.querySelector('.event__type-list');
     this.eventTypeGroup.addEventListener('input', this.#whenChangePointType);
+    this.eventDestination = this.element.querySelector(
+      '.event__field-group--destination'
+    );
+    this.eventDestination.addEventListener(
+      'input',
+      this.#whenChangeDestination
+    );
   };
-  //event__field-group--destination
 
   get state() {
     const point = { ...this._state };
@@ -69,6 +77,15 @@ export default class PointForm extends AbstractStatefulView {
   };
 
   #whenChangePointType = (evt) => {
-    this.updateElement({ type: evt.target.value });
+    this.updateElement({ type: evt.target.value, offers: []});
   };
+
+  #whenChangeDestination = debounce((evt) => {
+    const destIndex = this.#destinations.findIndex(
+      (element) => element.name === evt.target.value
+    );
+    if (destIndex !== -1) {
+      this.updateElement({ destination: destIndex });
+    }
+  });
 }

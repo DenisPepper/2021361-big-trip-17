@@ -2,6 +2,7 @@ import { createPointRowTemplate } from '../templates/point-row-templ';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 
 export default class PointRow extends AbstractStatefulView {
+  _state;
   #offers;
   #destinations;
   _callback = {
