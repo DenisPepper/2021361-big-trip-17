@@ -22,14 +22,26 @@ export default class PointPresenter {
     this.#callback.closeCurrentPointForm = closeCurrentEditView;
     this.#callback.resetThisInMainPresenter = resetCurrentPointPresenter;
     this.#pointRowView.setEditClickCallback(this.#editClickCallback);
-    this.#setCloseClickHandler();
-    this.#setSaveClickHandler();
+    this.#pointFormView.setCloseClickCallback(this.#closeClickCallback);
+    this.#pointFormView.setSaveClickCallback(this.#saveClickCallback);
   };
 
   #editClickCallback = () => {
     this.#callback.closeCurrentPointForm(this);
     this.#openPointForm();
     document.addEventListener('keydown', this.#onEscKeyDown);
+  };
+
+  #closeClickCallback = () => {
+    this.#callback.resetThisInMainPresenter();
+    this.#closePointForm();
+    this.removeOnEscClickHandler();
+  };
+
+  #saveClickCallback = () => {
+    this.#callback.resetThisInMainPresenter();
+    this.#closePointForm();
+    this.removeOnEscClickHandler();
   };
 
   #openPointForm = () => replace(this.#pointFormView, this.#pointRowView);
@@ -47,22 +59,6 @@ export default class PointPresenter {
 
   removeOnEscClickHandler = () =>
     document.removeEventListener('keydown', this.#onEscKeyDown);
-
-  #setCloseClickHandler = () => {
-    this.#pointFormView.setCloseClickHandler(() => {
-      this.#callback.resetThisInMainPresenter();
-      this.#closePointForm();
-      this.removeOnEscClickHandler();
-    });
-  };
-
-  #setSaveClickHandler = () => {
-    this.#pointFormView.setSaveClickHandler(() => {
-      this.#callback.resetThisInMainPresenter();
-      this.#closePointForm();
-      this.removeOnEscClickHandler();
-    });
-  };
 
   get pointRowView() {
     return this.#pointRowView;

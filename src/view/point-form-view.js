@@ -1,40 +1,58 @@
 import { createPointFormTempalte } from '../templates/point-form-templ';
-import AbstractView from '../framework/view/abstract-view';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 
-export default class PointForm extends AbstractView {
+export default class PointForm extends AbstractStatefulView {
   #point;
   #offers;
   #destinations;
   _callback = {
-    closeClick: null,
-    saveClick: null,
+    closeClick: () => {},
+    saveClick: () => {},
   };
+
+  rollupButton = null;
 
   constructor(point, offers, destinations) {
     super();
-    this.#point = point;
+    this.state = point;
     this.#offers = offers;
     this.#destinations = destinations;
+    this.init();
+  }
+
+  init = () => {
+    this.rollupButton = this.element.querySelector('.event__rollup-btn');
+    this.rollupButton.addEventListener('click', this.#closeClickHandler);
+    this.element.addEventListener('submit', this.#saveClickHandler);
+  };
+
+  get state() {
+    const point = { ...this._state };
+    return point;
+  }
+
+  set state(point) {
+    this._state = { ...point };
   }
 
   get template() {
     return createPointFormTempalte(
-      this.#point,
+      this._state,
       this.#offers,
       this.#destinations
     );
   }
 
-  setCloseClickHandler = (callback) => {
-    this._callback.closeClick = callback;
-    this.element
-      .querySelector('.event__rollup-btn')
-      .addEventListener('click', this.#closeClickHandler);
+  _restoreHandlers = () => {
+    this.init();
   };
 
-  setSaveClickHandler = (callback) => {
+  setCloseClickCallback = (callback) => {
+    this._callback.closeClick = callback;
+  };
+
+  setSaveClickCallback = (callback) => {
     this._callback.saveClick = callback;
-    this.element.addEventListener('submit', this.#saveClickHandler);
   };
 
   #closeClickHandler = () => {
