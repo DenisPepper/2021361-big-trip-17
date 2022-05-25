@@ -1,7 +1,7 @@
 import { createPointRowTemplate } from '../templates/point-row-templ';
-import AbstractView from '../framework/view/abstract-view';
+import AbstractStatefulView from '../framework/view/abstract-view';
 
-export default class PointRow extends AbstractView {
+export default class PointRow extends AbstractStatefulView {
   #point;
   #offers;
   #destinations;
@@ -18,9 +18,13 @@ export default class PointRow extends AbstractView {
     this.#point = point;
     this.#offers = offers;
     this.#destinations = destinations;
+    this.init();
+  }
+
+  init = () => {
     this.rollupButton = this.element.querySelector('.event__rollup-btn');
     this.favoriteButton = this.element.querySelector('.event__favorite-btn');
-  }
+  };
 
   get template() {
     return createPointRowTemplate(
@@ -47,5 +51,4 @@ export default class PointRow extends AbstractView {
   #favoriteClickHandler = () => {
     this._callback.favoriteButtonClick();
   };
-
 }
