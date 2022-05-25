@@ -6,31 +6,23 @@ const PICTURE_COUNT = 3;
 const PHOTO_URI = 'http://picsum.photos/248/152?r=';
 const MIN_PRICE = 10;
 const MAX_PRICE = 100;
-const POINT_TYPE = POINT_TYPES[getRandomInteger(0, POINT_TYPES.length - 1)];
 const DEST_DESC = 'This is a city in big country.';
 const DEST_NAMES = ['Amsterdam', 'Geneva', 'Chamonix'];
-const OFFERS_DESC = [
-  'Add luggage',
-  'Switch to comfort class',
-  'Add meal',
-  'Choose seats',
-  'Travel by train',
-];
+const OFFERS_COUNT = 5;
 
 const getFavorite = () => getRandomInteger(0, 1) === 0;
 
 const getPrice = () => getRandomInteger(MIN_PRICE, MAX_PRICE);
 
 export const getDemoOffers = () => {
-  const offers = Array.from({ length: 1 }, () => ({
-    type: POINT_TYPE,
-    offers: Array.from({ length: OFFERS_DESC.length }, (element, index) => ({
-      id: index + 1,
-      title: OFFERS_DESC[index],
+  const offers = Array.from({ length: POINT_TYPES.length }, (offer, i) => ({
+    type: POINT_TYPES[i],
+    offers: Array.from({ length: OFFERS_COUNT }, (element, j) => ({
+      id: j + 1,
+      title: `${POINT_TYPES[i]}-${j}`,
       price: getRandomInteger(MIN_PRICE, MAX_PRICE),
     })),
   }));
-
   return offers;
 };
 
