@@ -145,30 +145,44 @@ export default class MainPresenter {
     return SortSettings[this.#currentSort] || defaultCompare;
   };
 
+  #showNoPointsMessage = () => {
+    remove(this.#sortFormView);
+    this.#noPointsMessageView.message = this.#currentFilter;
+    render(this.#noPointsMessageView, this.#eventsContainer);
+  };
+
   #renderPointsList = () => {
     const points = this.#filter(this.#currentFilter, this.points);
+
     remove(this.#pointsListView);
+
     if (points.length === 0) {
-      remove(this.#sortFormView);
-      this.#noPointsMessageView.message = this.#currentFilter;
-      render(this.#noPointsMessageView, this.#eventsContainer);
+      this.#showNoPointsMessage();
       return;
     }
+
     points
       .sort(this.#getSortSettings())
-      .forEach((point) =>
-        this.#addPointToPointsList(
-          point,
-          new PointRow(point, this.offers, this.destinations),
-          new PointForm(point, this.offers, this.destinations)
-        )
-      );
-    remove(this.#noPointsMessageView);
+      .forEach(this.#renderPoint);
+
+    if (this.#eventsContainer.contains(this.#noPointsMessageView.element)) {
+      remove(this.#noPointsMessageView);
+    }
+
     if (!this.#eventsContainer.contains(this.#sortFormView.element)) {
       this.#sortFormView.init(this.#whenChangeSorts);
     }
+
     render(this.#sortFormView, this.#eventsContainer);
     render(this.#pointsListView, this.#eventsContainer);
+  };
+
+  #renderPoint = (point) => {
+    this.#addPointToPointsList(
+      point,
+      new PointRow(point, this.offers, this.destinations),
+      new PointForm(point, this.offers, this.destinations)
+    );
   };
 
   #addPointToPointsList = (point, pointRowView, pointFormView) => {
