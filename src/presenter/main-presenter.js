@@ -10,7 +10,7 @@ import { render, remove, replace } from '../framework/render';
 import { Filters } from '../settings';
 import { filtrate } from '../filter';
 import { Sorts } from '../settings';
-import { sorting } from '../sort';
+import { SortSettings } from '../settings';
 
 export default class MainPresenter {
   #model = null;
@@ -140,10 +140,13 @@ export default class MainPresenter {
 
   #filter = (filter, points) => filtrate(filter, points);
 
-  #sort = (sort, points) => sorting(sort, points);
+  #getSortSettings = () => {
+    const defaultCompare = () => 0;
+    return SortSettings[this.#currentSort] || defaultCompare;
+  };
 
   #renderPointsList = () => {
-    let points = this.#filter(this.#currentFilter, this.points);
+    const points = this.#filter(this.#currentFilter, this.points);
     remove(this.#pointsListView);
     if (points.length === 0) {
       remove(this.#sortFormView);
@@ -151,14 +154,15 @@ export default class MainPresenter {
       render(this.#noPointsMessageView, this.#eventsContainer);
       return;
     }
-    points = this.#sort(this.#currentSort, points);
-    points.forEach((point) =>
-      this.#addPointToPointsList(
-        point,
-        new PointRow(point, this.offers, this.destinations),
-        new PointForm(point, this.offers, this.destinations)
-      )
-    );
+    points
+      .sort(this.#getSortSettings())
+      .forEach((point) =>
+        this.#addPointToPointsList(
+          point,
+          new PointRow(point, this.offers, this.destinations),
+          new PointForm(point, this.offers, this.destinations)
+        )
+      );
     remove(this.#noPointsMessageView);
     if (!this.#eventsContainer.contains(this.#sortFormView.element)) {
       this.#sortFormView.init(this.#whenChangeSorts);
