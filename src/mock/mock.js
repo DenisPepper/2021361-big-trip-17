@@ -6,7 +6,7 @@ const PICTURE_COUNT = 3;
 const PHOTO_URI = 'http://picsum.photos/248/152?r=';
 const MIN_PRICE = 10;
 const MAX_PRICE = 100;
-const DEST_DESC = 'This is a city in big country.';
+const DEST_DESC = 'this is a city in big country.';
 const DEST_NAMES = ['Amsterdam', 'Geneva', 'Chamonix'];
 const OFFERS_COUNT = 5;
 
@@ -19,7 +19,7 @@ export const getDemoOffers = () => {
     type: POINT_TYPES[i],
     offers: Array.from({ length: OFFERS_COUNT }, (element, j) => ({
       id: j + 1,
-      title: `${POINT_TYPES[i]}-${j}`,
+      title: `${POINT_TYPES[i]} ${j + 1}`,
       price: getRandomInteger(MIN_PRICE, MAX_PRICE),
     })),
   }));
@@ -27,14 +27,17 @@ export const getDemoOffers = () => {
 };
 
 export const getDemoDestinations = () => {
-  const destinations = Array.from({ length: DEST_NAMES.length }, (element, index) => ({
-    description: DEST_DESC,
-    name: DEST_NAMES[index],
-    pictures: Array.from({ length: PICTURE_COUNT }, () => ({
-      src: `${PHOTO_URI}${getRandomInteger(0, PHOTO_COUNT)}`,
-      description: 'description of this photo',
-    })),
-  }));
+  const destinations = Array.from(
+    { length: DEST_NAMES.length },
+    (element, index) => ({
+      description: `${DEST_NAMES[index]} - ${DEST_DESC}`,
+      name: DEST_NAMES[index],
+      pictures: Array.from({ length: PICTURE_COUNT }, () => ({
+        src: `${PHOTO_URI}${getRandomInteger(0, PHOTO_COUNT)}`,
+        description: 'description of this photo',
+      })),
+    })
+  );
   return destinations;
 };
 
