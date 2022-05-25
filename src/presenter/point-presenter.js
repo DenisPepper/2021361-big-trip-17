@@ -1,13 +1,15 @@
-import { render } from '../framework/render';
+import { render, replace } from '../framework/render';
 
 export default class PointPresenter {
   #point = null;
   #pointsListView = null;
   #pointRowView = null;
   #pointFormView = null;
-  #updatePointRowView = null;
-  #closeCurrentEditView = null;
-  #resetCurrentPointPresenter = null;
+  #callback = {
+    updatePointRowView: null,
+    closeCurrentPointForm: null,
+    resetThisInMainPresenter: null,
+  };
 
   constructor(args) {
     const { point, pointRowView, pointFormView, pointsListView } = args;
@@ -17,13 +19,15 @@ export default class PointPresenter {
     this.#pointsListView = pointsListView;
   }
 
+  #openPointForm = () => replace(this.#pointFormView, this.#pointRowView);
+
+  #closePointForm = () => replace(this.#pointRowView, this.#pointFormView);
+
   #onEscKeyDown = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
-      this.#pointsListView.closePointForm(
-        this.#pointFormView,
-        this.#pointRowView
-      );
+      this.#callback.resetThisInMainPresenter();
+      this.#closePointForm();
       document.removeEventListener('keydown', this.#onEscKeyDown);
     }
   };
@@ -34,38 +38,30 @@ export default class PointPresenter {
   #setFavoriteClickHandler = () => {
     this.#pointRowView.setFavoriteClickHandler(() => {
       this.#point.isFavorite = !this.#point.isFavorite;
-      this.#updatePointRowView(this);
+      this.#callback.updatePointRowView(this);
     });
   };
 
   #setEditClickHandler = () => {
     this.#pointRowView.setEditClickHandler(() => {
-      this.#closeCurrentEditView(this);
-      this.#pointsListView.openPointForm(
-        this.#pointFormView,
-        this.#pointRowView
-      );
+      this.#callback.closeCurrentPointForm(this);
+      this.#openPointForm();
       document.addEventListener('keydown', this.#onEscKeyDown);
     });
   };
 
   #setCloseClickHandler = () => {
     this.#pointFormView.setCloseClickHandler(() => {
-      this.#resetCurrentPointPresenter();
-      this.#pointsListView.closePointForm(
-        this.#pointFormView,
-        this.#pointRowView
-      );
+      this.#callback.resetThisInMainPresenter();
+      this.#closePointForm();
       document.removeEventListener('keydown', this.#onEscKeyDown);
     });
   };
 
   #setSaveClickHandler = () => {
     this.#pointFormView.setSaveClickHandler(() => {
-      this.#pointsListView.closePointForm(
-        this.#pointFormView,
-        this.#pointRowView
-      );
+      this.#callback.resetThisInMainPresenter();
+      this.#closePointForm();
       document.removeEventListener('keydown', this.#onEscKeyDown);
     });
   };
@@ -95,9 +91,9 @@ export default class PointPresenter {
     closeCurrentEditView,
     resetCurrentPointPresenter
   ) => {
-    this.#updatePointRowView = updatePointRowView;
-    this.#closeCurrentEditView = closeCurrentEditView;
-    this.#resetCurrentPointPresenter = resetCurrentPointPresenter;
+    this.#callback.updatePointRowView = updatePointRowView;
+    this.#callback.closeCurrentPointForm = closeCurrentEditView;
+    this.#callback.resetThisInMainPresenter = resetCurrentPointPresenter;
     this.#setFavoriteClickHandler();
     this.#setEditClickHandler();
     this.#setCloseClickHandler();
