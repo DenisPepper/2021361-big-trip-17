@@ -24,18 +24,17 @@ export default class PointForm extends AbstractStatefulView {
   }
 
   init = () => {
+    this._restoreHandlers();
+  };
+
+  _restoreHandlers = () => {
     this.rollupButton = this.element.querySelector('.event__rollup-btn');
-    this.rollupButton.addEventListener('click', this.#closeClickHandler);
-    this.element.addEventListener('submit', this.#saveClickHandler);
     this.eventTypeGroup = this.element.querySelector('.event__type-list');
+    this.eventDestination = this.element.querySelector('.event__field-group--destination');
+    this.element.addEventListener('submit', this.#saveClickHandler);
     this.eventTypeGroup.addEventListener('input', this.#whenChangePointType);
-    this.eventDestination = this.element.querySelector(
-      '.event__field-group--destination'
-    );
-    this.eventDestination.addEventListener(
-      'input',
-      this.#whenChangeDestination
-    );
+    this.eventDestination.addEventListener('input', this.#whenChangeDestination);
+    this.rollupButton.addEventListener('click', this.#closeClickHandler);
   };
 
   get state() {
@@ -54,10 +53,6 @@ export default class PointForm extends AbstractStatefulView {
       this.#destinations
     );
   }
-
-  _restoreHandlers = () => {
-    this.init();
-  };
 
   setCloseClickCallback = (callback) => {
     this._callback.closeClick = callback;
@@ -84,7 +79,7 @@ export default class PointForm extends AbstractStatefulView {
     const destIndex = this.#destinations.findIndex(
       (element) => element.name === evt.target.value
     );
-    if (destIndex !== -1) {
+    if (destIndex !== -1 && destIndex !== this._state.destination) {
       this.updateElement({ destination: destIndex });
     }
   });

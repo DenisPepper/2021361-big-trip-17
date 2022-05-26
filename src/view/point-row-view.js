@@ -21,6 +21,10 @@ export default class PointRow extends AbstractStatefulView {
   }
 
   init = () => {
+    this._restoreHandlers();
+  };
+
+  _restoreHandlers = () => {
     this.rollupButton = this.element.querySelector('.event__rollup-btn');
     this.favoriteButton = this.element.querySelector('.event__favorite-btn');
     this.rollupButton.addEventListener('click', this.#editClickHandler);
@@ -43,10 +47,6 @@ export default class PointRow extends AbstractStatefulView {
       this.#destinations
     );
   }
-
-  _restoreHandlers = () => {
-    this.init();
-  };
 
   setEditClickCallback = (callback) => {
     this._callback.rollupButtonClick = callback;
