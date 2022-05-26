@@ -24,10 +24,10 @@ export default class PointForm extends AbstractStatefulView {
   }
 
   init = () => {
-    this._restoreHandlers();
+    this.#setHandlers();
   };
 
-  _restoreHandlers = () => {
+  #setHandlers = () => {
     this.rollupButton = this.element.querySelector('.event__rollup-btn');
     this.eventTypeGroup = this.element.querySelector('.event__type-list');
     this.eventDestination = this.element.querySelector('.event__field-group--destination');
@@ -35,6 +35,10 @@ export default class PointForm extends AbstractStatefulView {
     this.eventTypeGroup.addEventListener('input', this.#whenChangePointType);
     this.eventDestination.addEventListener('input', this.#whenChangeDestination);
     this.rollupButton.addEventListener('click', this.#closeClickHandler);
+  };
+
+  _restoreHandlers = () => {
+    this.#setHandlers();
   };
 
   get state() {

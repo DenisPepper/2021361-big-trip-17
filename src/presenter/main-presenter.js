@@ -34,7 +34,6 @@ export default class MainPresenter {
   #sortFormView = null;
   #noPointsMessageView = null;
   #currentpointPresenter = null;
-  //#pointPresenters = new Map();
   #currentFilter = null;
   #currentSort = null;
 
