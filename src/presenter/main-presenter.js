@@ -83,15 +83,15 @@ export default class MainPresenter {
   }
 
   get points() {
-    return this.#model === null ? [] : this.#model.points;
+    return this.#model.points;
   }
 
   get offers() {
-    return this.#model === null ? [] : this.#model.offers;
+    return this.#model.offers;
   }
 
   get destinations() {
-    return this.#model === null ? [] : this.#model.destinations;
+    return this.#model.destinations;
   }
 
   #whenChangeFilters = (value) => {
