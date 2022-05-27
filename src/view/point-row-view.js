@@ -3,8 +3,8 @@ import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 
 export default class PointRow extends AbstractStatefulView {
   _state;
-  #offers;
-  #destinations;
+  #offers = null;
+  #destinations = null;
   _callback = {
     rollupButtonClick: () => {},
   };

@@ -34,6 +34,7 @@ export default class PointPresenter {
 
   #closeClickCallback = () => {
     this.#callback.resetThisInMainPresenter();
+    this.#pointFormView.resetState(this.#point);
     this.#closePointForm();
     this.removeOnEscClickHandler();
   };
@@ -52,6 +53,7 @@ export default class PointPresenter {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
       this.#callback.resetThisInMainPresenter();
+      this.#pointFormView.resetState(this.#point);
       this.#closePointForm();
       this.removeOnEscClickHandler();
     }

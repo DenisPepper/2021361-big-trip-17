@@ -4,8 +4,8 @@ import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 
 export default class PointForm extends AbstractStatefulView {
   _state;
-  #offers;
-  #destinations;
+  #offers = null;
+  #destinations = null;
   _callback = {
     closeClick: () => {},
     saveClick: () => {},
@@ -49,6 +49,11 @@ export default class PointForm extends AbstractStatefulView {
   set state(point) {
     this._state = { ...point };
   }
+
+  resetState = (point) => {
+    this.state = point;
+    this.updateElement(this._state);
+  };
 
   get template() {
     return createPointFormTempalte(
