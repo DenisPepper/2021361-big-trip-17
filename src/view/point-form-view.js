@@ -64,7 +64,7 @@ export default class PointForm extends AbstractStatefulView {
 
   #setFlatpickr = () => {
     flatpickr(this.#eventStartTime, flatpickrSettings);
-    flatpickr(this.#eventEndTime, flatpickrSettings);
+    flatpickr(this.#eventEndTime, {...flatpickrSettings, minDate: this._state.dateFrom});
   };
 
   _restoreHandlers = () => {
@@ -125,6 +125,7 @@ export default class PointForm extends AbstractStatefulView {
 
   #whenInputStartTime = debounce((evt) => {
     this._state.dateFrom = evt.target.value;
+    flatpickr(this.#eventEndTime, {...flatpickrSettings, minDate: this._state.dateFrom});
   }, DELAY);
 
   #whenInputEndtTime = debounce((evt) => {
