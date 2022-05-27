@@ -1,5 +1,5 @@
 import { POINT_TYPES } from '../settings';
-import { firstCharToUpperCase, formatDateTimePointForm } from '../util';
+import { firstCharToUpperCase } from '../util';
 
 const getEventTypeList = (pointType = '') => {
   let result = '';
@@ -95,14 +95,14 @@ export const createPointFormTempalte = (point, offers, destinations) => {
       class="event__input event__input--time"
       id="event-start-time-1" type="text"
       name="event-start-time"
-      value="${formatDateTimePointForm(point.dateFrom)}"
+      value="${point.dateFrom}"
     />&mdash;
     <label class="visually-hidden" for="event-end-time-1">To</label>
     <input
       class="event__input event__input--time"
       id="event-end-time-1" type="text"
       name="event-end-time"
-      value="${formatDateTimePointForm(point.dateTo)}"
+      value="${point.dateTo}"
     />
   </div>
 

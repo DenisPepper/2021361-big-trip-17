@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { MINUTES_IN_HOUR, MINUTES_IN_DAY, DECIMAL, TIMEOUT_DELAY } from './settings';
+import { MINUTES_IN_HOUR, MINUTES_IN_DAY, DECIMAL, DEFAULT_DELAY } from './settings';
 
 export const getRandomInteger = (min, max) => {
   if (!Number.isInteger(min) || !Number.isInteger(max)) {
@@ -19,9 +19,6 @@ export const firstCharToUpperCase = (string) => {
   }
   return string[0].toUpperCase() + string.slice(1);
 };
-
-export const formatDateTimePointForm = (date) =>
-  dayjs(date).format('DD/MM/YY HH:mm');
 
 export const formatDate = (date) => dayjs(date).format('YYYY-MM-DD');
 
@@ -61,10 +58,10 @@ export const getTimeInterval = (dateFrom, dateTo) => {
     .format(format);
 };
 
-export const debounce = (callback) => {
+export const debounce = (callback, delay = DEFAULT_DELAY) => {
   let timeoutId;
   return (...rest) => {
     clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => callback.apply(null, rest), TIMEOUT_DELAY);
+    timeoutId = setTimeout(() => callback.apply(null, rest), delay);
   };
 };
