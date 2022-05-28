@@ -3,8 +3,8 @@ import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 
 export default class PointRow extends AbstractStatefulView {
   _state;
-  #offers;
-  #destinations;
+  #offers = null;
+  #destinations = null;
   _callback = {
     rollupButtonClick: () => {},
   };
@@ -21,10 +21,22 @@ export default class PointRow extends AbstractStatefulView {
   }
 
   init = () => {
+    this.#findElements();
+    this.#setHandlers();
+  };
+
+  #findElements = () => {
     this.rollupButton = this.element.querySelector('.event__rollup-btn');
     this.favoriteButton = this.element.querySelector('.event__favorite-btn');
+  };
+
+  #setHandlers = () => {
     this.rollupButton.addEventListener('click', this.#editClickHandler);
     this.favoriteButton.addEventListener('click', this.#favoriteClickHandler);
+  };
+
+  _restoreHandlers = () => {
+    this.init();
   };
 
   get state() {
@@ -43,10 +55,6 @@ export default class PointRow extends AbstractStatefulView {
       this.#destinations
     );
   }
-
-  _restoreHandlers = () => {
-    this.init();
-  };
 
   setEditClickCallback = (callback) => {
     this._callback.rollupButtonClick = callback;

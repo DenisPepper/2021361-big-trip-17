@@ -13,6 +13,18 @@ import { Sorts } from '../settings';
 import { SortSettings } from '../settings';
 import dayjs from 'dayjs';
 
+const getFilterSettings = (filter) => {
+  const nullPredicate = () => true;
+  const currentDate = dayjs();
+  const filterRule = FilterSettings[filter];
+  return filterRule === undefined ? nullPredicate : filterRule(currentDate);
+};
+
+const getSortSettings = (sort) => {
+  const defaultCompare = () => 0;
+  return SortSettings[sort] || defaultCompare;
+};
+
 export default class MainPresenter {
   #model = null;
   #pointsListView = null;
@@ -22,7 +34,6 @@ export default class MainPresenter {
   #sortFormView = null;
   #noPointsMessageView = null;
   #currentpointPresenter = null;
-  //#pointPresenters = new Map();
   #currentFilter = null;
   #currentSort = null;
 
@@ -72,15 +83,15 @@ export default class MainPresenter {
   }
 
   get points() {
-    return this.#model === null ? [] : this.#model.points;
+    return this.#model.points;
   }
 
   get offers() {
-    return this.#model === null ? [] : this.#model.offers;
+    return this.#model.offers;
   }
 
   get destinations() {
-    return this.#model === null ? [] : this.#model.destinations;
+    return this.#model.destinations;
   }
 
   #whenChangeFilters = (value) => {
@@ -122,18 +133,6 @@ export default class MainPresenter {
     this.#currentpointPresenter = null;
   };
 
-  #getFilterSettings = () => {
-    const nullPredicate = () => true;
-    const currentDate = dayjs();
-    const filterRule = FilterSettings[this.#currentFilter];
-    return filterRule === undefined ? nullPredicate : filterRule(currentDate);
-  };
-
-  #getSortSettings = () => {
-    const defaultCompare = () => 0;
-    return SortSettings[this.#currentSort] || defaultCompare;
-  };
-
   #showNoPointsMessage = () => {
     remove(this.#sortFormView);
     this.#noPointsMessageView.message = this.#currentFilter;
@@ -141,7 +140,7 @@ export default class MainPresenter {
   };
 
   #renderPointsList = () => {
-    const points = this.points.filter(this.#getFilterSettings());
+    const points = this.points.filter(getFilterSettings(this.#currentFilter));
 
     remove(this.#pointsListView);
 
@@ -150,7 +149,7 @@ export default class MainPresenter {
       return;
     }
 
-    points.sort(this.#getSortSettings()).forEach(this.#renderPoint);
+    points.sort(getSortSettings(this.#currentSort)).forEach(this.#renderPoint);
 
     if (this.#eventsContainer.contains(this.#noPointsMessageView.element)) {
       remove(this.#noPointsMessageView);
