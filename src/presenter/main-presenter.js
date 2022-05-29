@@ -13,17 +13,15 @@ import { Sorts } from '../settings';
 import { SortSettings } from '../settings';
 import dayjs from 'dayjs';
 
+const NULL_PREDICATE = () => true;
 const getFilterSettings = (filter) => {
-  const nullPredicate = () => true;
   const currentDate = dayjs();
   const filterRule = FilterSettings[filter];
-  return filterRule === undefined ? nullPredicate : filterRule(currentDate);
+  return filterRule === undefined ? NULL_PREDICATE : filterRule(currentDate);
 };
 
-const getSortSettings = (sort) => {
-  const defaultCompare = () => 0;
-  return SortSettings[sort] || defaultCompare;
-};
+const DEFAULT_COMPARE = () => 0;
+const getSortSettings = (sort) => SortSettings[sort] || DEFAULT_COMPARE;
 
 export default class MainPresenter {
   #model = null;
