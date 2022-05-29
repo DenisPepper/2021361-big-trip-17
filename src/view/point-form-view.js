@@ -7,7 +7,7 @@ import 'flatpickr/dist/themes/material_blue.css';
 
 const DELAY = 1000;
 
-const flatpickrStartTimeSettings = {
+const flatpickrSettings = {
   enableTime: true,
   altInput: true,
   altFormat: 'd/m/y H:i',
@@ -15,8 +15,6 @@ const flatpickrStartTimeSettings = {
   'locale': Russian,
   defaultHour: 8,
 };
-
-const flatpickrEndTimeSettings = {...flatpickrStartTimeSettings};
 
 export default class PointForm extends AbstractStatefulView {
   _state;
@@ -66,8 +64,8 @@ export default class PointForm extends AbstractStatefulView {
   };
 
   #setFlatpickr = () => {
-    flatpickr(this.#eventStartTime, flatpickrStartTimeSettings);
-    this.#flatpickrEndTime = flatpickr(this.#eventEndTime, {...flatpickrEndTimeSettings, minDate: this._state.dateFrom});
+    flatpickr(this.#eventStartTime, flatpickrSettings);
+    this.#flatpickrEndTime = flatpickr(this.#eventEndTime, {...flatpickrSettings, minDate: this._state.dateFrom});
   };
 
   _restoreHandlers = () => {
