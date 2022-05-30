@@ -66,6 +66,29 @@ export default class Model {
     return this.#destinations;
   }
 
+  addPoint = (point) => {
+    this.#points = [point, ...this.#points];
+    this.#notifier.run();
+  };
+
+  deletePoint = (point) => {
+    const index = this.#points.findIndex((element) => element.id === point.id);
+    if (index === -1) {
+      throw new Error('index of point not found');
+    }
+    this.#points = [...this.#points.slice(0, index), ...this.#points.slice(index + 1)];
+    this.#notifier.run();
+  };
+
+  updatePoint = (point) => {
+    const index = this.#points.findIndex((element) => element.id === point.id);
+    if (index === -1) {
+      throw new Error('index of point not found');
+    }
+    this.#points = [...this.#points.slice(0, index), point, ...this.#points.slice(index + 1)];
+    this.#notifier.run();
+  };
+
   filtrate = (filterName) => this.#filter.run(this.points, filterName);
 
   sorting = (points = this.points, sortName) => this.#sorter.run(points, sortName);
