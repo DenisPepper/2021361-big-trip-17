@@ -1,5 +1,5 @@
 import { getDemoPoint, getDemoOffers, getDemoDestinations } from '../mock/mock';
-import { POINTS_COUNT } from '../settings';
+import { POINTS_COUNT, Filters, Sorts } from '../settings';
 import Filter from '../services/filter';
 import Sorter from '../services/sorter';
 import Notifier from '../services/notifier';
@@ -20,6 +20,8 @@ export default class Model {
   #filter = null;
   #sorter = null;
   #notifier = null;
+  #currentFilterName = null;
+  #currentSortName = null;
 
   constructor(args) {
     const { filter, sorter, notifier} = args;
@@ -38,6 +40,8 @@ export default class Model {
     } else {
       throw new Error(`IllegalArgumentException! expected: ${Notifier}`);
     }
+    this.#currentFilterName = Filters.EVERYTHING;
+    this.#currentSortName = Sorts.DAY;
   }
 
   #getData = () => {
@@ -93,10 +97,27 @@ export default class Model {
 
   sorting = (points = this.points, sortName) => this.#sorter.run(points, sortName);
 
-  #notify = () => this.#notifier.run();
+  setFilterName = (filterName) => {
+    this.#currentFilterName = filterName;
+  };
 
-  addEvent = (callback) => this.#notifier.add(callback);
+  getFilterName = () => this.#currentFilterName;
 
-  removeEvent = (callback) => this.#notifier.remove(callback);
+  setSortName = (sortName) => {
+    this.#currentSortName = sortName;
+  };
+
+  composePointsList = (eventName, ) => {
+    const filterName = this.#currentFilterName;
+    const sortName = this.#currentSortName;
+    const points = this.filtrate(filterName);
+    this.#notify(eventName, this.sorting(points, sortName));
+  };
+
+  addEvent = (eventName, callback) => this.#notifier.add(eventName, callback);
+
+  removeEvent = (eventName, callback) => this.#notifier.remove(eventName, callback);
+
+  #notify = (eventName, ...args) => this.#notifier.run(eventName, args);
 
 }

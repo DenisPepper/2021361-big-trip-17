@@ -23,12 +23,16 @@ export const Filters = {
   PAST: 'past',
 };
 export const FilterRules = {
-  [Filters.FUTURE]: (currentDate) => (point) => currentDate.isBefore(dayjs(point.dateFrom)) || currentDate.isBefore(dayjs(point.dateTo)),
-  [Filters.PAST]: (currentDate) => (point) => currentDate.isAfter(dayjs(point.dateTo)) || currentDate.isAfter(dayjs(point.dateFrom)),
+  [Filters.FUTURE]: (currentDate) => (point) =>
+    currentDate.isBefore(dayjs(point.dateFrom)) ||
+    currentDate.isBefore(dayjs(point.dateTo)),
+  [Filters.PAST]: (currentDate) => (point) =>
+    currentDate.isAfter(dayjs(point.dateTo)) ||
+    currentDate.isAfter(dayjs(point.dateFrom)),
 };
 export const NoPointsMessages = {
-  [Filters.FUTURE] : 'There are no future events now',
-  [Filters.PAST] : 'There are no past events now',
+  [Filters.FUTURE]: 'There are no future events now',
+  [Filters.PAST]: 'There are no past events now',
 };
 export const Sorts = {
   DAY: 'sort-day',
@@ -37,9 +41,13 @@ export const Sorts = {
 };
 
 export const SorterRules = {
-  [Sorts.PRICE] : (a, b) => b.basePrice - a.basePrice,
-  [Sorts.TIME] : (a, b) => getDateDiffInMinute(b.dateFrom, b.dateTo) - getDateDiffInMinute(a.dateFrom, a.dateTo),
-  [Sorts.DAY] : (a, b) => dayjs(b.dateFrom) - (dayjs(a.dateFrom)),
+  [Sorts.PRICE]: (a, b) => b.basePrice - a.basePrice,
+  [Sorts.TIME]: (a, b) =>
+    getDateDiffInMinute(b.dateFrom, b.dateTo) -
+    getDateDiffInMinute(a.dateFrom, a.dateTo),
+  [Sorts.DAY]: (a, b) => dayjs(b.dateFrom) - dayjs(a.dateFrom),
 };
 
-
+export const Actions = {
+  RENDER_POINTS_LIST: 'RENDER_POINTS_LIST',
+};

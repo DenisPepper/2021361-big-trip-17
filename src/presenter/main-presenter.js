@@ -1,4 +1,5 @@
 import PointPresenter from './point-presenter';
+import СomposePresenter from './compose-presenter';
 import Model from '../model/model';
 import PointsList from '..//view/points-list-view';
 import FiltersForm from '../view/filters-view';
@@ -7,8 +8,7 @@ import NoPointsMessage from '../view/no-point-message-view';
 import PointRow from '../view/point-row-view';
 import PointForm from '../view/point-form-view';
 import { render, remove, replace } from '../framework/render';
-import { Filters } from '../settings';
-import { Sorts } from '../settings';
+import { Actions } from '../settings';
 
 export default class MainPresenter {
   #model = null;
@@ -18,9 +18,8 @@ export default class MainPresenter {
   #filtersFormView = null;
   #sortFormView = null;
   #noPointsMessageView = null;
-  #currentpointPresenter = null;
-  #currentFilter = null;
-  #currentSort = null;
+  #currentPointPresenter = null;
+  #composePresenter = null;
 
   constructor(args) {
     const {
@@ -31,6 +30,7 @@ export default class MainPresenter {
       filtersFormView,
       sortFormView,
       noPointsMessageView,
+
     } = args;
 
     if (model instanceof Model) {
@@ -79,71 +79,61 @@ export default class MainPresenter {
     return this.#model.destinations;
   }
 
-  #whenChangeFilters = (value) => {
-    this.#currentFilter = value;
-    this.#currentSort = Sorts.DAY;
-    this.#sortFormView.init(this.#whenChangeSorts);
-    this.#renderPointsList();
-  };
-
-  #whenChangeSorts = (value) => {
-    this.#currentSort = value;
-    this.#renderPointsList();
+  #setNotifications = () => {
+    this.#model.addEvent(Actions.RENDER_POINTS_LIST, (args) =>
+      this.#renderPointsList(args)
+    );
   };
 
   init = () => {
-    this.#currentFilter = Filters.EVERYTHING;
-    this.#currentSort = Sorts.DAY;
-    this.#filtersFormView.setFiltersClickHandler(this.#whenChangeFilters);
-    this.#sortFormView.init(this.#whenChangeSorts);
-    render(this.#filtersFormView, this.#controlsContainer);
-    render(this.#sortFormView, this.#eventsContainer);
-    this.#renderPointsList();
+    this.#composePresenter = new СomposePresenter(
+      {
+        model: this.#model,
+        filtersFormView: this.#filtersFormView,
+        sortFormView: this.#sortFormView,
+        controlsContainer: this.#controlsContainer,
+        eventsContainer: this.#eventsContainer
+      })
+      .renderFilterForm()
+      .renderSortForm();
+    this.#setNotifications();
+    this.#model.composePointsList(Actions.RENDER_POINTS_LIST);
   };
 
   #closeCurrentEditView = (pointPresenter) => {
-    if (this.#currentpointPresenter === null) {
-      this.#currentpointPresenter = pointPresenter;
+    if (this.#currentPointPresenter === null) {
+      this.#currentPointPresenter = pointPresenter;
     } else {
-      this.#currentpointPresenter.removeOnEscClickHandler();
+      this.#currentPointPresenter.removeOnEscClickHandler();
       replace(
-        this.#currentpointPresenter.pointRowView,
-        this.#currentpointPresenter.pointFormView
+        this.#currentPointPresenter.pointRowView,
+        this.#currentPointPresenter.pointFormView
       );
-      this.#currentpointPresenter = pointPresenter;
+      this.#currentPointPresenter = pointPresenter;
     }
   };
 
   #resetCurrentPointPresenter = () => {
-    this.#currentpointPresenter = null;
+    this.#currentPointPresenter = null;
   };
 
   #showNoPointsMessage = () => {
     remove(this.#sortFormView);
-    this.#noPointsMessageView.message = this.#currentFilter;
+    this.#noPointsMessageView.message = this.#model.getFilterName();
     render(this.#noPointsMessageView, this.#eventsContainer);
   };
 
-  #renderPointsList = () => {
-    const points = this.#model.filtrate(this.#currentFilter);
+  #renderPointsList = (points) => {
     remove(this.#pointsListView);
-
     if (points.length === 0) {
       this.#showNoPointsMessage();
       return;
     }
-
-    this.#model.sorting(points, this.#currentSort).forEach(this.#renderPoint);
-
     if (this.#eventsContainer.contains(this.#noPointsMessageView.element)) {
       remove(this.#noPointsMessageView);
+      this.#composePresenter.renderSortForm();
     }
-
-    if (!this.#eventsContainer.contains(this.#sortFormView.element)) {
-      this.#sortFormView.init(this.#whenChangeSorts);
-    }
-
-    render(this.#sortFormView, this.#eventsContainer);
+    points.forEach(this.#renderPoint);
     render(this.#pointsListView, this.#eventsContainer);
   };
 
