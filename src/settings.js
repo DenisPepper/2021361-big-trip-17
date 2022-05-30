@@ -22,7 +22,7 @@ export const Filters = {
   FUTURE: 'future',
   PAST: 'past',
 };
-export const FilterSettings = {
+export const FilterRules = {
   [Filters.FUTURE]: (currentDate) => (point) => currentDate.isBefore(dayjs(point.dateFrom)) || currentDate.isBefore(dayjs(point.dateTo)),
   [Filters.PAST]: (currentDate) => (point) => currentDate.isAfter(dayjs(point.dateTo)) || currentDate.isAfter(dayjs(point.dateFrom)),
 };
@@ -36,7 +36,7 @@ export const Sorts = {
   PRICE: 'sort-price',
 };
 
-export const SortSettings = {
+export const SorterRules = {
   [Sorts.PRICE] : (a, b) => b.basePrice - a.basePrice,
   [Sorts.TIME] : (a, b) => getDateDiffInMinute(b.dateFrom, b.dateTo) - getDateDiffInMinute(a.dateFrom, a.dateTo),
   [Sorts.DAY] : (a, b) => dayjs(b.dateFrom) - (dayjs(a.dateFrom)),
