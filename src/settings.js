@@ -50,4 +50,5 @@ export const SorterRules = {
 
 export const Actions = {
   RENDER_POINTS_LIST: 'RENDER_POINTS_LIST',
+  DELETE_POINT: 'DELETE_POINT',
 };

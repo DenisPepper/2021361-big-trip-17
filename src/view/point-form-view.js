@@ -23,6 +23,7 @@ export default class PointForm extends AbstractStatefulView {
   _callback = {
     closeClick: () => {},
     saveClick: () => {},
+    resetClick: () => {},
   };
 
   #rollupButton = null;
@@ -56,6 +57,7 @@ export default class PointForm extends AbstractStatefulView {
 
   #setHandlers = () => {
     this.element.addEventListener('submit', this.#saveClickHandler);
+    this.element.addEventListener('reset', this.#resetClickHandler);
     this.#eventTypeGroup.addEventListener('input', this.#whenInputPointType);
     this.#eventDestination.addEventListener('input', this.#whenInputDestination);
     this.#rollupButton.addEventListener('click', this.#closeClickHandler);
@@ -102,6 +104,10 @@ export default class PointForm extends AbstractStatefulView {
     this._callback.saveClick = callback;
   };
 
+  setResetClickCallback = (callback) => {
+    this._callback.resetClick = callback;
+  };
+
   #closeClickHandler = () => {
     this._callback.closeClick();
   };
@@ -109,6 +115,11 @@ export default class PointForm extends AbstractStatefulView {
   #saveClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.saveClick();
+  };
+
+  #resetClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.resetClick(this.state);
   };
 
   #whenInputPointType = (evt) => {

@@ -83,6 +83,9 @@ export default class MainPresenter {
     this.#model.addEvent(Actions.RENDER_POINTS_LIST, (args) =>
       this.#renderPointsList(args)
     );
+    this.#model.addEvent(Actions.DELETE_POINT, (args) =>
+      this.#whenDeletePoint(args)
+    );
   };
 
   init = () => {
@@ -100,21 +103,26 @@ export default class MainPresenter {
     this.#model.composePointsList(Actions.RENDER_POINTS_LIST);
   };
 
-  #closeCurrentEditView = (pointPresenter) => {
-    if (this.#currentPointPresenter === null) {
-      this.#currentPointPresenter = pointPresenter;
-    } else {
+  #setCurrentPointPresenter = (pointPresenter) => {
+    if (this.#currentPointPresenter) {
       this.#currentPointPresenter.removeOnEscClickHandler();
-      replace(
-        this.#currentPointPresenter.pointRowView,
-        this.#currentPointPresenter.pointFormView
-      );
-      this.#currentPointPresenter = pointPresenter;
+      this.#currentPointPresenter.closePointForm();
     }
+    this.#currentPointPresenter = pointPresenter;
   };
 
   #resetCurrentPointPresenter = () => {
     this.#currentPointPresenter = null;
+  };
+
+  #whenDeletePoint = (args) => {
+    let {pointPresenter} = args;
+    pointPresenter.clear();
+    pointPresenter = null;
+    this.#resetCurrentPointPresenter();
+    if (this.#model.pointsLength === 0) {
+      this.#showNoPointsMessage();
+    }
   };
 
   #showNoPointsMessage = () => {
@@ -139,21 +147,23 @@ export default class MainPresenter {
 
   #renderPoint = (point) => {
     this.#addPointToPointsList(
+      this.#model,
       point,
       new PointRow(point, this.offers, this.destinations),
       new PointForm(point, this.offers, this.destinations)
     );
   };
 
-  #addPointToPointsList = (point, pointRowView, pointFormView) => {
+  #addPointToPointsList = (model, point, pointRowView, pointFormView) => {
     const pointPresenter = new PointPresenter({
+      model,
       point,
       pointRowView,
       pointFormView,
       pointsListView: this.#pointsListView,
     });
     pointPresenter.init(
-      this.#closeCurrentEditView,
+      this.#setCurrentPointPresenter,
       this.#resetCurrentPointPresenter
     );
     pointPresenter.renderPoint();

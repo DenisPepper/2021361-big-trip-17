@@ -56,6 +56,10 @@ export default class Model {
     return this.#points.map((point) => ({...point}));
   }
 
+  get pointsLength() {
+    return this.#points.length;
+  }
+
   get offers() {
     this.#getData();
     return this.#offers.map((offer) => ({...offer}));
