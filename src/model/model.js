@@ -75,22 +75,24 @@ export default class Model {
     this.#notify();
   };
 
-  deletePoint = (point) => {
+  deletePoint = (point, args) => {
     const index = this.#points.findIndex((element) => element.id === point.id);
     if (index === -1) {
       throw new Error('index of point not found');
     }
     this.#points = [...this.#points.slice(0, index), ...this.#points.slice(index + 1)];
-    this.#notify();
+    const {eventName} = args;
+    this.#notify(eventName, args);
   };
 
-  updatePoint = (point) => {
+  updatePoint = (point, args) => {
     const index = this.#points.findIndex((element) => element.id === point.id);
     if (index === -1) {
       throw new Error('index of point not found');
     }
     this.#points = [...this.#points.slice(0, index), point, ...this.#points.slice(index + 1)];
-    this.#notify();
+    const {eventName} = args;
+    this.#notify(eventName, args);
   };
 
   filtrate = (filterName) => this.#filter.run(this.points, filterName);

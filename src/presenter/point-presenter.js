@@ -25,6 +25,7 @@ export default class PointPresenter {
     this.#callback.setCurrentPointPresenter = setCurrentPointPresenter;
     this.#callback.resetCurrentPointPresenter = resetCurrentPointPresenter;
     this.#pointRowView.setEditClickCallback(this.#whenEditClick);
+    this.#pointRowView.setFavoriteClickCallback(this.#whenFavoriteClick);
     this.#pointFormView.setCloseClickCallback(this.#whenCloseClick);
     this.#pointFormView.setSaveClickCallback(this.#whenSaveClick);
     this.#pointFormView.setResetClickCallback(this.#whenResetClick);
@@ -34,6 +35,10 @@ export default class PointPresenter {
     this.#callback.setCurrentPointPresenter(this);
     this.#openPointForm();
     document.addEventListener('keydown', this.#onEscKeyDown);
+  };
+
+  #whenFavoriteClick = (point) => {
+    this.#model.updatePoint(point, { eventName: ''});
   };
 
   #whenCloseClick = () => {
@@ -80,7 +85,6 @@ export default class PointPresenter {
 
   removeOnEscClickHandler = () =>
     document.removeEventListener('keydown', this.#onEscKeyDown);
-
 
   renderPoint = () => {
     render(this.#pointRowView, this.#pointsListView.element);
