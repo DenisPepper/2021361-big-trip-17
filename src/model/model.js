@@ -19,9 +19,10 @@ export default class Model {
   #loaded = false;
   #filter = null;
   #sorter = null;
+  #notifier = null;
 
   constructor(args) {
-    const { filter, sorter} = args;
+    const { filter, sorter, notifier} = args;
     if (filter instanceof Filter) {
       this.#filter = filter;
     } else {
@@ -31,6 +32,11 @@ export default class Model {
       this.#sorter = sorter;
     } else {
       throw new Error(`IllegalArgumentException! expected: ${Sorter}`);
+    }
+    if (notifier instanceof Notifier) {
+      this.#notifier = notifier;
+    } else {
+      throw new Error(`IllegalArgumentException! expected: ${Notifier}`);
     }
   }
 
@@ -62,7 +68,12 @@ export default class Model {
 
   filtrate = (filterName) => this.#filter.run(this.points, filterName);
 
-  sorting = (points = this.points, sortName) =>
-    this.#sorter.run(points, sortName);
+  sorting = (points = this.points, sortName) => this.#sorter.run(points, sortName);
+
+  #notify = () => {};
+
+  addEvent = (callback) => this.#notifier.add(callback);
+
+  removeEvent = (callback) => this.#notifier.remove(callback);
 
 }
