@@ -2,7 +2,7 @@ import FiltersForm from '../view/filters-view';
 import SortForm from '../view/sorts-view';
 import Model from '../model/model';
 import { Actions, Sorts } from '../settings';
-import { render } from '../framework/render';
+import { render, remove } from '../framework/render';
 
 export default class СomposePresenter {
   #model = null;
@@ -48,6 +48,11 @@ export default class СomposePresenter {
     render(this.#sortFormView, this.#eventsContainer);
     this.#sortFormView.setSortsClickHandler(this.#whenChangeSorts);
     return this;
+  };
+
+  removeSortForm = () => {
+    this.#sortFormView.removeSortsClickHandler();
+    remove(this.#sortFormView);
   };
 
   #whenChangeFilters = (filterName) => {

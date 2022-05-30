@@ -118,7 +118,7 @@ export default class MainPresenter {
   };
 
   #showNoPointsMessage = () => {
-    remove(this.#sortFormView);
+    this.#composePresenter.removeSortForm();
     this.#noPointsMessageView.message = this.#model.getFilterName();
     render(this.#noPointsMessageView, this.#eventsContainer);
   };
