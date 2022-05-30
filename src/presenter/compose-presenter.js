@@ -1,7 +1,7 @@
 import FiltersForm from '../view/filters-view';
 import SortForm from '../view/sorts-view';
 import Model from '../model/model';
-import { Actions, Sorts } from '../settings';
+import { Actions, Filters, Sorts } from '../settings';
 import { render, remove } from '../framework/render';
 
 export default class СomposePresenter {
@@ -10,6 +10,8 @@ export default class СomposePresenter {
   #sortFormView = null;
   #controlsContainer = null;
   #eventsContainer = null;
+  #currentFilterName = null;
+  #currentSortName = null;
 
   constructor(args) {
     const {
@@ -36,7 +38,11 @@ export default class СomposePresenter {
     }
     this.#controlsContainer = controlsContainer;
     this.#eventsContainer = eventsContainer;
+    this.#currentFilterName = Filters.EVERYTHING;
+    this.#currentSortName = Sorts.DAY;
   }
+
+  getFilterName = () => this.#currentFilterName;
 
   renderFilterForm = () => {
     render(this.#filtersFormView, this.#controlsContainer);
@@ -58,13 +64,13 @@ export default class СomposePresenter {
   #whenChangeFilters = (filterName) => {
     this.#sortFormView.init();
     this.#sortFormView.setSortsClickHandler(this.#whenChangeSorts);
-    this.#model.setFilterName(filterName);
-    this.#model.setSortName(Sorts.DAY);
-    this.#model.composePointsList(Actions.RENDER_POINTS_LIST);
+    this.#currentFilterName = filterName;
+    this.#currentSortName = Sorts.DAY;
+    this.#model.composePointsList(Actions.RENDER_POINTS_LIST, this.#currentFilterName, this.#currentSortName);
   };
 
   #whenChangeSorts = (sortName) => {
-    this.#model.setSortName(sortName);
-    this.#model.composePointsList(Actions.RENDER_POINTS_LIST);
+    this.#currentSortName = sortName;
+    this.#model.composePointsList(Actions.RENDER_POINTS_LIST, this.#currentFilterName, this.#currentSortName);
   };
 }
