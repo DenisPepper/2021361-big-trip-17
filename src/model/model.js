@@ -53,22 +53,22 @@ export default class Model {
 
   get points() {
     this.#getData();
-    return this.#points;
+    return this.#points.map((point) => ({...point}));
   }
 
   get offers() {
     this.#getData();
-    return this.#offers;
+    return this.#offers.map((offer) => ({...offer}));
   }
 
   get destinations() {
     this.#getData();
-    return this.#destinations;
+    return this.#destinations.map((dest) => ({...dest}));
   }
 
   addPoint = (point) => {
     this.#points = [point, ...this.#points];
-    this.#notifier.run();
+    this.#notify();
   };
 
   deletePoint = (point) => {
@@ -77,7 +77,7 @@ export default class Model {
       throw new Error('index of point not found');
     }
     this.#points = [...this.#points.slice(0, index), ...this.#points.slice(index + 1)];
-    this.#notifier.run();
+    this.#notify();
   };
 
   updatePoint = (point) => {
@@ -86,14 +86,14 @@ export default class Model {
       throw new Error('index of point not found');
     }
     this.#points = [...this.#points.slice(0, index), point, ...this.#points.slice(index + 1)];
-    this.#notifier.run();
+    this.#notify();
   };
 
   filtrate = (filterName) => this.#filter.run(this.points, filterName);
 
   sorting = (points = this.points, sortName) => this.#sorter.run(points, sortName);
 
-  #notify = () => {};
+  #notify = () => this.#notifier.run();
 
   addEvent = (callback) => this.#notifier.add(callback);
 
