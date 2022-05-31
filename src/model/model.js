@@ -1,8 +1,10 @@
 import { getDemoPoint, getDemoOffers, getDemoDestinations } from '../mock/mock';
 import { POINTS_COUNT } from '../settings';
+import { getCurrentDateTime } from '../util';
 import Filter from '../services/filter';
 import Sorter from '../services/sorter';
 import Notifier from '../services/notifier';
+import { POINT_TYPES } from '../settings';
 
 const getMock = () => ({
   points: Array.from({ length: POINTS_COUNT }, (element, index) =>
@@ -70,9 +72,28 @@ export default class Model {
     return this.#destinations.map((dest) => ({...dest}));
   }
 
-  addPoint = (point) => {
-    this.#points = [point, ...this.#points];
-    this.#notify();
+  get newPoint() {
+    return { basePrice: 0,
+      dateFrom: getCurrentDateTime(),
+      dateTo: getCurrentDateTime(),
+      destination: -1,
+      id: this.#points.length,
+      isFavorite: false,
+      offers: [],
+      type: POINT_TYPES[0],
+      isNew: true,
+    };
+  }
+
+  #validate = (point) => {
+    delete point.isNew;
+    return point;
+  };
+
+  addPoint = (point, args) => {
+    this.#points = [this.#validate(point), ...this.#points];
+    const {eventName} = args;
+    this.#notify(eventName, args);
   };
 
   deletePoint = (point, args) => {
@@ -90,7 +111,7 @@ export default class Model {
     if (index === -1) {
       throw new Error('index of point not found');
     }
-    this.#points = [...this.#points.slice(0, index), point, ...this.#points.slice(index + 1)];
+    this.#points = [...this.#points.slice(0, index), this.#validate(point), ...this.#points.slice(index + 1)];
     const {eventName} = args;
     this.#notify(eventName, args);
   };
@@ -99,10 +120,7 @@ export default class Model {
 
   sorting = (points = this.points, sortName) => this.#sorter.run(points, sortName);
 
-  composePointsList = (eventName, filterName, sortName) => {
-    const points = this.filtrate(filterName);
-    this.#notify(eventName, this.sorting(points, sortName));
-  };
+  compose = (filterName, sortName) => this.sorting(this.filtrate(filterName), sortName);
 
   addEvent = (eventName, callback) => this.#notifier.add(eventName, callback);
 

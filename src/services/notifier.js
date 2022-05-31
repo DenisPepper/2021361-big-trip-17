@@ -12,6 +12,9 @@ export default class Notifier {
   };
 
   run = (eventName, args) => {
+    if (eventName === null) {
+      return;
+    }
     const evt = this.#events.get(eventName);
     if (evt === undefined) {
       throw new Error(`${eventName} - event not found`);

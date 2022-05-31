@@ -1,31 +1,26 @@
 import FiltersForm from '../view/filters-view';
 import SortForm from '../view/sorts-view';
-import Model from '../model/model';
-import { Actions, Filters, Sorts } from '../settings';
+import { Filters, Sorts } from '../settings';
 import { render, remove } from '../framework/render';
 
 export default class СomposePresenter {
-  #model = null;
   #filtersFormView = null;
   #sortFormView = null;
   #controlsContainer = null;
   #eventsContainer = null;
   #currentFilterName = null;
   #currentSortName = null;
+  #callback = {
+    updateEvents: () => {},
+  };
 
   constructor(args) {
     const {
-      model,
       controlsContainer,
       eventsContainer,
       filtersFormView,
       sortFormView,
     } = args;
-    if (model instanceof Model) {
-      this.#model = model;
-    } else {
-      throw new Error(`IllegalArgumentException! expected: ${Model}`);
-    }
     if (filtersFormView instanceof FiltersForm) {
       this.#filtersFormView = filtersFormView;
     } else {
@@ -42,7 +37,14 @@ export default class СomposePresenter {
     this.#currentSortName = Sorts.DAY;
   }
 
+  init = (updateEvents) => {
+    this.#callback.updateEvents = updateEvents;
+    return this;
+  };
+
   getFilterName = () => this.#currentFilterName;
+
+  getSortName = () => this.#currentSortName;
 
   renderFilterForm = () => {
     render(this.#filtersFormView, this.#controlsContainer);
@@ -66,11 +68,11 @@ export default class СomposePresenter {
     this.#sortFormView.setSortsClickHandler(this.#whenChangeSorts);
     this.#currentFilterName = filterName;
     this.#currentSortName = Sorts.DAY;
-    this.#model.composePointsList(Actions.RENDER_POINTS_LIST, this.#currentFilterName, this.#currentSortName);
+    this.#callback.updateEvents();
   };
 
   #whenChangeSorts = (sortName) => {
     this.#currentSortName = sortName;
-    this.#model.composePointsList(Actions.RENDER_POINTS_LIST, this.#currentFilterName, this.#currentSortName);
+    this.#callback.updateEvents();
   };
 }

@@ -7,7 +7,7 @@ import SortForm from '../view/sorts-view';
 import NoPointsMessage from '../view/no-point-message-view';
 import PointRow from '../view/point-row-view';
 import PointForm from '../view/point-form-view';
-import { render, remove, replace } from '../framework/render';
+import { render, remove } from '../framework/render';
 import { Actions } from '../settings';
 
 export default class MainPresenter {
@@ -20,6 +20,7 @@ export default class MainPresenter {
   #noPointsMessageView = null;
   #currentPointPresenter = null;
   #composePresenter = null;
+  #newEventButton = null;
 
   constructor(args) {
     const {
@@ -30,7 +31,7 @@ export default class MainPresenter {
       filtersFormView,
       sortFormView,
       noPointsMessageView,
-
+      newEventButton,
     } = args;
 
     if (model instanceof Model) {
@@ -65,6 +66,7 @@ export default class MainPresenter {
 
     this.#controlsContainer = controlsContainer;
     this.#eventsContainer = eventsContainer;
+    this.#newEventButton = newEventButton;
   }
 
   get points() {
@@ -79,28 +81,41 @@ export default class MainPresenter {
     return this.#model.destinations;
   }
 
-  #setNotifications = () => {
-    this.#model.addEvent(Actions.RENDER_POINTS_LIST, (args) =>
-      this.#renderPointsList(args)
+  init = () => {
+    this.#newEventButton.addEventListener('click', this.#createNewEvent);
+    this.#createComposePresenter();
+    this.#setNotifications();
+    this.#updateEvents();
+  };
+
+  #updateEvents = () => {
+    const points = this.#model.compose(
+      this.#composePresenter.getFilterName(),
+      this.#composePresenter.getSortName()
     );
+    this.#renderPointsList(points);
+  };
+
+  #setNotifications = () => {
     this.#model.addEvent(Actions.DELETE_POINT, (args) =>
       this.#whenDeletePoint(args)
     );
+    this.#model.addEvent(Actions.UPDATE_EVENTS, (args) =>
+      this.#updateEvents(args)
+    );
   };
 
-  init = () => {
-    this.#composePresenter = new СomposePresenter(
-      {
-        model: this.#model,
-        filtersFormView: this.#filtersFormView,
-        sortFormView: this.#sortFormView,
-        controlsContainer: this.#controlsContainer,
-        eventsContainer: this.#eventsContainer
-      })
+  #createComposePresenter = () => {
+    this.#composePresenter = new СomposePresenter({
+      model: this.#model,
+      filtersFormView: this.#filtersFormView,
+      sortFormView: this.#sortFormView,
+      controlsContainer: this.#controlsContainer,
+      eventsContainer: this.#eventsContainer,
+    })
+      .init(this.#updateEvents)
       .renderFilterForm()
       .renderSortForm();
-    this.#setNotifications();
-    this.#model.composePointsList(Actions.RENDER_POINTS_LIST);
   };
 
   #setCurrentPointPresenter = (pointPresenter) => {
@@ -116,7 +131,7 @@ export default class MainPresenter {
   };
 
   #whenDeletePoint = (args) => {
-    let {pointPresenter} = args;
+    let { pointPresenter } = args;
     pointPresenter.clear();
     pointPresenter = null;
     this.#resetCurrentPointPresenter();
@@ -145,27 +160,35 @@ export default class MainPresenter {
     render(this.#pointsListView, this.#eventsContainer);
   };
 
-  #renderPoint = (point) => {
-    this.#addPointToPointsList(
-      this.#model,
-      point,
-      new PointRow(point, this.offers, this.destinations),
-      new PointForm(point, this.offers, this.destinations)
-    );
-  };
+  #renderPoint = (point) => this.#createPointPresenter(
+    this.#model,
+    point,
+    new PointRow(point, this.offers, this.destinations),
+    new PointForm(point, this.offers, this.destinations)
+  );
 
-  #addPointToPointsList = (model, point, pointRowView, pointFormView) => {
+  #createPointPresenter = (model, point, pointRowView, pointFormView) => {
     const pointPresenter = new PointPresenter({
       model,
       point,
       pointRowView,
       pointFormView,
       pointsListView: this.#pointsListView,
-    });
-    pointPresenter.init(
-      this.#setCurrentPointPresenter,
-      this.#resetCurrentPointPresenter
-    );
-    pointPresenter.renderPoint();
+    })
+      .init(this.#setCurrentPointPresenter,
+        this.#resetCurrentPointPresenter,
+        this.#whenDeletePoint)
+      .renderPoint();
+    return pointPresenter;
+  };
+
+  #createNewEvent = () => {
+    const pointPresenter = this.#renderPoint(this.#model.newPoint);
+    pointPresenter.setOnEscClickHandler();
+    this.#setCurrentPointPresenter(pointPresenter);
+    if (this.#model.pointsLength === 0) {
+      remove(this.#noPointsMessageView);
+      render(this.#pointsListView, this.#eventsContainer);
+    }
   };
 }

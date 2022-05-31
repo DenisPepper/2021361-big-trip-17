@@ -17,6 +17,7 @@ const mainPresenter = new MainPresenter({
   pointsListView: new PointsList(),
   controlsContainer: document.querySelector('.trip-controls__filters'),
   eventsContainer: document.querySelector('.trip-events'),
+  newEventButton: document.querySelector('.trip-main__event-add-btn'),
   filtersFormView: new FiltersForm(),
   sortFormView: new SortForm(),
   noPointsMessageView: new NoPointsMessage(),

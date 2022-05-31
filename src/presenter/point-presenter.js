@@ -8,8 +8,9 @@ export default class PointPresenter {
   #pointRowView = null;
   #pointFormView = null;
   #callback = {
-    setCurrentPointPresenter: null,
-    resetCurrentPointPresenter: null,
+    setCurrentPointPresenter: () => {},
+    resetCurrentPointPresenter: () => {},
+    whenDeletePoint: () => {},
   };
 
   constructor(args) {
@@ -21,14 +22,16 @@ export default class PointPresenter {
     this.#pointsListView = pointsListView;
   }
 
-  init = (setCurrentPointPresenter, resetCurrentPointPresenter) => {
+  init = (setCurrentPointPresenter, resetCurrentPointPresenter, whenDeletePoint) => {
     this.#callback.setCurrentPointPresenter = setCurrentPointPresenter;
     this.#callback.resetCurrentPointPresenter = resetCurrentPointPresenter;
+    this.#callback.whenDeletePoint = whenDeletePoint;
     this.#pointRowView.setEditClickCallback(this.#whenEditClick);
     this.#pointRowView.setFavoriteClickCallback(this.#whenFavoriteClick);
     this.#pointFormView.setCloseClickCallback(this.#whenCloseClick);
     this.#pointFormView.setSaveClickCallback(this.#whenSaveClick);
     this.#pointFormView.setResetClickCallback(this.#whenResetClick);
+    return this;
   };
 
   #whenEditClick = () => {
@@ -38,7 +41,7 @@ export default class PointPresenter {
   };
 
   #whenFavoriteClick = (point) => {
-    this.#model.updatePoint(point, { eventName: ''});
+    this.#model.updatePoint(point, { eventName: null });
   };
 
   #whenCloseClick = () => {
@@ -48,10 +51,15 @@ export default class PointPresenter {
     this.removeOnEscClickHandler();
   };
 
-  #whenSaveClick = () => {
+  #whenSaveClick = (point) => {
     this.#callback.resetCurrentPointPresenter();
     this.closePointForm();
     this.removeOnEscClickHandler();
+    if (this.#point.isNew) {
+      this.#model.addPoint(point, { eventName: Actions.UPDATE_EVENTS });
+    } else {
+      this.#model.updatePoint(point, { eventName: Actions.UPDATE_EVENTS });
+    }
   };
 
   #whenResetClick = (point) => {
@@ -64,7 +72,13 @@ export default class PointPresenter {
 
   #openPointForm = () => replace(this.#pointFormView, this.#pointRowView);
 
-  closePointForm = () => replace(this.#pointRowView, this.#pointFormView);
+  closePointForm = () => {
+    if (this.#point.isNew) {
+      this.#callback.whenDeletePoint({pointPresenter: this});
+    } else {
+      replace(this.#pointRowView, this.#pointFormView);
+    }
+  };
 
   clear = () => {
     remove(this.#pointFormView);
@@ -83,10 +97,16 @@ export default class PointPresenter {
     }
   };
 
-  removeOnEscClickHandler = () =>
-    document.removeEventListener('keydown', this.#onEscKeyDown);
+  setOnEscClickHandler = () => document.addEventListener('keydown', this.#onEscKeyDown);
+
+  removeOnEscClickHandler = () => document.removeEventListener('keydown', this.#onEscKeyDown);
 
   renderPoint = () => {
-    render(this.#pointRowView, this.#pointsListView.element);
+    if (this.#point.isNew) {
+      render(this.#pointFormView, this.#pointsListView.element, 'afterbegin');
+    } else {
+      render(this.#pointRowView, this.#pointsListView.element);
+    }
+    return this;
   };
 }

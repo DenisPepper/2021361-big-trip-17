@@ -5,7 +5,7 @@ export const POINTS_COUNT = 3;
 export const DECIMAL = 10;
 export const MINUTES_IN_HOUR = 60;
 export const MINUTES_IN_DAY = 1440;
-export const DEFAULT_DELAY = 500;
+export const DEFAULT_DELAY = 1000;
 export const POINT_TYPES = [
   'taxi',
   'bus',
@@ -45,10 +45,10 @@ export const SorterRules = {
   [Sorts.TIME]: (a, b) =>
     getDateDiffInMinute(b.dateFrom, b.dateTo) -
     getDateDiffInMinute(a.dateFrom, a.dateTo),
-  [Sorts.DAY]: (a, b) => dayjs(b.dateFrom) - dayjs(a.dateFrom),
+  [Sorts.DAY]: (a, b) => dayjs(a.dateFrom) - dayjs(b.dateFrom),
 };
 
 export const Actions = {
-  RENDER_POINTS_LIST: 'RENDER_POINTS_LIST',
+  UPDATE_EVENTS: 'UPDATE_EVENTS',
   DELETE_POINT: 'DELETE_POINT',
 };
