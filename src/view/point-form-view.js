@@ -4,6 +4,7 @@ import AbstractStatefulView from '../framework/view/abstract-stateful-view';
 import flatpickr from 'flatpickr';
 import { Russian } from 'flatpickr/dist/l10n/ru.js';
 import 'flatpickr/dist/themes/material_blue.css';
+import { DECIMAL } from '../settings';
 
 const Delay = {
   POINT_TYPE: 200,
@@ -36,6 +37,7 @@ export default class PointForm extends AbstractStatefulView {
   #eventStartTime = null;
   #eventEndTime = null;
   #flatpickrEndTime = null;
+  #price = null;
 
   constructor(point, offers, destinations) {
     super();
@@ -60,6 +62,7 @@ export default class PointForm extends AbstractStatefulView {
     this.#rollupButton = this.element.querySelector('.event__rollup-btn');
     this.#eventTypeGroup = this.element.querySelector('.event__type-list');
     this.#eventDestination = this.element.querySelector('.event__input--destination');
+    this.#price = this.element.querySelector('#event-price-1');
   };
 
   #setHandlers = () => {
@@ -70,6 +73,7 @@ export default class PointForm extends AbstractStatefulView {
     this.#rollupButton.addEventListener('click', this.#closeClickHandler);
     this.#eventStartTime.addEventListener('input', this.#whenInputStartTime);
     this.#eventEndTime.addEventListener('input', this.#whenInputEndtTime);
+    this.#price.addEventListener('input', this.#whenInputPrice);
   };
 
   #setFlatpickr = () => {
@@ -149,5 +153,12 @@ export default class PointForm extends AbstractStatefulView {
 
   #whenInputEndtTime = debounce((evt) => {
     this._state.dateTo = evt.target.value;
+  });
+
+  #whenInputPrice = debounce((evt) => {
+    const price = parseInt(evt.target.value, DECIMAL);
+    if (price) {
+      this._state.basePrice = price;
+    }
   });
 }
