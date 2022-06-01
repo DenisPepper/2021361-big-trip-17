@@ -65,3 +65,5 @@ export const debounce = (callback, delay = DEFAULT_DELAY) => {
     timeoutId = setTimeout(() => callback.apply(null, rest), delay);
   };
 };
+
+export const getCurrentDateTime = () => dayjs().format();

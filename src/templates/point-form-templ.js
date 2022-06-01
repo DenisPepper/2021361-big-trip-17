@@ -39,6 +39,16 @@ const getOffersList = (typeOffersObject, pointOffers) => {
   return result;
 };
 
+const getOffersSection = (point, offersCollection) => {
+  const result = `<section class="event__section  event__section--offers">
+    <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+    <div class="event__available-offers">
+      ${getOffersList(offersCollection, point.offers)}
+    </div>
+  </section>`;
+  return result;
+};
+
 const getPictures = (pictures) => {
   let result = '';
   pictures.forEach((picture) => {
@@ -47,10 +57,28 @@ const getPictures = (pictures) => {
   return result;
 };
 
+const getPicturesContainer = (pictures) => {
+  const result =  pictures.length === 0 ? '' : `<div class="event__photos-container">
+  <div class="event__photos-tape"> 
+   ${getPictures(pictures)}
+  </div>
+  </div>`;
+  return result;
+};
+
+const getDestinationSection = (destination) => {
+  const result = `<section class="event__section  event__section--destination">
+  <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+  <p class="event__destination-description">${destination.description}</p>
+  ${getPicturesContainer(destination.pictures)}  
+  </section>`;
+  return result;
+};
+
 export const createPointFormTempalte = (point, offers, destinations) => {
   const destination = destinations[point.destination];
-  const typeOffersObject = offers
-    .filter((element) => element.type === point.type)
+  const offersCollection = offers
+    .filter((offer) => offer.type === point.type)
     .pop();
 
   return `<form class="event event--edit" action="#" method="post">
@@ -81,7 +109,7 @@ export const createPointFormTempalte = (point, offers, destinations) => {
     <input
       class="event__input event__input--destination"
       id="event-destination-1" type="text" name="event-destination"
-      value="${destination.name}"
+      value="${destination === undefined ? '' : destination.name}"
       list="destination-list-1"
     />
     <datalist id="destination-list-1">
@@ -127,24 +155,12 @@ export const createPointFormTempalte = (point, offers, destinations) => {
   </button>
 </header>
 
-<section class="event__details">
-  <section class="event__section  event__section--offers">
-    <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-
-    <div class="event__available-offers">
-      ${typeOffersObject === undefined ? '' : getOffersList(typeOffersObject, point.offers)}
-    </div>
-  </section>
-
-  <section class="event__section  event__section--destination">
-    <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-    <p class="event__destination-description">${destination.description}</p>
-    <div class="event__photos-container">
-    <div class="event__photos-tape">
-    ${getPictures(destination.pictures)}
-     </div>
-   </div>
-  </section>
+  <section class="event__details">
+  
+  ${offersCollection === undefined ? '' : getOffersSection(point, offersCollection)}
+  
+  ${destination === undefined ? '' : getDestinationSection(destination)}
+  
 </section>
 </form>`;
 };

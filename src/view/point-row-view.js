@@ -7,6 +7,7 @@ export default class PointRow extends AbstractStatefulView {
   #destinations = null;
   _callback = {
     rollupButtonClick: () => {},
+    favoriteButtonClick: () => {},
   };
 
   rollupButton = null;
@@ -14,7 +15,7 @@ export default class PointRow extends AbstractStatefulView {
 
   constructor(point, offers, destinations) {
     super();
-    this.state = point;
+    this.#setState(point);
     this.#offers = offers;
     this.#destinations = destinations;
     this.init();
@@ -39,14 +40,11 @@ export default class PointRow extends AbstractStatefulView {
     this.init();
   };
 
-  get state() {
-    const point = { ...this._state };
-    return point;
-  }
-
-  set state(point) {
+  #setState = (point) => {
     this._state = { ...point };
-  }
+  };
+
+  #getState = () => ({ ...this._state });
 
   get template() {
     return createPointRowTemplate(
@@ -55,6 +53,10 @@ export default class PointRow extends AbstractStatefulView {
       this.#destinations
     );
   }
+
+  setFavoriteClickCallback = (callback) => {
+    this._callback.favoriteButtonClick = callback;
+  };
 
   setEditClickCallback = (callback) => {
     this._callback.rollupButtonClick = callback;
@@ -68,5 +70,6 @@ export default class PointRow extends AbstractStatefulView {
     this.updateElement({
       isFavorite: !this._state.isFavorite,
     });
+    this._callback.favoriteButtonClick(this.#getState());
   };
 }

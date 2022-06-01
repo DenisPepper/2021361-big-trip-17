@@ -15,9 +15,8 @@ export default class SortForm extends AbstractView {
     return createSortsFormTemplate();
   }
 
-  init = (callback) => {
+  init = () => {
     this.element[0].checked = true;
-    this.setSortsClickHandler(callback);
   };
 
   setSortsClickHandler = (callback) => {
@@ -28,4 +27,9 @@ export default class SortForm extends AbstractView {
   #setSortsClick = (evt) => {
     this._callback.setSortsClick(evt.target.value);
   };
+
+  removeSortsClickHandler = () => {
+    this.element.removeEventListener('input', this._callback.setSortsClick);
+  };
+
 }

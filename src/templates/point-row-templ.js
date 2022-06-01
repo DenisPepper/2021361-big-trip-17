@@ -39,7 +39,7 @@ export const createPointRowTemplate = (point, offers, destinations) => {
       src="img/icons/${point.type}.png" alt="Event type icon">
     </div>
     <h3 class="event__title">${firstCharToUpperCase(point.type)}
-     ${destination.name}</h3>
+     ${destination === undefined ? '' : destination.name}</h3>
     <div class="event__schedule">
     <p class="event__time">
       <time class="event__start-time" 
