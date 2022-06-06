@@ -1,7 +1,6 @@
 import dayjs from 'dayjs';
 import { getDateDiffInMinute } from './util';
 
-export const POINTS_COUNT = 3;
 export const DECIMAL = 10;
 export const MINUTES_IN_HOUR = 60;
 export const MINUTES_IN_DAY = 1440;

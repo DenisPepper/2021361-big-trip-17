@@ -1,9 +1,8 @@
-import { getDemoPoint, getDemoOffers, getDemoDestinations } from '../mock/mock';
-import { POINTS_COUNT } from '../settings';
 import { getCurrentDateTime } from '../util';
 import Filter from '../services/filter';
 import Sorter from '../services/sorter';
 import EventManager from '../services/notifier';
+import Loader from '../services/loader';
 import { POINT_TYPES } from '../settings';
 
 const modelEvents = {
@@ -11,25 +10,22 @@ const modelEvents = {
   UPDATE_LIST: 'update_list',
 };
 
-const getMock = () => ({
-  points: Array.from({ length: POINTS_COUNT }, (element, index) =>
-    getDemoPoint(index)
-  ),
-  offers: getDemoOffers(),
-  destinations: getDemoDestinations(),
-});
-
 export default class Model {
   #points = [];
   #offers = [];
   #destinations = [];
-  #loaded = false;
   #filter = null;
   #sorter = null;
   #eventManager = null;
+  #loader = null;
+  #loaderState = {
+    pointsIsLoad: false,
+    offersIsLoad: false,
+    destinationsIsLoad: false,
+  };
 
   constructor(args) {
-    const { filter, sorter, notifier: eventManager } = args;
+    const { filter, sorter, eventManager, loader } = args;
     if (filter instanceof Filter) {
       this.#filter = filter;
     } else {
@@ -45,36 +41,66 @@ export default class Model {
     } else {
       throw new Error(`IllegalArgumentException! expected: ${EventManager}`);
     }
+    if (loader instanceof Loader) {
+      this.#loader = loader;
+    } else {
+      throw new Error(`IllegalArgumentException! expected: ${Loader}`);
+    }
   }
 
-  #getData = () => {
-    if (this.#loaded) {
-      return;
-    }
-    this.#loaded = true;
-    const { points, offers, destinations } = getMock();
-    this.#points = points;
-    this.#offers = offers;
-    this.#destinations = destinations;
+  init = () => {
+    this.#loader.getPoints(this.setPoints);
+    this.#loader.getDestinations(this.setDestinations);
+    this.#loader.getOffers(this.setOffers);
   };
 
   get points() {
-    this.#getData();
     return this.#points.map((point) => ({ ...point }));
   }
 
-  get pointsLength() {
-    return this.#points.length;
-  }
+  setPoints = (points) => {
+    if (points) {
+      this.#points = points;
+      this.#loaderState.pointsIsLoad = true;
+      this.#loaderCheck();
+    }
+  };
 
   get offers() {
-    this.#getData();
     return this.#offers.map((offer) => ({ ...offer }));
   }
 
+  setOffers = (offers) => {
+    if (offers) {
+      this.#offers = offers.map((element) => this.#validate(element));
+      this.#loaderState.offersIsLoad = true;
+      this.#loaderCheck();
+    }
+  };
+
   get destinations() {
-    this.#getData();
     return this.#destinations.map((dest) => ({ ...dest }));
+  }
+
+  setDestinations = (destinations) => {
+    if (destinations) {
+      this.#destinations = destinations;
+      this.#loaderState.destinationsIsLoad = true;
+      this.#loaderCheck();
+    }
+  };
+
+  #loaderCheck = () => {
+    for (const key in this.#loaderState) {
+      if (!this.#loaderState[key]) {
+        return;
+      }
+    }
+    this.#notify(modelEvents.UPDATE_LIST, this);
+  };
+
+  get pointsLength() {
+    return this.#points.length;
   }
 
   get newPoint() {

@@ -81,23 +81,25 @@ export default class MainPresenter {
   }
 
   init = () => {
-    this.#newEventButton.addEventListener('click', this.#createNewEvent);
-    this.#createComposePresenter();
     this.#setNotifications();
-    this.#whenUpdatePoints();
-  };
-
-  #whenUpdatePoints = () => {
-    const points = this.#model.compose(
-      this.#composePresenter.getFilterName(),
-      this.#composePresenter.getSortName()
-    );
-    this.#renderPointsList(points);
+    this.#model.init();
   };
 
   #setNotifications = () => {
     this.#model.addDeletePointListener((args) => this.#whenDeletePoint(args));
     this.#model.addUpdatePointsListener((args) => this.#whenUpdatePoints(args));
+  };
+
+  #whenUpdatePoints = () => {
+    if (!this.#eventsContainer.contains(this.#filtersFormView.element)) {
+      this.#newEventButton.addEventListener('click', this.#createNewEvent);
+      this.#createComposePresenter();
+    }
+    const points = this.#model.compose(
+      this.#composePresenter.getFilterName(),
+      this.#composePresenter.getSortName()
+    );
+    this.#renderPointsList(points);
   };
 
   #createComposePresenter = () => {

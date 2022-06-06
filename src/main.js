@@ -7,12 +7,14 @@ import NoPointsMessage from './view/no-point-message-view';
 import Filter from './services/filter';
 import Sorter from './services/sorter';
 import EventManager from './services/notifier';
+import Loader from './services/loader';
 
 const mainPresenter = new MainPresenter({
   model: new Model({
     filter: new Filter(),
     sorter: new Sorter(),
-    notifier: new EventManager(),
+    eventManager: new EventManager(),
+    loader: new Loader(),
   }),
   pointsListView: new PointsList(),
   controlsContainer: document.querySelector('.trip-controls__filters'),
