@@ -8,7 +8,6 @@ import NoPointsMessage from '../view/no-point-message-view';
 import PointRow from '../view/point-row-view';
 import PointForm from '../view/point-form-view';
 import { render, remove } from '../framework/render';
-import { Actions } from '../settings';
 
 export default class MainPresenter {
   #model = null;
@@ -85,10 +84,10 @@ export default class MainPresenter {
     this.#newEventButton.addEventListener('click', this.#createNewEvent);
     this.#createComposePresenter();
     this.#setNotifications();
-    this.#updateEvents();
+    this.#whenUpdatePoints();
   };
 
-  #updateEvents = () => {
+  #whenUpdatePoints = () => {
     const points = this.#model.compose(
       this.#composePresenter.getFilterName(),
       this.#composePresenter.getSortName()
@@ -97,12 +96,8 @@ export default class MainPresenter {
   };
 
   #setNotifications = () => {
-    this.#model.addEvent(Actions.DELETE_POINT, (args) =>
-      this.#whenDeletePoint(args)
-    );
-    this.#model.addEvent(Actions.UPDATE_EVENTS, (args) =>
-      this.#updateEvents(args)
-    );
+    this.#model.addDeletePointListener((args) => this.#whenDeletePoint(args));
+    this.#model.addUpdatePointsListener((args) => this.#whenUpdatePoints(args));
   };
 
   #createComposePresenter = () => {
@@ -113,7 +108,7 @@ export default class MainPresenter {
       controlsContainer: this.#controlsContainer,
       eventsContainer: this.#eventsContainer,
     })
-      .init(this.#updateEvents)
+      .init(this.#whenUpdatePoints)
       .renderFilterForm()
       .renderSortForm();
   };
@@ -160,12 +155,13 @@ export default class MainPresenter {
     render(this.#pointsListView, this.#eventsContainer);
   };
 
-  #renderPoint = (point) => this.#createPointPresenter(
-    this.#model,
-    point,
-    new PointRow(point, this.offers, this.destinations),
-    new PointForm(point, this.offers, this.destinations)
-  );
+  #renderPoint = (point) =>
+    this.#createPointPresenter(
+      this.#model,
+      point,
+      new PointRow(point, this.offers, this.destinations),
+      new PointForm(point, this.offers, this.destinations)
+    );
 
   #createPointPresenter = (model, point, pointRowView, pointFormView) => {
     const pointPresenter = new PointPresenter({
@@ -175,9 +171,11 @@ export default class MainPresenter {
       pointFormView,
       pointsListView: this.#pointsListView,
     })
-      .init(this.#setCurrentPointPresenter,
+      .init(
+        this.#setCurrentPointPresenter,
         this.#resetCurrentPointPresenter,
-        this.#whenDeletePoint)
+        this.#whenDeletePoint
+      )
       .renderPoint();
     return pointPresenter;
   };

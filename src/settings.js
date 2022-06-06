@@ -47,8 +47,3 @@ export const SorterRules = {
     getDateDiffInMinute(a.dateFrom, a.dateTo),
   [Sorts.DAY]: (a, b) => dayjs(a.dateFrom) - dayjs(b.dateFrom),
 };
-
-export const Actions = {
-  UPDATE_EVENTS: 'UPDATE_EVENTS',
-  DELETE_POINT: 'DELETE_POINT',
-};

@@ -6,13 +6,13 @@ import SortForm from './view/sorts-view';
 import NoPointsMessage from './view/no-point-message-view';
 import Filter from './services/filter';
 import Sorter from './services/sorter';
-import Notifier from './services/notifier';
+import EventManager from './services/notifier';
 
 const mainPresenter = new MainPresenter({
   model: new Model({
     filter: new Filter(),
     sorter: new Sorter(),
-    notifier: new Notifier(),
+    notifier: new EventManager(),
   }),
   pointsListView: new PointsList(),
   controlsContainer: document.querySelector('.trip-controls__filters'),

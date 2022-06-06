@@ -3,8 +3,13 @@ import { POINTS_COUNT } from '../settings';
 import { getCurrentDateTime } from '../util';
 import Filter from '../services/filter';
 import Sorter from '../services/sorter';
-import Notifier from '../services/notifier';
+import EventManager from '../services/notifier';
 import { POINT_TYPES } from '../settings';
+
+const modelEvents = {
+  DELETE_POINT: 'delete_point',
+  UPDATE_LIST: 'update_list',
+};
 
 const getMock = () => ({
   points: Array.from({ length: POINTS_COUNT }, (element, index) =>
@@ -21,10 +26,10 @@ export default class Model {
   #loaded = false;
   #filter = null;
   #sorter = null;
-  #notifier = null;
+  #eventManager = null;
 
   constructor(args) {
-    const { filter, sorter, notifier} = args;
+    const { filter, sorter, notifier: eventManager } = args;
     if (filter instanceof Filter) {
       this.#filter = filter;
     } else {
@@ -35,10 +40,10 @@ export default class Model {
     } else {
       throw new Error(`IllegalArgumentException! expected: ${Sorter}`);
     }
-    if (notifier instanceof Notifier) {
-      this.#notifier = notifier;
+    if (eventManager instanceof EventManager) {
+      this.#eventManager = eventManager;
     } else {
-      throw new Error(`IllegalArgumentException! expected: ${Notifier}`);
+      throw new Error(`IllegalArgumentException! expected: ${EventManager}`);
     }
   }
 
@@ -55,7 +60,7 @@ export default class Model {
 
   get points() {
     this.#getData();
-    return this.#points.map((point) => ({...point}));
+    return this.#points.map((point) => ({ ...point }));
   }
 
   get pointsLength() {
@@ -64,16 +69,17 @@ export default class Model {
 
   get offers() {
     this.#getData();
-    return this.#offers.map((offer) => ({...offer}));
+    return this.#offers.map((offer) => ({ ...offer }));
   }
 
   get destinations() {
     this.#getData();
-    return this.#destinations.map((dest) => ({...dest}));
+    return this.#destinations.map((dest) => ({ ...dest }));
   }
 
   get newPoint() {
-    return { basePrice: 0,
+    return {
+      basePrice: 0,
       dateFrom: getCurrentDateTime(),
       dateTo: getCurrentDateTime(),
       destination: -1,
@@ -92,8 +98,7 @@ export default class Model {
 
   addPoint = (point, args) => {
     this.#points = [this.#validate(point), ...this.#points];
-    const {eventName} = args;
-    this.#notify(eventName, args);
+    this.#notify(modelEvents.UPDATE_LIST, args);
   };
 
   deletePoint = (point, args) => {
@@ -101,9 +106,11 @@ export default class Model {
     if (index === -1) {
       throw new Error('index of point not found');
     }
-    this.#points = [...this.#points.slice(0, index), ...this.#points.slice(index + 1)];
-    const {eventName} = args;
-    this.#notify(eventName, args);
+    this.#points = [
+      ...this.#points.slice(0, index),
+      ...this.#points.slice(index + 1),
+    ];
+    this.#notify(modelEvents.DELETE_POINT, args);
   };
 
   updatePoint = (point, args) => {
@@ -111,21 +118,27 @@ export default class Model {
     if (index === -1) {
       throw new Error('index of point not found');
     }
-    this.#points = [...this.#points.slice(0, index), this.#validate(point), ...this.#points.slice(index + 1)];
-    const {eventName} = args;
-    this.#notify(eventName, args);
+    this.#points = [
+      ...this.#points.slice(0, index),
+      this.#validate(point),
+      ...this.#points.slice(index + 1),
+    ];
+    this.#notify(modelEvents.UPDATE_LIST, args);
   };
 
-  filtrate = (filterName) => this.#filter.run(this.points, filterName);
+  #filtrate = (filterName) => this.#filter.run(this.points, filterName);
 
-  sorting = (points = this.points, sortName) => this.#sorter.run(points, sortName);
+  #sorting = (points = this.points, sortName) =>
+    this.#sorter.run(points, sortName);
 
-  compose = (filterName, sortName) => this.sorting(this.filtrate(filterName), sortName);
+  compose = (filterName, sortName) =>
+    this.#sorting(this.#filtrate(filterName), sortName);
 
-  addEvent = (eventName, callback) => this.#notifier.add(eventName, callback);
+  addDeletePointListener = (callback) =>
+    this.#eventManager.add(modelEvents.DELETE_POINT, callback);
 
-  removeEvent = (eventName, callback) => this.#notifier.remove(eventName, callback);
+  addUpdatePointsListener = (callback) =>
+    this.#eventManager.add(modelEvents.UPDATE_LIST, callback);
 
-  #notify = (eventName, ...args) => this.#notifier.run(eventName, args);
-
+  #notify = (name, args) => this.#eventManager.invoke(name, args);
 }

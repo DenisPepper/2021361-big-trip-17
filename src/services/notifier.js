@@ -1,24 +1,61 @@
-export default class Notifier {
+class EventPool {
+  #events = new Set();
+  add = (event) => this.#events.add(event);
+  remove = (event) => this.#events.remove(event);
+  invoke = (args) => this.#events.forEach((event) => event(args));
+}
+
+export default class EventManager {
   #events = new Map();
 
-  add = (eventName, callback) => {
-    this.#events.set(eventName, callback);
+  /**
+   * Метод возвращает новый пул функций обратного вызова
+   * @param {String} name - ключ для нового пула функций
+   * @returns {Map<String, EventPool>} элемент карты событий
+   */
+  #newEventPool = (name) => {
+    const pool = new EventPool();
+    this.#events.set(name, pool);
+    return pool;
   };
 
-  remove = (eventName, callback) => {
-    if (this.#events.has(eventName)) {
-      this.#events.delete(eventName, callback);
+  /**
+   * Метод возвращает готовый или новый пул функций обратного вызова
+   * @param {String} name - ключ для нового пула функций
+   * @returns {Map<String, EventPool>}
+   */
+  #getNotifier = (name) => {
+    const pool = this.#events.get(name);
+    if (pool) {
+      return pool;
     }
+    return this.#newEventPool(name);
   };
 
-  run = (eventName, args) => {
-    if (eventName === null) {
-      return;
-    }
-    const evt = this.#events.get(eventName);
-    if (evt === undefined) {
-      throw new Error(`${eventName} - event not found`);
-    }
-    evt.apply(null, args);
+  /**
+   * Метод добавляет функцию в пул функций обратного вызова
+   * @param {String} name - ключ пула функций
+   * @param {Function} event - функция обратного вызова
+   */
+  add = (name, event) => {
+    this.#getNotifier(name).add(event);
+  };
+
+  /**
+   * Метод удаляет функцию из пула функций обратного вызова
+   * @param {String} name - ключ пула функций
+   * @param {Function} event - функция обратного вызова
+   */
+  remove = (name, event) => {
+    this.#getNotifier(name).remove(event);
+  };
+
+  /**
+   * Метод вызывает все функции из пула функций обратного вызова
+   * @param {String} name - ключ пула функций
+   * @param {Any} sourse - аргумент для функциий обратного вызова
+   */
+  invoke = (name, args) => {
+    this.#getNotifier(name).invoke(args);
   };
 }
