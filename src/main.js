@@ -4,18 +4,9 @@ import PointsList from './view/points-list-view';
 import FiltersForm from './view/filters-view';
 import SortForm from './view/sorts-view';
 import NoPointsMessage from './view/no-point-message-view';
-import Filter from './services/filter';
-import Sorter from './services/sorter';
-import EventManager from './services/notifier';
-import Loader from './services/loader';
 
 const mainPresenter = new MainPresenter({
-  model: new Model({
-    filter: new Filter(),
-    sorter: new Sorter(),
-    eventManager: new EventManager(),
-    loader: new Loader(),
-  }),
+  model: new Model(),
   pointsListView: new PointsList(),
   controlsContainer: document.querySelector('.trip-controls__filters'),
   eventsContainer: document.querySelector('.trip-events'),

@@ -26,23 +26,19 @@ export default class Loader {
     const response = await fetch(url, params);
     if (response.ok) {
       const data = await response.json();
-      return data;
+      return {ok: response.ok, data};
     } else {
-      throw new Error(
-        `server response ${response.status} (${response.statusText})`
-      );
+      return {ok: false, data: []};
     }
   };
 
   getPoints = async (whenLoadPoints) => {
-    const url = `${this.#serverURL}${this.#offersURN}`;
+    const url = `${this.#serverURL}${this.#pointsURN}`;
     const params = {
       method: Method.GET,
       headers: {
-        'Content-Type': 'application/json',
         Authorization: 'Basic hS2sfS44wcl1sa2j',
       },
-      body: null,
     };
     const points = await this.#sendRequest(url, params);
     whenLoadPoints(points);
@@ -53,10 +49,8 @@ export default class Loader {
     const params = {
       method: Method.GET,
       headers: {
-        'Content-Type': 'application/json',
         Authorization: 'Basic hS2sfS44wcl1sa2j',
       },
-      body: null,
     };
     const destinations = await this.#sendRequest(url, params);
     whenLoadDestinations(destinations);
@@ -67,10 +61,8 @@ export default class Loader {
     const params = {
       method: Method.GET,
       headers: {
-        'Content-Type': 'application/json',
         Authorization: 'Basic hS2sfS44wcl1sa2j',
       },
-      body: null,
     };
     const offers = await this.#sendRequest(url, params);
     whenLoadOffers(offers);

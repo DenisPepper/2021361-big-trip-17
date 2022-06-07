@@ -1,13 +1,13 @@
-import { getCurrentDateTime } from '../util';
 import Filter from '../services/filter';
 import Sorter from '../services/sorter';
 import EventManager from '../services/notifier';
 import Loader from '../services/loader';
-import { POINT_TYPES } from '../settings';
+import Adapter from '../services/adapter';
 
 const modelEvents = {
   DELETE_POINT: 'delete_point',
   UPDATE_LIST: 'update_list',
+  AFTER_LOAD: 'after_load',
 };
 
 export default class Model {
@@ -19,13 +19,20 @@ export default class Model {
   #eventManager = null;
   #loader = null;
   #loaderState = {
-    pointsIsLoad: false,
-    offersIsLoad: false,
-    destinationsIsLoad: false,
+    points: { wasRequested: false },
+    offers: { wasRequested: false },
+    destinations: { wasRequested: false },
   };
 
-  constructor(args) {
-    const { filter, sorter, eventManager, loader } = args;
+  #adapter = null;
+
+  constructor(
+    filter = new Filter(),
+    sorter = new Sorter(),
+    eventManager = new EventManager(),
+    loader = new Loader(),
+    adapter = new Adapter()
+  ) {
     if (filter instanceof Filter) {
       this.#filter = filter;
     } else {
@@ -46,6 +53,11 @@ export default class Model {
     } else {
       throw new Error(`IllegalArgumentException! expected: ${Loader}`);
     }
+    if (adapter instanceof Adapter) {
+      this.#adapter = adapter;
+    } else {
+      throw new Error(`IllegalArgumentException! expected: ${Adapter}`);
+    }
   }
 
   init = () => {
@@ -58,11 +70,13 @@ export default class Model {
     return this.#points.map((point) => ({ ...point }));
   }
 
-  setPoints = (points) => {
-    if (points) {
-      this.#points = points;
-      this.#loaderState.pointsIsLoad = true;
-      this.#loaderCheck();
+  setPoints = (args) => {
+    if (args) {
+      const { ok, data } = args;
+      this.#points = data;
+      this.#loaderState.points.wasRequested = true;
+      this.#loaderState.points.ok = ok;
+      this.#checkLoader();
     }
   };
 
@@ -70,11 +84,13 @@ export default class Model {
     return this.#offers.map((offer) => ({ ...offer }));
   }
 
-  setOffers = (offers) => {
-    if (offers) {
-      this.#offers = offers.map((element) => this.#validate(element));
-      this.#loaderState.offersIsLoad = true;
-      this.#loaderCheck();
+  setOffers = (args) => {
+    if (args) {
+      const { ok, data } = args;
+      this.#offers = data;
+      this.#loaderState.offers.wasRequested = true;
+      this.#loaderState.offers.ok = ok;
+      this.#checkLoader();
     }
   };
 
@@ -82,39 +98,39 @@ export default class Model {
     return this.#destinations.map((dest) => ({ ...dest }));
   }
 
-  setDestinations = (destinations) => {
-    if (destinations) {
-      this.#destinations = destinations;
-      this.#loaderState.destinationsIsLoad = true;
-      this.#loaderCheck();
+  setDestinations = (args) => {
+    if (args) {
+      const { ok, data } = args;
+      this.#destinations = data;
+      this.#loaderState.destinations.wasRequested = true;
+      this.#loaderState.destinations.ok = ok;
+      this.#checkLoader();
     }
   };
 
-  #loaderCheck = () => {
+  get loaderState() {
+    return { ...this.#loaderState };
+  }
+
+  #checkLoader = () => {
     for (const key in this.#loaderState) {
-      if (!this.#loaderState[key]) {
+      if (!this.#loaderState[key].wasRequested) {
         return;
       }
     }
-    this.#notify(modelEvents.UPDATE_LIST, this);
+    this.#adaptPointsForClient();
+    this.#notify(modelEvents.AFTER_LOAD, this);
   };
 
-  get pointsLength() {
-    return this.#points.length;
-  }
+  #adaptPointsForClient = () => {
+    this.#points = this.#adapter.pointsForClient(
+      this.#points,
+      this.#destinations
+    );
+  };
 
   get newPoint() {
-    return {
-      basePrice: 0,
-      dateFrom: getCurrentDateTime(),
-      dateTo: getCurrentDateTime(),
-      destination: -1,
-      id: this.#points.length,
-      isFavorite: false,
-      offers: [],
-      type: POINT_TYPES[0],
-      isNew: true,
-    };
+    return this.#adapter.getNewPoint();
   }
 
   #validate = (point) => {
@@ -165,6 +181,9 @@ export default class Model {
 
   addUpdatePointsListener = (callback) =>
     this.#eventManager.add(modelEvents.UPDATE_LIST, callback);
+
+  addLoaderListener = (callback) =>
+    this.#eventManager.add(modelEvents.AFTER_LOAD, callback);
 
   #notify = (name, args) => this.#eventManager.invoke(name, args);
 }

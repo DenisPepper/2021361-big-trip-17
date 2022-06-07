@@ -8,6 +8,7 @@ import NoPointsMessage from '../view/no-point-message-view';
 import PointRow from '../view/point-row-view';
 import PointForm from '../view/point-form-view';
 import { render, remove } from '../framework/render';
+import { NoPointsMessages } from '../settings';
 
 export default class MainPresenter {
   #model = null;
@@ -81,6 +82,9 @@ export default class MainPresenter {
   }
 
   init = () => {
+    this.#showNoPointsMessage();
+    this.#disableNewEventButton();
+    this.#newEventButton.addEventListener('click', this.#createNewEvent);
     this.#setNotifications();
     this.#model.init();
   };
@@ -88,11 +92,22 @@ export default class MainPresenter {
   #setNotifications = () => {
     this.#model.addDeletePointListener((args) => this.#whenDeletePoint(args));
     this.#model.addUpdatePointsListener((args) => this.#whenUpdatePoints(args));
+    this.#model.addLoaderListener((args) => this.#afterLoad(args));
+  };
+
+  #afterLoad = () => {
+    const { offers, destinations } = this.#model.loaderState;
+    if (offers.ok && destinations.ok) {
+      this.#whenUpdatePoints();
+    } else {
+      this.#noPointsMessageView.message = NoPointsMessages.RELOAD;
+    }
   };
 
   #whenUpdatePoints = () => {
-    if (!this.#eventsContainer.contains(this.#filtersFormView.element)) {
-      this.#newEventButton.addEventListener('click', this.#createNewEvent);
+    if (this.#eventsContainer.contains(this.#noPointsMessageView.element)) {
+      remove(this.#noPointsMessageView);
+      this.#enableNewEventButton();
       this.#createComposePresenter();
     }
     const points = this.#model.compose(
@@ -132,14 +147,20 @@ export default class MainPresenter {
     pointPresenter.clear();
     pointPresenter = null;
     this.#resetCurrentPointPresenter();
-    if (this.#model.pointsLength === 0) {
+    // create predicate, which controls count of points with current filter
+    /*if () {
       this.#showNoPointsMessage();
-    }
+    }*/
   };
 
   #showNoPointsMessage = () => {
-    this.#composePresenter.removeSortForm();
-    this.#noPointsMessageView.message = this.#composePresenter.getFilterName();
+    if (this.#composePresenter) {
+      this.#composePresenter.removeSortForm();
+      this.#noPointsMessageView.message =
+        this.#composePresenter.getFilterName();
+    } else {
+      this.#noPointsMessageView.message = NoPointsMessages.LOADING;
+    }
     render(this.#noPointsMessageView, this.#eventsContainer);
   };
 
@@ -186,9 +207,20 @@ export default class MainPresenter {
     const pointPresenter = this.#renderPoint(this.#model.newPoint);
     pointPresenter.setOnEscClickHandler();
     this.#setCurrentPointPresenter(pointPresenter);
+    /* add predicate , which controls this condition
     if (this.#model.pointsLength === 0) {
       remove(this.#noPointsMessageView);
       render(this.#pointsListView, this.#eventsContainer);
-    }
+    }*/
+    remove(this.#noPointsMessageView);
+    render(this.#pointsListView, this.#eventsContainer);
+  };
+
+  #enableNewEventButton = () => {
+    this.#newEventButton.disabled = false;
+  };
+
+  #disableNewEventButton = () => {
+    this.#newEventButton.disabled = true;
   };
 }
