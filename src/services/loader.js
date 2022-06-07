@@ -1,8 +1,8 @@
 const SEREVR_URL = 'https://17.ecmascript.pages.academy/big-trip';
-const DEST_URI = '/destinations';
-const OFFERS_URI = '/offers';
-const POINTS_URI = '/points';
-const Method = { GET: 'GET' };
+const DEST_URN = '/destinations';
+const OFFERS_URN = '/offers';
+const POINTS_URN = '/points';
+const Method = { GET: 'GET', PUT: 'PUT' };
 
 export default class Loader {
   #serverURL = '';
@@ -12,9 +12,9 @@ export default class Loader {
 
   constructor(
     serverURL = SEREVR_URL,
-    pointsURN = POINTS_URI,
-    destinationsURN = DEST_URI,
-    offersURN = OFFERS_URI
+    pointsURN = POINTS_URN,
+    destinationsURN = DEST_URN,
+    offersURN = OFFERS_URN
   ) {
     this.#serverURL = serverURL;
     this.#destinationsURN = destinationsURN;
@@ -22,49 +22,63 @@ export default class Loader {
     this.#pointsURN = pointsURN;
   }
 
-  #sendRequest = async (url, params) => {
-    const response = await fetch(url, params);
+  #sendRequest = async (uri, params) => {
+    const response = await fetch(uri, params);
     if (response.ok) {
       const data = await response.json();
-      return {ok: response.ok, data};
+      return { ok: response.ok, data };
     } else {
-      return {ok: false, data: []};
+      return { ok: false, data: [] };
     }
   };
 
-  getPoints = async (whenLoadPoints) => {
-    const url = `${this.#serverURL}${this.#pointsURN}`;
+  getPoints = async (loadPointsHandler) => {
+    const uri = `${this.#serverURL}${this.#pointsURN}`;
     const params = {
       method: Method.GET,
       headers: {
         Authorization: 'Basic hS2sfS44wcl1sa2j',
       },
     };
-    const points = await this.#sendRequest(url, params);
-    whenLoadPoints(points);
+    const response = await this.#sendRequest(uri, params);
+    loadPointsHandler(response);
   };
 
-  getDestinations = async (whenLoadDestinations) => {
-    const url = `${this.#serverURL}${this.#destinationsURN}`;
+  getDestinations = async (loadDestinationsHandler) => {
+    const uri = `${this.#serverURL}${this.#destinationsURN}`;
     const params = {
       method: Method.GET,
       headers: {
         Authorization: 'Basic hS2sfS44wcl1sa2j',
       },
     };
-    const destinations = await this.#sendRequest(url, params);
-    whenLoadDestinations(destinations);
+    const response = await this.#sendRequest(uri, params);
+    loadDestinationsHandler(response);
   };
 
-  getOffers = async (whenLoadOffers) => {
-    const url = `${this.#serverURL}${this.#offersURN}`;
+  getOffers = async (loadOffersHandler) => {
+    const uri = `${this.#serverURL}${this.#offersURN}`;
     const params = {
       method: Method.GET,
       headers: {
         Authorization: 'Basic hS2sfS44wcl1sa2j',
       },
     };
-    const offers = await this.#sendRequest(url, params);
-    whenLoadOffers(offers);
+    const response = await this.#sendRequest(uri, params);
+    loadOffersHandler(response);
+  };
+
+  updatePoint = async (point, updatePointHandler, args) => {
+    const uri = `${this.#serverURL}${this.#pointsURN}/${point.id}`;
+    const params = {
+      method: Method.PUT,
+      headers: {
+        Authorization: 'Basic hS2sfS44wcl1sa2j',
+        'Content-Type': 'application/json;charset=utf-8'
+      },
+      body: JSON.stringify(point)
+    };
+    const response = await this.#sendRequest(uri, params);
+    updatePointHandler(response, args);
   };
 }

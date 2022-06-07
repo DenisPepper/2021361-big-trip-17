@@ -61,18 +61,18 @@ export default class Model {
   }
 
   init = () => {
-    this.#loader.getPoints(this.setPoints);
-    this.#loader.getDestinations(this.setDestinations);
-    this.#loader.getOffers(this.setOffers);
+    this.#loader.getPoints(this.#loadPointsHandler);
+    this.#loader.getDestinations(this.loadDestinationsHandler);
+    this.#loader.getOffers(this.loadOffersHandler);
   };
 
   get points() {
     return this.#points.map((point) => ({ ...point }));
   }
 
-  setPoints = (args) => {
-    if (args) {
-      const { ok, data } = args;
+  #loadPointsHandler = (response) => {
+    if (response) {
+      const { ok, data } = response;
       this.#points = data;
       this.#loaderState.points.wasRequested = true;
       this.#loaderState.points.ok = ok;
@@ -84,9 +84,9 @@ export default class Model {
     return this.#offers.map((offer) => ({ ...offer }));
   }
 
-  setOffers = (args) => {
-    if (args) {
-      const { ok, data } = args;
+  loadOffersHandler = (response) => {
+    if (response) {
+      const { ok, data } = response;
       this.#offers = data;
       this.#loaderState.offers.wasRequested = true;
       this.#loaderState.offers.ok = ok;
@@ -98,9 +98,9 @@ export default class Model {
     return this.#destinations.map((dest) => ({ ...dest }));
   }
 
-  setDestinations = (args) => {
-    if (args) {
-      const { ok, data } = args;
+  loadDestinationsHandler = (response) => {
+    if (response) {
+      const { ok, data } = response;
       this.#destinations = data;
       this.#loaderState.destinations.wasRequested = true;
       this.#loaderState.destinations.ok = ok;
@@ -118,28 +118,26 @@ export default class Model {
         return;
       }
     }
-    this.#adaptPointsForClient();
+    this.#convertAllPointsForClient();
     this.#notify(modelEvents.AFTER_LOAD, this);
   };
 
-  #adaptPointsForClient = () => {
-    this.#points = this.#adapter.pointsForClient(
-      this.#points,
-      this.#destinations
+  #convertAllPointsForClient = () => {
+    this.#points = this.#points.map((point) =>
+      this.#convertPointForClient(point)
     );
   };
+
+  #convertPointForClient = (point) => this.#adapter.PointForClient(point);
+
+  #convertPointForServer = (point) => this.#adapter.pointForServer(point);
 
   get newPoint() {
     return this.#adapter.getNewPoint();
   }
 
-  #validate = (point) => {
-    delete point.isNew;
-    return point;
-  };
-
   addPoint = (point, args) => {
-    this.#points = [this.#validate(point), ...this.#points];
+    this.#points = [point, ...this.#points];
     this.#notify(modelEvents.UPDATE_LIST, args);
   };
 
@@ -155,17 +153,29 @@ export default class Model {
     this.#notify(modelEvents.DELETE_POINT, args);
   };
 
-  updatePoint = (point, args) => {
+  #updatePointHandler = (response, args) => {
+    if (!response.ok) {
+      return;
+    }
+    const point = this.#convertPointForClient(response.data);
     const index = this.#points.findIndex((element) => element.id === point.id);
     if (index === -1) {
       throw new Error('index of point not found');
     }
     this.#points = [
       ...this.#points.slice(0, index),
-      this.#validate(point),
+      point,
       ...this.#points.slice(index + 1),
     ];
     this.#notify(modelEvents.UPDATE_LIST, args);
+  };
+
+  updatePoint = (point, args) => {
+    this.#loader.updatePoint(
+      this.#convertPointForServer(point),
+      this.#updatePointHandler,
+      args
+    );
   };
 
   #filtrate = (filterName) => this.#filter.run(this.points, filterName);

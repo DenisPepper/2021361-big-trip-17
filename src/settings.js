@@ -16,6 +16,7 @@ export const POINT_TYPES = [
   'sightseeing',
   'restaurant',
 ];
+export const DEFAULT_POINT_TYPE = 'taxi';
 export const Filters = {
   EVERYTHING: 'everything',
   FUTURE: 'future',
