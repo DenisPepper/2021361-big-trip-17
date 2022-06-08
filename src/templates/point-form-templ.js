@@ -23,9 +23,9 @@ const getDestinationsList = (destinations) => {
   return result;
 };
 
-const getOffersList = (typeOffersObject, pointOffers) => {
+const getOffersList = (offerTypeObject, pointOffers) => {
   let result = '';
-  typeOffersObject.offers.forEach((offer) => {
+  offerTypeObject.offers.forEach((offer) => {
     const checked = pointOffers.includes(offer.id) ? 'checked' : '';
     result += `<div class="event__offer-selector">
     <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}-1" type="checkbox" name="event-offer-${offer.id}" ${checked}>
@@ -39,11 +39,11 @@ const getOffersList = (typeOffersObject, pointOffers) => {
   return result;
 };
 
-const getOffersSection = (point, offersCollection) => {
+const getOffersSection = (point, offerTypeObject) => {
   const result = `<section class="event__section  event__section--offers">
     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
     <div class="event__available-offers">
-      ${getOffersList(offersCollection, point.offers)}
+      ${getOffersList(offerTypeObject, point.offers)}
     </div>
   </section>`;
   return result;
@@ -76,8 +76,8 @@ const getDestinationSection = (destination) => {
 };
 
 export const createPointFormTempalte = (point, offers, destinations) => {
-  const destination = destinations[point.destination];
-  const offersCollection = offers
+  const destination = point.destination;
+  const offerTypeObject = offers
     .filter((offer) => offer.type === point.type)
     .pop();
 
@@ -109,7 +109,7 @@ export const createPointFormTempalte = (point, offers, destinations) => {
     <input
       class="event__input event__input--destination"
       id="event-destination-1" type="text" name="event-destination"
-      value="${destination === undefined ? '' : destination.name}"
+      value="${destination === null ? '' : destination.name}"
       list="destination-list-1"
     />
     <datalist id="destination-list-1">
@@ -157,9 +157,9 @@ export const createPointFormTempalte = (point, offers, destinations) => {
 
   <section class="event__details">
   
-  ${offersCollection === undefined ? '' : getOffersSection(point, offersCollection)}
+  ${offerTypeObject.offers.length === 0 ? '' : getOffersSection(point, offerTypeObject)}
   
-  ${destination === undefined ? '' : getDestinationSection(destination)}
+  ${destination === null ? '' : getDestinationSection(destination)}
   
 </section>
 </form>`;

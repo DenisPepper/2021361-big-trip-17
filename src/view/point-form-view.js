@@ -138,11 +138,11 @@ export default class PointForm extends AbstractStatefulView {
   }, Delay.POINT_TYPE);
 
   #whenInputDestination = debounce((evt) => {
-    const destIndex = this.#destinations.findIndex(
+    const destination = this.#destinations.find(
       (element) => element.name === evt.target.value
     );
-    if (destIndex !== -1 && destIndex !== this._state.destination) {
-      this.updateElement({ destination: destIndex });
+    if (destination) {
+      this.updateElement({ destination });
     }
   }, Delay.DEST);
 
