@@ -4,11 +4,11 @@ import Model from '../model/model';
 import PointsList from '..//view/points-list-view';
 import FiltersForm from '../view/filters-view';
 import SortForm from '../view/sorts-view';
-import NoPointsMessage from '../view/no-point-message-view';
+import Message from '../view/message-view';
 import PointRow from '../view/point-row-view';
 import PointForm from '../view/point-form-view';
 import { render, remove } from '../framework/render';
-import { NoPointsMessages } from '../settings';
+import { Messages } from '../settings';
 
 export default class MainPresenter {
   #model = null;
@@ -17,7 +17,7 @@ export default class MainPresenter {
   #eventsContainer = null;
   #filtersFormView = null;
   #sortFormView = null;
-  #noPointsMessageView = null;
+  #MessageView = null;
   #currentPointPresenter = null;
   #composePresenter = null;
   #newEventButton = null;
@@ -30,7 +30,7 @@ export default class MainPresenter {
       eventsContainer,
       filtersFormView,
       sortFormView,
-      noPointsMessageView,
+      MessageView,
       newEventButton,
     } = args;
 
@@ -58,10 +58,10 @@ export default class MainPresenter {
       throw new Error(`IllegalArgumentException! expected: ${SortForm}`);
     }
 
-    if (noPointsMessageView instanceof NoPointsMessage) {
-      this.#noPointsMessageView = noPointsMessageView;
+    if (MessageView instanceof Message) {
+      this.#MessageView = MessageView;
     } else {
-      throw new Error(`IllegalArgumentException! expected: ${NoPointsMessage}`);
+      throw new Error(`IllegalArgumentException! expected: ${Message}`);
     }
 
     this.#controlsContainer = controlsContainer;
@@ -82,7 +82,7 @@ export default class MainPresenter {
   }
 
   init = () => {
-    this.#showNoPointsMessage();
+    this.#showMessage();
     this.#disableNewEventButton();
     this.#newEventButton.addEventListener('click', this.#createNewEvent);
     this.#setNotifications();
@@ -100,13 +100,13 @@ export default class MainPresenter {
     if (offers.ok && destinations.ok) {
       this.#whenUpdatePoints();
     } else {
-      this.#noPointsMessageView.message = NoPointsMessages.RELOAD;
+      this.#MessageView.message = Messages.RELOAD;
     }
   };
 
   #whenUpdatePoints = () => {
-    if (this.#eventsContainer.contains(this.#noPointsMessageView.element)) {
-      remove(this.#noPointsMessageView);
+    if (this.#eventsContainer.contains(this.#MessageView.element)) {
+      remove(this.#MessageView);
       this.#enableNewEventButton();
       this.#createComposePresenter();
     }
@@ -153,25 +153,25 @@ export default class MainPresenter {
     }*/
   };
 
-  #showNoPointsMessage = () => {
+  #showMessage = () => {
     if (this.#composePresenter) {
       this.#composePresenter.removeSortForm();
-      this.#noPointsMessageView.message =
+      this.#MessageView.message =
         this.#composePresenter.getFilterName();
     } else {
-      this.#noPointsMessageView.message = NoPointsMessages.LOADING;
+      this.#MessageView.message = Messages.LOADING;
     }
-    render(this.#noPointsMessageView, this.#eventsContainer);
+    render(this.#MessageView, this.#eventsContainer);
   };
 
   #renderPointsList = (points) => {
     remove(this.#pointsListView);
     if (points.length === 0) {
-      this.#showNoPointsMessage();
+      this.#showMessage();
       return;
     }
-    if (this.#eventsContainer.contains(this.#noPointsMessageView.element)) {
-      remove(this.#noPointsMessageView);
+    if (this.#eventsContainer.contains(this.#MessageView.element)) {
+      remove(this.#MessageView);
       this.#composePresenter.renderSortForm();
     }
     points.forEach(this.#renderPoint);
@@ -212,7 +212,7 @@ export default class MainPresenter {
       remove(this.#noPointsMessageView);
       render(this.#pointsListView, this.#eventsContainer);
     }*/
-    remove(this.#noPointsMessageView);
+    remove(this.#MessageView);
     render(this.#pointsListView, this.#eventsContainer);
   };
 

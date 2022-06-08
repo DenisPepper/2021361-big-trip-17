@@ -30,12 +30,12 @@ export const FilterRules = {
     currentDate.isAfter(dayjs(point.dateTo)) ||
     currentDate.isAfter(dayjs(point.dateFrom)),
 };
-export const NoPointsMessages = {
-  [Filters.EVERYTHING]:'Click New Event to create your first point',
+export const Messages = {
+  [Filters.EVERYTHING]: 'Click New Event to create your first point',
   [Filters.FUTURE]: 'There are no future events now',
   [Filters.PAST]: 'There are no past events now',
   LOADING: 'Loading ...',
-  RELOAD: 'Server error. Please, try again later'
+  RELOAD: 'Server error. Please, try again later',
 };
 export const Sorts = {
   DAY: 'sort-day',
