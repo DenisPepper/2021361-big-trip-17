@@ -3,7 +3,7 @@ import AbstractView from '../framework/view/abstract-view';
 
 export default class FiltersForm extends AbstractView {
   _callback = {
-    setFiltersClick: null,
+    filterClick: null,
   };
 
   #filterEverything = this.element.querySelector('#filter-everything');
@@ -18,11 +18,11 @@ export default class FiltersForm extends AbstractView {
   }
 
   setFiltersClickHandler = (callback) => {
-    this._callback.setFiltersClick = callback;
+    this._callback.filterClick = callback;
     this.element.addEventListener('input', this.#FiltersClickHandler);
   };
 
   #FiltersClickHandler = (evt) => {
-    this._callback.setFiltersClick(evt.target.value);
+    this._callback.filterClick(evt.target.value);
   };
 }

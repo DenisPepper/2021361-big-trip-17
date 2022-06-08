@@ -48,13 +48,13 @@ export default class СomposePresenter {
 
   renderFilterForm = () => {
     render(this.#filtersFormView, this.#controlsContainer);
-    this.#filtersFormView.setFiltersClickHandler(this.#whenChangeFilters);
+    this.#filtersFormView.setFiltersClickHandler(this.#changeFilterHandler);
     return this;
   };
 
   renderSortForm = () => {
     render(this.#sortFormView, this.#eventsContainer);
-    this.#sortFormView.setSortsClickHandler(this.#whenChangeSorts);
+    this.#sortFormView.setSortsClickHandler(this.#changeSortHandler);
     return this;
   };
 
@@ -63,15 +63,15 @@ export default class СomposePresenter {
     remove(this.#sortFormView);
   };
 
-  #whenChangeFilters = (filterName) => {
+  #changeFilterHandler = (filterName) => {
     this.#sortFormView.init();
-    this.#sortFormView.setSortsClickHandler(this.#whenChangeSorts);
+    this.#sortFormView.setSortsClickHandler(this.#changeSortHandler);
     this.#currentFilterName = filterName;
     this.#currentSortName = Sorts.DAY;
     this.#callback.updateEvents();
   };
 
-  #whenChangeSorts = (sortName) => {
+  #changeSortHandler = (sortName) => {
     this.#currentSortName = sortName;
     this.#callback.updateEvents();
   };

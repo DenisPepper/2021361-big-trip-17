@@ -68,12 +68,12 @@ export default class PointForm extends AbstractStatefulView {
   #setHandlers = () => {
     this.element.addEventListener('submit', this.#saveClickHandler);
     this.element.addEventListener('reset', this.#resetClickHandler);
-    this.#eventTypeGroup.addEventListener('input', this.#whenInputPointType);
-    this.#eventDestination.addEventListener('input', this.#whenInputDestination);
+    this.#eventTypeGroup.addEventListener('input', this.#inputPointTypeHandler);
+    this.#eventDestination.addEventListener('input', this.#inputDestinationHandler);
     this.#rollupButton.addEventListener('click', this.#closeClickHandler);
-    this.#eventStartTime.addEventListener('input', this.#whenInputStartTime);
-    this.#eventEndTime.addEventListener('input', this.#whenInputEndtTime);
-    this.#price.addEventListener('input', this.#whenInputPrice);
+    this.#eventStartTime.addEventListener('input', this.#inputStartTimeHandler);
+    this.#eventEndTime.addEventListener('input', this.#inputEndtTimeHandler);
+    this.#price.addEventListener('input', this.#inputPriceHandler);
   };
 
   #setFlatpickr = () => {
@@ -107,15 +107,15 @@ export default class PointForm extends AbstractStatefulView {
     );
   }
 
-  setCloseClickCallback = (callback) => {
+  setCloseClickHandler = (callback) => {
     this._callback.closeClick = callback;
   };
 
-  setSaveClickCallback = (callback) => {
+  setSaveClickHandler = (callback) => {
     this._callback.saveClick = callback;
   };
 
-  setResetClickCallback = (callback) => {
+  setResetClickHandler = (callback) => {
     this._callback.resetClick = callback;
   };
 
@@ -133,11 +133,11 @@ export default class PointForm extends AbstractStatefulView {
     this._callback.resetClick(this.state);
   };
 
-  #whenInputPointType = debounce((evt) => {
+  #inputPointTypeHandler = debounce((evt) => {
     this.updateElement({ type: evt.target.value, offers: []});
   }, Delay.POINT_TYPE);
 
-  #whenInputDestination = debounce((evt) => {
+  #inputDestinationHandler = debounce((evt) => {
     const destination = this.#destinations.find(
       (element) => element.name === evt.target.value
     );
@@ -146,16 +146,16 @@ export default class PointForm extends AbstractStatefulView {
     }
   }, Delay.DEST);
 
-  #whenInputStartTime = debounce((evt) => {
+  #inputStartTimeHandler = debounce((evt) => {
     this._state.dateFrom = evt.target.value;
     this.#flatpickrEndTime.set('minDate', this._state.dateFrom);
   });
 
-  #whenInputEndtTime = debounce((evt) => {
+  #inputEndtTimeHandler = debounce((evt) => {
     this._state.dateTo = evt.target.value;
   });
 
-  #whenInputPrice = debounce((evt) => {
+  #inputPriceHandler = debounce((evt) => {
     const price = parseInt(evt.target.value, DECIMAL);
     if (price) {
       this._state.basePrice = price;

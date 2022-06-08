@@ -54,11 +54,11 @@ export default class PointRow extends AbstractStatefulView {
     );
   }
 
-  setFavoriteClickCallback = (callback) => {
+  setFavoriteClickHandler = (callback) => {
     this._callback.favoriteButtonClick = callback;
   };
 
-  setEditClickCallback = (callback) => {
+  setEditClickHandler = (callback) => {
     this._callback.rollupButtonClick = callback;
   };
 

@@ -3,7 +3,7 @@ import AbstractView from '../framework/view/abstract-view';
 
 export default class SortForm extends AbstractView {
   _callback = {
-    setSortsClick: null,
+    sortsClick: null,
   };
 
   constructor() {
@@ -21,11 +21,11 @@ export default class SortForm extends AbstractView {
 
   setSortsClickHandler = (callback) => {
     this._callback.setSortsClick = callback;
-    this.element.addEventListener('input', this.#setSortsClick);
+    this.element.addEventListener('input', this.#sortsClickHandler);
   };
 
-  #setSortsClick = (evt) => {
-    this._callback.setSortsClick(evt.target.value);
+  #sortsClickHandler = (evt) => {
+    this._callback.sortsClick(evt.target.value);
   };
 
   removeSortsClickHandler = () => {
