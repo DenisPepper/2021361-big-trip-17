@@ -6,7 +6,7 @@ import Adapter from '../services/adapter';
 
 const modelEvents = {
   DELETE_POINT: 'delete_point',
-  UPDATE_LIST: 'update_list',
+  UPDATE_POINT: 'update_list',
   BEFORE_LOAD: 'before_load',
   AFTER_LOAD: 'after_load',
 };
@@ -140,7 +140,7 @@ export default class Model {
 
   addPoint = (point, args) => {
     this.#points = [point, ...this.#points];
-    this.#notify(modelEvents.UPDATE_LIST, args);
+    this.#notify(modelEvents.UPDATE_POINT, args);
   };
 
   deletePoint = (point, args) => {
@@ -169,7 +169,7 @@ export default class Model {
       point,
       ...this.#points.slice(index + 1),
     ];
-    this.#notify(modelEvents.UPDATE_LIST, args);
+    this.#notify(modelEvents.UPDATE_POINT, args);
   };
 
   updatePoint = (point, args) => {
@@ -191,8 +191,8 @@ export default class Model {
   addDeletePointListener = (callback) =>
     this.#eventManager.add(modelEvents.DELETE_POINT, callback);
 
-  addUpdatePointsListener = (callback) =>
-    this.#eventManager.add(modelEvents.UPDATE_LIST, callback);
+  addPointsUpdatedListener  = (callback) =>
+    this.#eventManager.add(modelEvents.UPDATE_POINT, callback);
 
   addAfterLoadListener = (callback) =>
     this.#eventManager.add(modelEvents.AFTER_LOAD, callback);

@@ -89,26 +89,26 @@ export default class MainPresenter {
   };
 
   #setNotifications = () => {
-    this.#model.addDeletePointListener((args) => this.#whenDeletePoint(args));
-    this.#model.addUpdatePointsListener((args) => this.#whenUpdatePoints(args));
-    this.#model.addBeforeLoadListener((args) => this.#beforeLoad(args));
-    this.#model.addAfterLoadListener((args) => this.#afterLoad(args));
+    this.#model.addDeletePointListener((args) => this.#pointDeleteHandler(args));
+    this.#model.addPointsUpdatedListener((args) => this.#pointsUpdateHandler (args));
+    this.#model.addBeforeLoadListener((args) => this.#beforeLoadHandler(args));
+    this.#model.addAfterLoadListener((args) => this.#afterLoadHandler(args));
   };
 
-  #beforeLoad = () => {
+  #beforeLoadHandler = () => {
     this.#showMessage();
   };
 
-  #afterLoad = () => {
+  #afterLoadHandler = () => {
     const { offers, destinations } = this.#model.loaderState;
     if (offers.ok && destinations.ok) {
-      this.#whenUpdatePoints();
+      this.#pointsUpdateHandler ();
     } else {
       this.#MessageView.message = Messages.RELOAD;
     }
   };
 
-  #whenUpdatePoints = () => {
+  #pointsUpdateHandler  = () => {
     if (this.#eventsContainer.contains(this.#MessageView.element)) {
       remove(this.#MessageView);
       this.#enableNewEventButton();
@@ -129,7 +129,7 @@ export default class MainPresenter {
       controlsContainer: this.#controlsContainer,
       eventsContainer: this.#eventsContainer,
     })
-      .init(this.#whenUpdatePoints)
+      .init(this.#pointsUpdateHandler )
       .renderFilterForm()
       .renderSortForm();
   };
@@ -146,7 +146,7 @@ export default class MainPresenter {
     this.#currentPointPresenter = null;
   };
 
-  #whenDeletePoint = (args) => {
+  #pointDeleteHandler = (args) => {
     let { pointPresenter } = args;
     pointPresenter.clear();
     pointPresenter = null;
@@ -201,7 +201,7 @@ export default class MainPresenter {
       .init(
         this.#setCurrentPointPresenter,
         this.#resetCurrentPointPresenter,
-        this.#whenDeletePoint
+        this.#pointDeleteHandler
       )
       .renderPoint();
     return pointPresenter;
