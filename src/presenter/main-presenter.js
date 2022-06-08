@@ -82,7 +82,6 @@ export default class MainPresenter {
   }
 
   init = () => {
-    this.#showMessage();
     this.#disableNewEventButton();
     this.#newEventButton.addEventListener('click', this.#createNewEvent);
     this.#setNotifications();
@@ -92,7 +91,12 @@ export default class MainPresenter {
   #setNotifications = () => {
     this.#model.addDeletePointListener((args) => this.#whenDeletePoint(args));
     this.#model.addUpdatePointsListener((args) => this.#whenUpdatePoints(args));
-    this.#model.addLoaderListener((args) => this.#afterLoad(args));
+    this.#model.addBeforeLoadListener((args) => this.#beforeLoad(args));
+    this.#model.addAfterLoadListener((args) => this.#afterLoad(args));
+  };
+
+  #beforeLoad = () => {
+    this.#showMessage();
   };
 
   #afterLoad = () => {
@@ -154,12 +158,12 @@ export default class MainPresenter {
   };
 
   #showMessage = () => {
-    if (this.#composePresenter) {
+    if (this.#composePresenter === null) {
+      this.#MessageView.message = Messages.LOADING;
+    } else {
       this.#composePresenter.removeSortForm();
       this.#MessageView.message =
         this.#composePresenter.getFilterName();
-    } else {
-      this.#MessageView.message = Messages.LOADING;
     }
     render(this.#MessageView, this.#eventsContainer);
   };
