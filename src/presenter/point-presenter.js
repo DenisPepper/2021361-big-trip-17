@@ -1,5 +1,4 @@
 import { render, replace, remove } from '../framework/render';
-import { Actions } from '../settings';
 
 export default class PointPresenter {
   #model = null;
@@ -56,15 +55,14 @@ export default class PointPresenter {
     this.closePointForm();
     this.removeOnEscClickHandler();
     if (this.#point.isNew) {
-      this.#model.addPoint(point, { eventName: Actions.UPDATE_EVENTS });
+      this.#model.addPoint(point);
     } else {
-      this.#model.updatePoint(point, { eventName: Actions.UPDATE_EVENTS });
+      this.#model.updatePoint(point);
     }
   };
 
   #whenResetClick = (point) => {
     this.#model.deletePoint(point, {
-      eventName: Actions.DELETE_POINT,
       pointPresenter: this,
     });
     this.removeOnEscClickHandler();

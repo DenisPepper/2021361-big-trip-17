@@ -4,7 +4,8 @@ import { NoPointsMessages } from '../settings';
 
 export default class NoPointsMessage extends AbstractView {
   get template() {
-    return createNoPointMessageTemplate();
+    const template = createNoPointMessageTemplate();
+    return template;
   }
 
   get message() {
@@ -12,7 +13,6 @@ export default class NoPointsMessage extends AbstractView {
   }
 
   set message(filter) {
-    this.element.textContent =
-      NoPointsMessages[filter] || 'Click New Event to create your first point';
+    this.element.textContent = NoPointsMessages[filter] || filter;
   }
 }

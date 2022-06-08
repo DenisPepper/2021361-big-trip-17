@@ -1,7 +1,6 @@
 import dayjs from 'dayjs';
 import { getDateDiffInMinute } from './util';
 
-export const POINTS_COUNT = 3;
 export const DECIMAL = 10;
 export const MINUTES_IN_HOUR = 60;
 export const MINUTES_IN_DAY = 1440;
@@ -17,6 +16,7 @@ export const POINT_TYPES = [
   'sightseeing',
   'restaurant',
 ];
+export const DEFAULT_POINT_TYPE = 'taxi';
 export const Filters = {
   EVERYTHING: 'everything',
   FUTURE: 'future',
@@ -31,8 +31,11 @@ export const FilterRules = {
     currentDate.isAfter(dayjs(point.dateFrom)),
 };
 export const NoPointsMessages = {
+  [Filters.EVERYTHING]:'Click New Event to create your first point',
   [Filters.FUTURE]: 'There are no future events now',
   [Filters.PAST]: 'There are no past events now',
+  LOADING: 'Loading ...',
+  RELOAD: 'Server error. Please, try again later'
 };
 export const Sorts = {
   DAY: 'sort-day',
@@ -46,9 +49,4 @@ export const SorterRules = {
     getDateDiffInMinute(b.dateFrom, b.dateTo) -
     getDateDiffInMinute(a.dateFrom, a.dateTo),
   [Sorts.DAY]: (a, b) => dayjs(a.dateFrom) - dayjs(b.dateFrom),
-};
-
-export const Actions = {
-  UPDATE_EVENTS: 'UPDATE_EVENTS',
-  DELETE_POINT: 'DELETE_POINT',
 };
