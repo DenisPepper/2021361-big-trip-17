@@ -7,6 +7,7 @@ import Adapter from '../services/adapter';
 const modelEvents = {
   DELETE_POINT: 'delete_point',
   UPDATE_LIST: 'update_list',
+  BEFORE_LOAD: 'before_load',
   AFTER_LOAD: 'after_load',
 };
 
@@ -61,6 +62,7 @@ export default class Model {
   }
 
   init = () => {
+    this.#notify(modelEvents.BEFORE_LOAD, this);
     this.#loader.getPoints(this.#loadPointsHandler);
     this.#loader.getDestinations(this.loadDestinationsHandler);
     this.#loader.getOffers(this.loadOffersHandler);
@@ -192,8 +194,11 @@ export default class Model {
   addUpdatePointsListener = (callback) =>
     this.#eventManager.add(modelEvents.UPDATE_LIST, callback);
 
-  addLoaderListener = (callback) =>
+  addAfterLoadListener = (callback) =>
     this.#eventManager.add(modelEvents.AFTER_LOAD, callback);
+
+  addBeforeLoadListener = (callback) =>
+    this.#eventManager.add(modelEvents.BEFORE_LOAD, callback);
 
   #notify = (name, args) => this.#eventManager.invoke(name, args);
 }
