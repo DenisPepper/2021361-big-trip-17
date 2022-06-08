@@ -138,9 +138,20 @@ export default class Model {
     return this.#adapter.getNewPoint();
   }
 
-  addPoint = (point, args) => {
+  #addPointHandler = (response, args) => {
+    if (!response.ok) {
+      return;
+    }
+    const point = this.#convertPointForClient(response.data);
     this.#points = [point, ...this.#points];
     this.#notify(modelEvents.UPDATE_POINT, args);
+  };
+
+  addPoint = (point, args) => {
+    this.#loader.createPoint(
+      this.#convertPointForServer(point),
+      this.#addPointHandler,
+      args);
   };
 
   #deletePointHandler = (response, args) => {

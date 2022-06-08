@@ -2,7 +2,7 @@ const SEREVR_URL = 'https://17.ecmascript.pages.academy/big-trip';
 const DEST_URN = '/destinations';
 const OFFERS_URN = '/offers';
 const POINTS_URN = '/points';
-const Method = { GET: 'GET', PUT: 'PUT', DELETE: 'DELETE' };
+const Method = { GET: 'GET', POST: 'POST', PUT: 'PUT', DELETE: 'DELETE' };
 
 export default class Loader {
   #serverURL = '';
@@ -67,6 +67,13 @@ export default class Loader {
     const params = this.#getParams();
     const response = await this.#sendRequest(uri, params);
     loadOffersHandler(response);
+  };
+
+  createPoint = async (point, createPointHandler, args) => {
+    const uri = this.#getApiUri(this.#pointsURN);
+    const params = this.#getParams(Method.POST, 'application/json;charset=utf-8', JSON.stringify(point));
+    const response = await this.#sendRequest(uri, params);
+    createPointHandler(response, args);
   };
 
   updatePoint = async (point, updatePointHandler, args) => {

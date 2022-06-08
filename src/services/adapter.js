@@ -1,4 +1,3 @@
-import { getCurrentDateTime } from '../util';
 import { DEFAULT_POINT_TYPE } from '../settings';
 
 export default class Adapter {
@@ -29,8 +28,8 @@ export default class Adapter {
 
   getNewPoint = () => ({
     basePrice: 0,
-    dateFrom: getCurrentDateTime(),
-    dateTo: getCurrentDateTime(),
+    dateFrom: null,
+    dateTo: null,
     destination: null,
     isFavorite: false,
     offers: [],
