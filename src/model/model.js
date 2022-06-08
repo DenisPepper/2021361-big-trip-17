@@ -143,8 +143,12 @@ export default class Model {
     this.#notify(modelEvents.UPDATE_POINT, args);
   };
 
-  deletePoint = (point, args) => {
-    const index = this.#points.findIndex((element) => element.id === point.id);
+  #deletePointHandler = (response, args) => {
+    if (!response.ok) {
+      return;
+    }
+    const {id} = response;
+    const index = this.#points.findIndex((element) => element.id === id);
     if (index === -1) {
       throw new Error('index of point not found');
     }
@@ -153,6 +157,13 @@ export default class Model {
       ...this.#points.slice(index + 1),
     ];
     this.#notify(modelEvents.DELETE_POINT, args);
+  };
+
+  deletePoint = (point, args) => {
+    this.#loader.deletePoint(point,
+      this.#deletePointHandler,
+      args
+    );
   };
 
   #updatePointHandler = (response, args) => {

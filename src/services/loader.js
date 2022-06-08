@@ -2,7 +2,7 @@ const SEREVR_URL = 'https://17.ecmascript.pages.academy/big-trip';
 const DEST_URN = '/destinations';
 const OFFERS_URN = '/offers';
 const POINTS_URN = '/points';
-const Method = { GET: 'GET', PUT: 'PUT' };
+const Method = { GET: 'GET', PUT: 'PUT', DELETE: 'DELETE' };
 
 export default class Loader {
   #serverURL = '';
@@ -27,16 +27,21 @@ export default class Loader {
   #getParams = (method = Method.GET, contentType=undefined, body = undefined)=>({
     method,
     headers:{
-      authorization: 'Basic hS2sfS44wcl1sa2j',
+      Authorization: 'Basic hS2sfS4tfvytfcl1sa2j',
       'Content-Type': contentType
     },
     body
   });
 
+  #isJSON = (response) => {
+    const contentType = response.headers.get('Content-Type');
+    return contentType && contentType.indexOf('application/json') !== -1;
+  };
+
   #sendRequest = async (uri, params) => {
     const response = await fetch(uri, params);
     if (response.ok) {
-      const data = await response.json();
+      const data = this.#isJSON(response) ? await response.json() : await response.text();
       return { ok: response.ok, data };
     } else {
       return { ok: false, data: [] };
@@ -69,5 +74,13 @@ export default class Loader {
     const params = this.#getParams(Method.PUT, 'application/json;charset=utf-8', JSON.stringify(point));
     const response = await this.#sendRequest(uri, params);
     updatePointHandler(response, args);
+  };
+
+  deletePoint = async (point, deletePointHandler, args) => {
+    const uri = this.#getApiUri(`${this.#pointsURN}/${point.id}`);
+    const params = this.#getParams(Method.DELETE);
+    const response = await this.#sendRequest(uri, params);
+    response.id = point.id;
+    deletePointHandler(response, args);
   };
 }
