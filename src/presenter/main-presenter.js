@@ -91,6 +91,7 @@ export default class MainPresenter {
   #setNotifications = () => {
     this.#model.addDeletePointListener((args) => this.#pointDeleteHandler(args));
     this.#model.addPointsUpdatedListener((args) => this.#pointsUpdateHandler (args));
+    this.#model.addLoadErrorListener((args) => this.#loadErrorHandler(args));
     this.#model.addBeforeLoadListener((args) => this.#beforeLoadHandler(args));
     this.#model.addAfterLoadListener((args) => this.#afterLoadHandler(args));
   };
@@ -155,6 +156,11 @@ export default class MainPresenter {
     /*if () {
       this.#showNoPointsMessage();
     }*/
+  };
+
+  #loadErrorHandler = () => {
+    //const { pointPresenter } = args;
+    this.#currentPointPresenter.onLoadErrorHandler();
   };
 
   #showMessage = () => {

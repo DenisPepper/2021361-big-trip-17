@@ -9,7 +9,7 @@ export default class PointPresenter {
   #callback = {
     setCurrentPointPresenter: () => {},
     resetCurrentPointPresenter: () => {},
-    whenDeletePoint: () => {},
+    pointDeleteHandler: () => {},
   };
 
   constructor(args) {
@@ -21,10 +21,10 @@ export default class PointPresenter {
     this.#pointsListView = pointsListView;
   }
 
-  init = (setCurrentPointPresenter, resetCurrentPointPresenter, whenDeletePoint) => {
+  init = (setCurrentPointPresenter, resetCurrentPointPresenter, pointDeleteHandler) => {
     this.#callback.setCurrentPointPresenter = setCurrentPointPresenter;
     this.#callback.resetCurrentPointPresenter = resetCurrentPointPresenter;
-    this.#callback.whenDeletePoint = whenDeletePoint;
+    this.#callback.pointDeleteHandler = pointDeleteHandler;
     this.#pointRowView.setEditClickHandler(this.#editClickHandler);
     this.#pointRowView.setFavoriteClickHandler(this.#favoriteClickHandler);
     this.#pointFormView.setCloseClickHandler(this.#closeClickHandler);
@@ -51,9 +51,9 @@ export default class PointPresenter {
   };
 
   #saveClickHandler = (point) => {
-    this.#callback.resetCurrentPointPresenter();
-    this.closePointForm();
-    this.removeOnEscClickHandler();
+    //this.#callback.resetCurrentPointPresenter();
+    //this.closePointForm();
+    //this.removeOnEscClickHandler();
     if (this.#point.isNew) {
       this.#model.addPoint(point);
     } else {
@@ -62,17 +62,19 @@ export default class PointPresenter {
   };
 
   #resetClickHandler = (point) => {
-    this.#model.deletePoint(point, {
-      pointPresenter: this,
-    });
-    this.removeOnEscClickHandler();
+    this.#model.deletePoint(point);
+    //this.removeOnEscClickHandler();
+  };
+
+  onLoadErrorHandler = () => {
+    this.#pointFormView.onLoadErrorHandler();
   };
 
   #openPointForm = () => replace(this.#pointFormView, this.#pointRowView);
 
   closePointForm = () => {
     if (this.#point.isNew) {
-      this.#callback.whenDeletePoint({pointPresenter: this});
+      this.#callback.pointDeleteHandler({pointPresenter: this});
     } else {
       replace(this.#pointRowView, this.#pointFormView);
     }

@@ -28,8 +28,8 @@ export default class Adapter {
 
   getNewPoint = () => ({
     basePrice: 0,
-    dateFrom: null,
-    dateTo: null,
+    dateFrom: '',
+    dateTo: '',
     destination: null,
     isFavorite: false,
     offers: [],

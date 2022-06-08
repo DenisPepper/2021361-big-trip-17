@@ -39,12 +39,17 @@ export default class Loader {
   };
 
   #sendRequest = async (uri, params) => {
-    const response = await fetch(uri, params);
-    if (response.ok) {
-      const data = this.#isJSON(response) ? await response.json() : await response.text();
-      return { ok: response.ok, data };
-    } else {
-      return { ok: false, data: [] };
+    const result = { ok: false, data: [] };
+    try {
+      const response = await fetch(uri, params);
+      if (response.ok) {
+        const data = this.#isJSON(response) ? await response.json() : await response.text();
+        return { ok: response.ok, data };
+      } else {
+        return result;
+      }
+    } catch (error) {
+      return result;
     }
   };
 

@@ -67,9 +67,10 @@ export default class PointRow extends AbstractStatefulView {
   };
 
   #favoriteClickHandler = () => {
-    this.updateElement({
+    //
+    /*this.updateElement({
       isFavorite: !this._state.isFavorite,
-    });
+    });*/
     this._callback.favoriteButtonClick(this.#getState());
   };
 }
