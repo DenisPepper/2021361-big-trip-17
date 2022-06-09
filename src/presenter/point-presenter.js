@@ -57,9 +57,6 @@ export default class PointPresenter {
   };
 
   #saveClickHandler = (point) => {
-    //this.#callback.resetCurrentPointPresenter();
-    //this.closePointForm();
-    //this.removeOnEscClickHandler();
     if (this.#point.isNew) {
       this.#model.addPoint(point);
     } else {

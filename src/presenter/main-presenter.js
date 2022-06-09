@@ -114,6 +114,7 @@ export default class MainPresenter {
   };
 
   #pointsUpdateHandler = () => {
+    this.#closeCurrentPointForm();
     if (this.#eventsContainer.contains(this.#MessageView.element)) {
       remove(this.#MessageView);
       this.#enableNewEventButton();
@@ -144,9 +145,7 @@ export default class MainPresenter {
   };
 
   #closeCurrentPointForm = () => {
-    if (this.#currentPointPresenter) {
-      this.#currentPointPresenter.closePointForm();
-    }
+    this.#currentPointPresenter.closePointForm();
   };
 
   #resetCurrentPointPresenter = () => {
