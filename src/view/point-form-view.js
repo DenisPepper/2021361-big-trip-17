@@ -111,6 +111,10 @@ export default class PointForm extends AbstractStatefulView {
     this.updateElement(this._state);
   };
 
+  removeEventListeners = () => {
+    this.#removeHandlers();
+  };
+
   get template() {
     return createPointFormTempalte(
       this._state,

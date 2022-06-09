@@ -89,8 +89,12 @@ export default class MainPresenter {
   };
 
   #setNotifications = () => {
-    this.#model.addDeletePointListener((args) => this.#pointDeleteHandler(args));
-    this.#model.addPointsUpdatedListener((args) => this.#pointsUpdateHandler (args));
+    this.#model.addDeletePointListener((args) =>
+      this.#pointDeleteHandler(args)
+    );
+    this.#model.addPointsUpdatedListener((args) =>
+      this.#pointsUpdateHandler(args)
+    );
     this.#model.addLoadErrorListener((args) => this.#loadErrorHandler(args));
     this.#model.addBeforeLoadListener((args) => this.#beforeLoadHandler(args));
     this.#model.addAfterLoadListener((args) => this.#afterLoadHandler(args));
@@ -103,13 +107,13 @@ export default class MainPresenter {
   #afterLoadHandler = () => {
     const { offers, destinations } = this.#model.loaderState;
     if (offers.ok && destinations.ok) {
-      this.#pointsUpdateHandler ();
+      this.#pointsUpdateHandler();
     } else {
       this.#MessageView.message = Messages.RELOAD;
     }
   };
 
-  #pointsUpdateHandler  = () => {
+  #pointsUpdateHandler = () => {
     if (this.#eventsContainer.contains(this.#MessageView.element)) {
       remove(this.#MessageView);
       this.#enableNewEventButton();
@@ -130,27 +134,27 @@ export default class MainPresenter {
       controlsContainer: this.#controlsContainer,
       eventsContainer: this.#eventsContainer,
     })
-      .init(this.#pointsUpdateHandler )
+      .init(this.#pointsUpdateHandler)
       .renderFilterForm()
       .renderSortForm();
   };
 
   #setCurrentPointPresenter = (pointPresenter) => {
+    this.#currentPointPresenter = pointPresenter;
+  };
+
+  #closeCurrentPointForm = () => {
     if (this.#currentPointPresenter) {
-      this.#currentPointPresenter.removeOnEscClickHandler();
       this.#currentPointPresenter.closePointForm();
     }
-    this.#currentPointPresenter = pointPresenter;
   };
 
   #resetCurrentPointPresenter = () => {
     this.#currentPointPresenter = null;
   };
 
-  #pointDeleteHandler = (args) => {
-    let { pointPresenter } = args;
-    pointPresenter.clear();
-    pointPresenter = null;
+  #pointDeleteHandler = () => {
+    this.#currentPointPresenter.clear();
     this.#resetCurrentPointPresenter();
     // create predicate, which controls count of points with current filter
     /*if () {
@@ -159,7 +163,6 @@ export default class MainPresenter {
   };
 
   #loadErrorHandler = () => {
-    //const { pointPresenter } = args;
     this.#currentPointPresenter.onLoadErrorHandler();
   };
 
@@ -168,8 +171,7 @@ export default class MainPresenter {
       this.#MessageView.message = Messages.LOADING;
     } else {
       this.#composePresenter.removeSortForm();
-      this.#MessageView.message =
-        this.#composePresenter.getFilterName();
+      this.#MessageView.message = this.#composePresenter.getFilterName();
     }
     render(this.#MessageView, this.#eventsContainer);
   };
@@ -207,13 +209,16 @@ export default class MainPresenter {
       .init(
         this.#setCurrentPointPresenter,
         this.#resetCurrentPointPresenter,
-        this.#pointDeleteHandler
+        this.#pointDeleteHandler,
+        this.#closeCurrentPointForm
       )
       .renderPoint();
     return pointPresenter;
   };
 
   #createNewEvent = () => {
+    //this.#disableNewEventButton();
+    this.#closeCurrentPointForm();
     const pointPresenter = this.#renderPoint(this.#model.newPoint);
     pointPresenter.setOnEscClickHandler();
     this.#setCurrentPointPresenter(pointPresenter);

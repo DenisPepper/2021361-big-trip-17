@@ -36,6 +36,15 @@ export default class PointRow extends AbstractStatefulView {
     this.favoriteButton.addEventListener('click', this.#favoriteClickHandler);
   };
 
+  #removeHandlers = () => {
+    this.rollupButton.removeEventListener('click', this.#editClickHandler);
+    this.favoriteButton.removeEventListener('click', this.#favoriteClickHandler);
+  };
+
+  removeEventListeners = () => {
+    this.#removeHandlers();
+  };
+
   _restoreHandlers = () => {
     this.init();
   };
