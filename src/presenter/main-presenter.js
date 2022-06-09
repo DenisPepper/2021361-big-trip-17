@@ -98,6 +98,8 @@ export default class MainPresenter {
     this.#model.addLoadErrorListener((args) => this.#loadErrorHandler(args));
     this.#model.addBeforeLoadListener((args) => this.#beforeLoadHandler(args));
     this.#model.addAfterLoadListener((args) => this.#afterLoadHandler(args));
+    this.#model.addFavoriteUpdateListener((args) => this.#favoriteUpdateHandler(args));
+    this.#model.addFavoriteUpdateErrorListener((args) => this.#favoriteUpdateErrorHandler(args));
   };
 
   #beforeLoadHandler = () => {
@@ -112,6 +114,17 @@ export default class MainPresenter {
       this.#MessageView.message = Messages.RELOAD;
     }
   };
+
+  #favoriteUpdateHandler = (args) => {
+    const { pointPresenter, point } = args;
+    pointPresenter.favoriteUpdateHandler(point);
+  };
+
+  #favoriteUpdateErrorHandler = (args) => {
+    const { pointPresenter } = args;
+    pointPresenter.favoriteUpdateErrorHandler();
+  };
+
 
   #pointsUpdateHandler = () => {
     this.#closeCurrentPointForm();
@@ -145,7 +158,9 @@ export default class MainPresenter {
   };
 
   #closeCurrentPointForm = () => {
-    this.#currentPointPresenter.closePointForm();
+    if (this.#currentPointPresenter) {
+      this.#currentPointPresenter.closePointForm();
+    }
   };
 
   #resetCurrentPointPresenter = () => {

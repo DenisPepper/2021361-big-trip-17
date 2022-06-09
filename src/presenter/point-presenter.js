@@ -48,7 +48,16 @@ export default class PointPresenter {
   };
 
   #favoriteClickHandler = (point) => {
-    this.#model.updatePoint(point, { eventName: null });
+    this.#model.updateFavorite(point, {pointPresenter: this});
+  };
+
+  favoriteUpdateHandler = (point) => {
+    this.#point = point;
+    this.#pointRowView.favoriteUpdateHandler(this.#point);
+  };
+
+  favoriteUpdateErrorHandler = () => {
+    this.#pointRowView.favoriteErrorHandler(this.#point);
   };
 
   #closeClickHandler = () => {
