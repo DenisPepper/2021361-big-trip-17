@@ -177,7 +177,7 @@ export default class MainPresenter {
   };
 
   #loadErrorHandler = () => {
-    this.#currentPointPresenter.onLoadErrorHandler();
+    this.#currentPointPresenter.loadErrorHandler();
   };
 
   #showMessage = () => {

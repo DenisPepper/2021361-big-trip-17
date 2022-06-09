@@ -155,14 +155,15 @@ export default class PointForm extends AbstractStatefulView {
     this._callback.resetClick(this.state);
   };
 
-  onLoadErrorHandler = () => {
-    this.shake();
-    this.#enableFormElements();
-    if (this.#action === Actions.RESET) {
-      this.#switchResetButtonText();
-    } else {
-      this.#switchSubmitButtonText();
-    }
+  loadErrorHandler = () => {
+    this.shake(() => {
+      this.#enableFormElements();
+      if (this.#action === Actions.RESET) {
+        this.#switchResetButtonText();
+      } else {
+        this.#switchSubmitButtonText();
+      }
+    });
   };
 
   #inputPointTypeHandler = debounce((evt) => {

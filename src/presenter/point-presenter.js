@@ -77,8 +77,8 @@ export default class PointPresenter {
     this.#model.deletePoint(point);
   };
 
-  onLoadErrorHandler = () => {
-    this.#pointFormView.onLoadErrorHandler();
+  loadErrorHandler = () => {
+    this.#pointFormView.loadErrorHandler();
   };
 
   #openPointForm = () => replace(this.#pointFormView, this.#pointRowView);
