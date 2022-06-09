@@ -7,7 +7,9 @@ import Adapter from '../services/adapter';
 const modelEvents = {
   DELETE_POINT: 'delete_point',
   UPDATE_POINT: 'update_point',
+  UPDATE_FAVORITE: 'update_favorite',
   LOAD_ERROR: 'load_error',
+  FAVORITE_ERROR: 'favorite_error',
   BEFORE_LOAD: 'before_load',
   AFTER_LOAD: 'after_load',
 };
@@ -139,13 +141,16 @@ export default class Model {
     return this.#adapter.getNewPoint();
   }
 
+  #add = (point) => {
+    this.#points = [point, ...this.#points];
+  };
+
   #addPointHandler = (response, args) => {
     if (!response.ok) {
       this.#notify(modelEvents.LOAD_ERROR, args);
       return;
     }
-    const point = this.#convertPointForClient(response.data);
-    this.#points = [point, ...this.#points];
+    this.#add(this.#convertPointForClient(response.data));
     this.#notify(modelEvents.UPDATE_POINT, args);
   };
 
@@ -156,12 +161,7 @@ export default class Model {
       args);
   };
 
-  #deletePointHandler = (response, args) => {
-    if (!response.ok) {
-      this.#notify(modelEvents.LOAD_ERROR, args);
-      return;
-    }
-    const {id} = response;
+  #delete = (id) => {
     const index = this.#points.findIndex((element) => element.id === id);
     if (index === -1) {
       throw new Error('index of point not found');
@@ -170,6 +170,14 @@ export default class Model {
       ...this.#points.slice(0, index),
       ...this.#points.slice(index + 1),
     ];
+  };
+
+  #deletePointHandler = (response, args) => {
+    if (!response.ok) {
+      this.#notify(modelEvents.LOAD_ERROR, args);
+      return;
+    }
+    this.#delete(response.id);
     this.#notify(modelEvents.DELETE_POINT, args);
   };
 
@@ -180,12 +188,7 @@ export default class Model {
     );
   };
 
-  #updatePointHandler = (response, args) => {
-    if (!response.ok) {
-      this.#notify(modelEvents.LOAD_ERROR, args);
-      return;
-    }
-    const point = this.#convertPointForClient(response.data);
+  #update = (point) => {
     const index = this.#points.findIndex((element) => element.id === point.id);
     if (index === -1) {
       throw new Error('index of point not found');
@@ -195,6 +198,15 @@ export default class Model {
       point,
       ...this.#points.slice(index + 1),
     ];
+    return point;
+  };
+
+  #updatePointHandler = (response, args) => {
+    if (!response.ok) {
+      this.#notify(modelEvents.LOAD_ERROR, args);
+      return;
+    }
+    this.#update(this.#convertPointForClient(response.data));
     this.#notify(modelEvents.UPDATE_POINT, args);
   };
 
@@ -202,6 +214,23 @@ export default class Model {
     this.#loader.updatePoint(
       this.#convertPointForServer(point),
       this.#updatePointHandler,
+      args
+    );
+  };
+
+  #updateFavoriteHandler = (response, args) => {
+    if (!response.ok) {
+      this.#notify(modelEvents.FAVORITE_ERROR, args);
+      return;
+    }
+    const point = this.#update(this.#convertPointForClient(response.data));
+    this.#notify(modelEvents.UPDATE_FAVORITE, {...args, point});
+  };
+
+  updateFavorite = (point, args) => {
+    this.#loader.updatePoint(
+      this.#convertPointForServer(point),
+      this.#updateFavoriteHandler,
       args
     );
   };
@@ -220,8 +249,14 @@ export default class Model {
   addPointsUpdatedListener  = (callback) =>
     this.#eventManager.add(modelEvents.UPDATE_POINT, callback);
 
+  addFavoriteUpdateListener = (callback) =>
+    this.#eventManager.add(modelEvents.UPDATE_FAVORITE, callback);
+
   addLoadErrorListener  = (callback) =>
     this.#eventManager.add(modelEvents.LOAD_ERROR, callback);
+
+  addFavoriteUpdateErrorListener  = (callback) =>
+    this.#eventManager.add(modelEvents.FAVORITE_ERROR, callback);
 
   addAfterLoadListener = (callback) =>
     this.#eventManager.add(modelEvents.AFTER_LOAD, callback);
