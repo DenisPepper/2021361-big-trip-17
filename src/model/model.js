@@ -11,7 +11,7 @@ const modelEvents = {
   FAVORITE_ERROR: 'favorite_error',
   LOAD_ERROR: 'load_error',
   BEFORE_LOAD: 'before_load',
-  AFTER_AFTER: 'after_load',
+  AFTER_LOAD: 'after_load',
   BEFORE_START: 'before_start',
   START: 'start',
 };
@@ -281,8 +281,9 @@ export default class Model {
   addBeforeLoadListener = (callback) =>
     this.#eventManager.add(modelEvents.BEFORE_LOAD, callback);
 
-  addAfterLoadListener= (callback) =>
+  addAfterLoadListener= (callback) => {
     this.#eventManager.add(modelEvents.AFTER_LOAD, callback);
+  };
 
   #notify = (name, args) => this.#eventManager.invoke(name, args);
 }
