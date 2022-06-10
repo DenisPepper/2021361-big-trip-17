@@ -8,10 +8,12 @@ const modelEvents = {
   DELETE_POINT: 'delete_point',
   UPDATE_POINT: 'update_point',
   UPDATE_FAVORITE: 'update_favorite',
-  LOAD_ERROR: 'load_error',
   FAVORITE_ERROR: 'favorite_error',
+  LOAD_ERROR: 'load_error',
   BEFORE_LOAD: 'before_load',
-  AFTER_LOAD: 'after_load',
+  AFTER_AFTER: 'after_load',
+  BEFORE_START: 'before_start',
+  START: 'start',
 };
 
 export default class Model {
@@ -65,7 +67,7 @@ export default class Model {
   }
 
   init = () => {
-    this.#notify(modelEvents.BEFORE_LOAD, this);
+    this.#notify(modelEvents.BEFORE_START, this);
     this.#loader.getPoints(this.#loadPointsHandler);
     this.#loader.getDestinations(this.loadDestinationsHandler);
     this.#loader.getOffers(this.loadOffersHandler);
@@ -124,7 +126,7 @@ export default class Model {
       }
     }
     this.#convertAllPointsForClient();
-    this.#notify(modelEvents.AFTER_LOAD, this);
+    this.#notify(modelEvents.START, this);
   };
 
   #convertAllPointsForClient = () => {
@@ -148,13 +150,16 @@ export default class Model {
   #addPointHandler = (response, args) => {
     if (!response.ok) {
       this.#notify(modelEvents.LOAD_ERROR, args);
+      this.#notify(modelEvents.AFTER_LOAD, args);
       return;
     }
     this.#add(this.#convertPointForClient(response.data));
     this.#notify(modelEvents.UPDATE_POINT, args);
+    this.#notify(modelEvents.AFTER_LOAD, args);
   };
 
   addPoint = (point, args) => {
+    this.#notify(modelEvents.BEFORE_LOAD, args);
     this.#loader.createPoint(
       this.#convertPointForServer(point),
       this.#addPointHandler,
@@ -175,13 +180,16 @@ export default class Model {
   #deletePointHandler = (response, args) => {
     if (!response.ok) {
       this.#notify(modelEvents.LOAD_ERROR, args);
+      this.#notify(modelEvents.AFTER_LOAD, args);
       return;
     }
     this.#delete(response.id);
     this.#notify(modelEvents.DELETE_POINT, args);
+    this.#notify(modelEvents.AFTER_LOAD, args);
   };
 
   deletePoint = (point, args) => {
+    this.#notify(modelEvents.BEFORE_LOAD, args);
     this.#loader.deletePoint(point,
       this.#deletePointHandler,
       args
@@ -204,13 +212,16 @@ export default class Model {
   #updatePointHandler = (response, args) => {
     if (!response.ok) {
       this.#notify(modelEvents.LOAD_ERROR, args);
+      this.#notify(modelEvents.AFTER_LOAD, args);
       return;
     }
     this.#update(this.#convertPointForClient(response.data));
     this.#notify(modelEvents.UPDATE_POINT, args);
+    this.#notify(modelEvents.AFTER_LOAD, args);
   };
 
   updatePoint = (point, args) => {
+    this.#notify(modelEvents.BEFORE_LOAD, args);
     this.#loader.updatePoint(
       this.#convertPointForServer(point),
       this.#updatePointHandler,
@@ -221,13 +232,16 @@ export default class Model {
   #updateFavoriteHandler = (response, args) => {
     if (!response.ok) {
       this.#notify(modelEvents.FAVORITE_ERROR, args);
+      this.#notify(modelEvents.AFTER_LOAD, args);
       return;
     }
     const point = this.#update(this.#convertPointForClient(response.data));
     this.#notify(modelEvents.UPDATE_FAVORITE, {...args, point});
+    this.#notify(modelEvents.AFTER_LOAD, args);
   };
 
   updateFavorite = (point, args) => {
+    this.#notify(modelEvents.BEFORE_LOAD, args);
     this.#loader.updatePoint(
       this.#convertPointForServer(point),
       this.#updateFavoriteHandler,
@@ -258,11 +272,17 @@ export default class Model {
   addFavoriteUpdateErrorListener  = (callback) =>
     this.#eventManager.add(modelEvents.FAVORITE_ERROR, callback);
 
-  addAfterLoadListener = (callback) =>
-    this.#eventManager.add(modelEvents.AFTER_LOAD, callback);
+  addStartListener = (callback) =>
+    this.#eventManager.add(modelEvents.START, callback);
+
+  addBeforeStartListener = (callback) =>
+    this.#eventManager.add(modelEvents.BEFORE_START, callback);
 
   addBeforeLoadListener = (callback) =>
     this.#eventManager.add(modelEvents.BEFORE_LOAD, callback);
+
+  addAfterLoadListener= (callback) =>
+    this.#eventManager.add(modelEvents.AFTER_LOAD, callback);
 
   #notify = (name, args) => this.#eventManager.invoke(name, args);
 }

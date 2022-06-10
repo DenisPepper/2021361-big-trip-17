@@ -35,7 +35,7 @@ export const Messages = {
   [Filters.FUTURE]: 'There are no future events now',
   [Filters.PAST]: 'There are no past events now',
   LOADING: 'Loading ...',
-  RELOAD: 'Server error. Please, try again later',
+  RESTART: 'Server error. Please, try again later',
 };
 export const Sorts = {
   DAY: 'sort-day',

@@ -9,6 +9,9 @@ import PointRow from '../view/point-row-view';
 import PointForm from '../view/point-form-view';
 import { render, remove } from '../framework/render';
 import { Messages } from '../settings';
+import UiBlocker from '../framework/ui-blocker/ui-blocker';
+
+const TimeLimit = {LOWER_LIMIT: 350, UPPER_LIMIT: 1000};
 
 export default class MainPresenter {
   #model = null;
@@ -21,6 +24,7 @@ export default class MainPresenter {
   #currentPointPresenter = null;
   #composePresenter = null;
   #newEventButton = null;
+  #uiBlocker = new UiBlocker(TimeLimit.LOWER_LIMIT, TimeLimit.UPPER_LIMIT);
 
   constructor(args) {
     const {
@@ -89,30 +93,36 @@ export default class MainPresenter {
   };
 
   #setNotifications = () => {
-    this.#model.addDeletePointListener((args) =>
-      this.#pointDeleteHandler(args)
-    );
-    this.#model.addPointsUpdatedListener((args) =>
-      this.#pointsUpdateHandler(args)
-    );
+    this.#model.addDeletePointListener((args) => this.#pointDeleteHandler(args));
+    this.#model.addPointsUpdatedListener((args) => this.#pointsUpdateHandler(args));
     this.#model.addLoadErrorListener((args) => this.#loadErrorHandler(args));
-    this.#model.addBeforeLoadListener((args) => this.#beforeLoadHandler(args));
-    this.#model.addAfterLoadListener((args) => this.#afterLoadHandler(args));
+    this.#model.addBeforeStartListener((args) => this.#beforeStartHandler(args));
+    this.#model.addStartListener((args) => this.#startHandler(args));
     this.#model.addFavoriteUpdateListener((args) => this.#favoriteUpdateHandler(args));
     this.#model.addFavoriteUpdateErrorListener((args) => this.#favoriteUpdateErrorHandler(args));
+    this.#model.addBeforeLoadListener((args) => this.#beforeLoadHandler(args));
+    this.#model.addAfterLoadListener((args) => this.#afterLoadHandler(args));
   };
 
-  #beforeLoadHandler = () => {
+  #beforeStartHandler = () => {
     this.#showMessage();
   };
 
-  #afterLoadHandler = () => {
+  #startHandler = () => {
     const { offers, destinations } = this.#model.loaderState;
     if (offers.ok && destinations.ok) {
       this.#pointsUpdateHandler();
     } else {
-      this.#MessageView.message = Messages.RELOAD;
+      this.#MessageView.message = Messages.RESTART;
     }
+  };
+
+  #beforeLoadHandler = () => {
+    this.#uiBlocker.block();
+  };
+
+  #afterLoadHandler = () => {
+    this.#uiBlocker.unblock();
   };
 
   #favoriteUpdateHandler = (args) => {
