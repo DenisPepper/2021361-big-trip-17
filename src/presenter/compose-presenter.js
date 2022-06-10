@@ -1,6 +1,7 @@
 import FiltersForm from '../view/filters-view';
 import SortForm from '../view/sorts-view';
-import { Filters, Sorts } from '../settings';
+import { Sorts } from '../settings';
+import { Filters } from '../services/filter';
 import { render, remove } from '../framework/render';
 
 export default class СomposePresenter {

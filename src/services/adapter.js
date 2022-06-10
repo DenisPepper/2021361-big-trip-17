@@ -1,4 +1,5 @@
 import { DEFAULT_POINT_TYPE } from '../settings';
+import { isFuture, isPast } from './filter';
 
 export default class Adapter {
   pointForServer = (point) => {
@@ -23,7 +24,9 @@ export default class Adapter {
     id: point.id,
     isFavorite: point.is_favorite,
     offers: point.offers,
-    type: point.type
+    type: point.type,
+    isFuture: isFuture({dateFrom: point.date_from, dateTo: point.date_to}),
+    isPast: isPast({dateFrom: point.date_from, dateTo: point.date_to}),
   });
 
   getNewPoint = () => ({
