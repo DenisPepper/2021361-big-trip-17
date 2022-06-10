@@ -24,9 +24,9 @@ const getOffersList = (typeOffersObject, pointOffers) => {
 const isFavorite = (favorite) =>
   favorite ? 'event__favorite-btn--active' : '';
 
-export const createPointRowTemplate = (point, offers, destinations) => {
-  const destination = destinations[point.destination];
-  const typeOffersObject = offers
+export const createPointRowTemplate = (point, offers) => {
+  const destination = point.destination;
+  const offerTypeObject = offers
     .filter((element) => element.type === point.type)
     .pop();
   return `
@@ -39,7 +39,7 @@ export const createPointRowTemplate = (point, offers, destinations) => {
       src="img/icons/${point.type}.png" alt="Event type icon">
     </div>
     <h3 class="event__title">${firstCharToUpperCase(point.type)}
-     ${destination === undefined ? '' : destination.name}</h3>
+     ${destination === null ? '' : destination.name}</h3>
     <div class="event__schedule">
     <p class="event__time">
       <time class="event__start-time" 
@@ -58,7 +58,7 @@ export const createPointRowTemplate = (point, offers, destinations) => {
     </p>
     <h4 class="visually-hidden">Offers:</h4>
     <ul class="event__selected-offers">
-    ${typeOffersObject === undefined ? '' : getOffersList(typeOffersObject, point.offers)}
+    ${getOffersList(offerTypeObject, point.offers)}
     </ul>
     <button class="event__favorite-btn 
     ${isFavorite(point.isFavorite)}" type="button">

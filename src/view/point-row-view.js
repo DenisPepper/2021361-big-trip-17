@@ -1,5 +1,8 @@
 import { createPointRowTemplate } from '../templates/point-row-templ';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view';
+import { debounce } from '../util';
+
+const DELAY = 500;
 
 export default class PointRow extends AbstractStatefulView {
   _state;
@@ -10,8 +13,9 @@ export default class PointRow extends AbstractStatefulView {
     favoriteButtonClick: () => {},
   };
 
-  rollupButton = null;
-  favoriteButton = null;
+  #rollupButton = null;
+  #favoriteButton = null;
+  #disabled = false;
 
   constructor(point, offers, destinations) {
     super();
@@ -27,13 +31,22 @@ export default class PointRow extends AbstractStatefulView {
   };
 
   #findElements = () => {
-    this.rollupButton = this.element.querySelector('.event__rollup-btn');
-    this.favoriteButton = this.element.querySelector('.event__favorite-btn');
+    this.#rollupButton = this.element.querySelector('.event__rollup-btn');
+    this.#favoriteButton = this.element.querySelector('.event__favorite-btn');
   };
 
   #setHandlers = () => {
-    this.rollupButton.addEventListener('click', this.#editClickHandler);
-    this.favoriteButton.addEventListener('click', this.#favoriteClickHandler);
+    this.#rollupButton.addEventListener('click', this.#editClickHandler);
+    this.#favoriteButton.addEventListener('click', this.#favoriteClickHandler);
+  };
+
+  #removeHandlers = () => {
+    this.#rollupButton.removeEventListener('click', this.#editClickHandler);
+    this.#favoriteButton.removeEventListener('click', this.#favoriteClickHandler);
+  };
+
+  removeEventListeners = () => {
+    this.#removeHandlers();
   };
 
   _restoreHandlers = () => {
@@ -54,11 +67,11 @@ export default class PointRow extends AbstractStatefulView {
     );
   }
 
-  setFavoriteClickCallback = (callback) => {
+  setFavoriteClickHandler = (callback) => {
     this._callback.favoriteButtonClick = callback;
   };
 
-  setEditClickCallback = (callback) => {
+  setEditClickHandler = (callback) => {
     this._callback.rollupButtonClick = callback;
   };
 
@@ -66,10 +79,22 @@ export default class PointRow extends AbstractStatefulView {
     this._callback.rollupButtonClick();
   };
 
-  #favoriteClickHandler = () => {
-    this.updateElement({
-      isFavorite: !this._state.isFavorite,
-    });
+  #favoriteClickHandler = debounce(() => {
+    if (this.#disabled) {
+      return;
+    }
+    this.#disabled = true;
+    this._state.isFavorite = !this._state.isFavorite;
     this._callback.favoriteButtonClick(this.#getState());
+  }, DELAY);
+
+  favoriteUpdateHandler = (point) => {
+    this.updateElement(point);
+    this._restoreHandlers();
+    this.#disabled = false;
+  };
+
+  favoriteErrorHandler = (point) => {
+    this.shake(() => this.favoriteUpdateHandler(point));
   };
 }

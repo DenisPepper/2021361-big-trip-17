@@ -6,6 +6,10 @@ import { Russian } from 'flatpickr/dist/l10n/ru.js';
 import 'flatpickr/dist/themes/material_blue.css';
 import { DECIMAL } from '../settings';
 
+const SubmitButtonText = {SAVE: 'Save', SAVING: 'Saving...'};
+const ResetButtonText = {DELETE: 'Delete', DELETING: 'Deleting...'};
+const Actions = {SUBMIT: 'submit', RESET: 'reset'};
+
 const Delay = {
   POINT_TYPE: 200,
   DEST: 500,
@@ -21,23 +25,17 @@ const flatpickrSettings = {
 };
 
 export default class PointForm extends AbstractStatefulView {
-  _state;
   #offers = null;
   #destinations = null;
+  #elements = new Map();
+  #action = null;
+  #flatpickrEndTime = null;
+  _state;
   _callback = {
     closeClick: () => {},
     saveClick: () => {},
     resetClick: () => {},
   };
-
-  #rollupButton = null;
-  #resetButton = null;
-  #eventTypeGroup = null;
-  #eventDestination = null;
-  #eventStartTime = null;
-  #eventEndTime = null;
-  #flatpickrEndTime = null;
-  #price = null;
 
   constructor(point, offers, destinations) {
     super();
@@ -51,38 +49,52 @@ export default class PointForm extends AbstractStatefulView {
     this.#findElements();
     this.#setHandlers();
     this.#setFlatpickr();
-    this.#resetButton.disabled = this._state.isNew;
-    this.#eventDestination.placeholder = 'choose destination';
+    this.#elements.get('resetButton').disabled = this._state.isNew;
+    this.#elements.get('destination').placeholder = 'choose destination';
+    this.#elements.get('submitButton').textContent = SubmitButtonText.SAVE;
+    this.#elements.get('resetButton').textContent = ResetButtonText.DELETE;
   };
 
   #findElements = () => {
-    this.#resetButton = this.element.querySelector('.event__reset-btn');
-    this.#eventStartTime = this.element.querySelector('#event-start-time-1');
-    this.#eventEndTime = this.element.querySelector('#event-end-time-1');
-    this.#rollupButton = this.element.querySelector('.event__rollup-btn');
-    this.#eventTypeGroup = this.element.querySelector('.event__type-list');
-    this.#eventDestination = this.element.querySelector('.event__input--destination');
-    this.#price = this.element.querySelector('#event-price-1');
+    this.#elements.set('submitButton', this.element.querySelector('.event__save-btn'));
+    this.#elements.set('resetButton', this.element.querySelector('.event__reset-btn'));
+    this.#elements.set('startTime', this.element.querySelector('#event-start-time-1'));
+    this.#elements.set('endTime', this.element.querySelector('#event-end-time-1'));
+    this.#elements.set('rollupButton', this.element.querySelector('.event__rollup-btn'));
+    this.#elements.set('eventTypeGroup', this.element.querySelector('.event__type-list'));
+    this.#elements.set('destination', this.element.querySelector('.event__input--destination'));
+    this.#elements.set('price', this.element.querySelector('#event-price-1'));
   };
 
   #setHandlers = () => {
     this.element.addEventListener('submit', this.#saveClickHandler);
     this.element.addEventListener('reset', this.#resetClickHandler);
-    this.#eventTypeGroup.addEventListener('input', this.#whenInputPointType);
-    this.#eventDestination.addEventListener('input', this.#whenInputDestination);
-    this.#rollupButton.addEventListener('click', this.#closeClickHandler);
-    this.#eventStartTime.addEventListener('input', this.#whenInputStartTime);
-    this.#eventEndTime.addEventListener('input', this.#whenInputEndtTime);
-    this.#price.addEventListener('input', this.#whenInputPrice);
+    this.#elements.get('eventTypeGroup').addEventListener('input', this.#inputPointTypeHandler);
+    this.#elements.get('destination').addEventListener('input', this.#inputDestinationHandler);
+    this.#elements.get('rollupButton').addEventListener('click', this.#closeClickHandler);
+    this.#elements.get('startTime').addEventListener('input', this.#inputStartTimeHandler);
+    this.#elements.get('endTime').addEventListener('input', this.#inputEndtTimeHandler);
+    this.#elements.get('price').addEventListener('input', this.#inputPriceHandler);
   };
 
   #setFlatpickr = () => {
-    flatpickr(this.#eventStartTime, flatpickrSettings);
-    this.#flatpickrEndTime = flatpickr(this.#eventEndTime, {...flatpickrSettings, minDate: this._state.dateFrom});
+    flatpickr(this.#elements.get('startTime'), flatpickrSettings);
+    this.#flatpickrEndTime = flatpickr(this.#elements.get('endTime'), {...flatpickrSettings, minDate: this._state.dateFrom});
   };
 
   _restoreHandlers = () => {
     this.init();
+  };
+
+  #removeHandlers = () => {
+    this.element.removeEventListener('submit', this.#saveClickHandler);
+    this.element.removeEventListener('reset', this.#resetClickHandler);
+    this.#elements.get('eventTypeGroup').removeEventListener('input', this.#inputPointTypeHandler);
+    this.#elements.get('destination').removeEventListener('input', this.#inputDestinationHandler);
+    this.#elements.get('rollupButton').removeEventListener('click', this.#closeClickHandler);
+    this.#elements.get('startTime').removeEventListener('input', this.#inputStartTimeHandler);
+    this.#elements.get('endTime').removeEventListener('input', this.#inputEndtTimeHandler);
+    this.#elements.get('price').removeEventListener('input', this.#inputPriceHandler);
   };
 
   get state() {
@@ -99,6 +111,10 @@ export default class PointForm extends AbstractStatefulView {
     this.updateElement(this._state);
   };
 
+  removeEventListeners = () => {
+    this.#removeHandlers();
+  };
+
   get template() {
     return createPointFormTempalte(
       this._state,
@@ -107,15 +123,15 @@ export default class PointForm extends AbstractStatefulView {
     );
   }
 
-  setCloseClickCallback = (callback) => {
+  setCloseClickHandler = (callback) => {
     this._callback.closeClick = callback;
   };
 
-  setSaveClickCallback = (callback) => {
+  setSaveClickHandler = (callback) => {
     this._callback.saveClick = callback;
   };
 
-  setResetClickCallback = (callback) => {
+  setResetClickHandler = (callback) => {
     this._callback.resetClick = callback;
   };
 
@@ -125,40 +141,88 @@ export default class PointForm extends AbstractStatefulView {
 
   #saveClickHandler = (evt) => {
     evt.preventDefault();
+    this.#disableFormElements();
+    this.#switchSubmitButtonText();
+    this.#action = Actions.SUBMIT;
     this._callback.saveClick(this._state);
   };
 
   #resetClickHandler = (evt) => {
     evt.preventDefault();
+    this.#disableFormElements();
+    this.#switchResetButtonText();
+    this.#action = Actions.RESET;
     this._callback.resetClick(this.state);
   };
 
-  #whenInputPointType = debounce((evt) => {
+  loadErrorHandler = () => {
+    this.shake(() => {
+      this.#enableFormElements();
+      if (this.#action === Actions.RESET) {
+        this.#switchResetButtonText();
+      } else {
+        this.#switchSubmitButtonText();
+      }
+    });
+  };
+
+  #inputPointTypeHandler = debounce((evt) => {
     this.updateElement({ type: evt.target.value, offers: []});
   }, Delay.POINT_TYPE);
 
-  #whenInputDestination = debounce((evt) => {
-    const destIndex = this.#destinations.findIndex(
+  #inputDestinationHandler = debounce((evt) => {
+    const destination = this.#destinations.find(
       (element) => element.name === evt.target.value
     );
-    if (destIndex !== -1 && destIndex !== this._state.destination) {
-      this.updateElement({ destination: destIndex });
+    if (destination) {
+      this.updateElement({ destination });
     }
   }, Delay.DEST);
 
-  #whenInputStartTime = debounce((evt) => {
+  #inputStartTimeHandler = debounce((evt) => {
     this._state.dateFrom = evt.target.value;
     this.#flatpickrEndTime.set('minDate', this._state.dateFrom);
   });
 
-  #whenInputEndtTime = debounce((evt) => {
+  #inputEndtTimeHandler = debounce((evt) => {
     this._state.dateTo = evt.target.value;
   });
 
-  #whenInputPrice = debounce((evt) => {
+  #inputPriceHandler = debounce((evt) => {
     const price = parseInt(evt.target.value, DECIMAL);
     if (price) {
       this._state.basePrice = price;
     }
   });
+
+  #disableFormElements = () => {
+    const elements = [...this.element.elements];
+    elements.forEach((element) => {
+      element.disabled = true;
+    });
+  };
+
+  #enableFormElements = () => {
+    const elements = [...this.element.elements];
+    elements.forEach((element) => {
+      element.disabled = false;
+    });
+    this.#elements.get('resetButton').disabled = this._state.isNew;
+  };
+
+  #switchResetButtonText = () => {
+    if (this.#elements.get('resetButton').textContent === ResetButtonText.DELETING) {
+      this.#elements.get('resetButton').textContent = ResetButtonText.DELETE;
+    } else {
+      this.#elements.get('resetButton').textContent = ResetButtonText.DELETING;
+    }
+  };
+
+  #switchSubmitButtonText = () => {
+    if(this.#elements.get('submitButton').textContent === SubmitButtonText.SAVING) {
+      this.#elements.get('submitButton').textContent = SubmitButtonText.SAVE;
+    } else {
+      this.#elements.get('submitButton').textContent = SubmitButtonText.SAVING;
+    }
+  };
 }
