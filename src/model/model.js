@@ -137,7 +137,7 @@ export default class Model {
     );
   };
 
-  #convertPointForClient = (point) => this.#adapter.PointForClient(point);
+  #convertPointForClient = (point) => this.#adapter.PointForClient(point, this.#offers);
 
   #convertPointForServer = (point) => this.#adapter.pointForServer(point);
 

@@ -209,7 +209,6 @@ export default class PointForm extends AbstractStatefulView {
     } else {
       offers.splice(offers.findIndex((element) => element === id), SPLICE_COUNT);
     }
-    console.log(offers);
   }, Delay.OFFER);
 
   #disableFormElements = () => {
