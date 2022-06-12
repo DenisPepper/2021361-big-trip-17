@@ -113,7 +113,7 @@ export default class СomposePresenter {
       return;
     }
     render(this.#sortFormView, this.#eventsContainer);
-    this.#sortFormView.setSortsClickHandler(this.#changeSortHandler);
+    this.#sortFormView.init(this.#changeSortHandler);
     return this;
   };
 
@@ -123,8 +123,7 @@ export default class СomposePresenter {
   };
 
   #changeFilterHandler = (filterName) => {
-    this.#sortFormView.init();
-    this.#sortFormView.setSortsClickHandler(this.#changeSortHandler);
+    this.#sortFormView.setFirstChecked();
     this.#currentFilterName = filterName;
     this.#currentSortName = Sorts.DAY;
     this.#callback.updatePointsList();
