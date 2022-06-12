@@ -9,10 +9,12 @@ import { DECIMAL } from '../settings';
 const SubmitButtonText = {SAVE: 'Save', SAVING: 'Saving...'};
 const ResetButtonText = {DELETE: 'Delete', DELETING: 'Deleting...'};
 const Actions = {SUBMIT: 'submit', RESET: 'reset'};
-
+const SPLICE_COUNT = 1;
 const Delay = {
   POINT_TYPE: 200,
+  PRICE: 200,
   DEST: 500,
+  OFFER: 250,
 };
 
 const flatpickrSettings = {
@@ -64,6 +66,7 @@ export default class PointForm extends AbstractStatefulView {
     this.#elements.set('eventTypeGroup', this.element.querySelector('.event__type-list'));
     this.#elements.set('destination', this.element.querySelector('.event__input--destination'));
     this.#elements.set('price', this.element.querySelector('#event-price-1'));
+    this.#elements.set('offers', this.element.querySelector('.event__details'));
   };
 
   #setHandlers = () => {
@@ -75,6 +78,7 @@ export default class PointForm extends AbstractStatefulView {
     this.#elements.get('startTime').addEventListener('input', this.#inputStartTimeHandler);
     this.#elements.get('endTime').addEventListener('input', this.#inputEndtTimeHandler);
     this.#elements.get('price').addEventListener('input', this.#inputPriceHandler);
+    this.#elements.get('offers').addEventListener('input', this.#inputOffersHandler);
   };
 
   #setFlatpickr = () => {
@@ -95,6 +99,7 @@ export default class PointForm extends AbstractStatefulView {
     this.#elements.get('startTime').removeEventListener('input', this.#inputStartTimeHandler);
     this.#elements.get('endTime').removeEventListener('input', this.#inputEndtTimeHandler);
     this.#elements.get('price').removeEventListener('input', this.#inputPriceHandler);
+    this.#elements.get('offers').removeEventListener('input', this.#inputOffersHandler);
   };
 
   get state() {
@@ -175,7 +180,7 @@ export default class PointForm extends AbstractStatefulView {
       (element) => element.name === evt.target.value
     );
     if (destination) {
-      this.updateElement({ destination });
+      this.updateElement({ destination, offers:[] });
     }
   }, Delay.DEST);
 
@@ -193,7 +198,19 @@ export default class PointForm extends AbstractStatefulView {
     if (price) {
       this._state.basePrice = price;
     }
-  });
+  }, Delay.PRICE);
+
+  #inputOffersHandler = debounce((evt) => {
+    const target = evt.target;
+    const offers = this._state.offers;
+    const id = parseInt(target.id.split('-').pop(), DECIMAL);
+    if (target.checked) {
+      offers.push(id);
+    } else {
+      offers.splice(offers.findIndex((element) => element === id), SPLICE_COUNT);
+    }
+    console.log(offers);
+  }, Delay.OFFER);
 
   #disableFormElements = () => {
     const elements = [...this.element.elements];
