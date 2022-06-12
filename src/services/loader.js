@@ -92,7 +92,7 @@ export default class Loader {
     const uri = this.#getApiUri(`${this.#pointsURN}/${point.id}`);
     const params = this.#getParams(Method.DELETE);
     const response = await this.#sendRequest(uri, params);
-    response.id = point.id;
+    response.point = point;
     deletePointHandler(response, args);
   };
 }

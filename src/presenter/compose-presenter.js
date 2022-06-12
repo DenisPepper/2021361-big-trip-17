@@ -11,8 +11,14 @@ export default class СomposePresenter {
   #eventsContainer = null;
   #currentFilterName = null;
   #currentSortName = null;
+  #filtersCounter = {
+    [Filters.EVERYTHING]: 0,
+    [Filters.FUTURE]: 0,
+    [Filters.PAST]: 0,
+  };
+
   #callback = {
-    updateEvents: () => {},
+    updatePointsList: () => {},
   };
 
   constructor(args) {
@@ -38,12 +44,61 @@ export default class СomposePresenter {
     this.#currentSortName = Sorts.DAY;
   }
 
-  init = (updateEvents) => {
-    this.#callback.updateEvents = updateEvents;
+  init = (updatePointsList) => {
+    this.#callback.updatePointsList = updatePointsList;
     return this;
   };
 
-  getFilterName = () => this.#currentFilterName;
+  checkFiltersAbsence = () => {
+    for (const key in this.#filtersCounter) {
+      if (this.#filtersCounter[key] === 0) {
+        this.#filtersFormView.disableFilter(key);
+      } else {
+        this.#filtersFormView.enableFilter(key);
+      }
+    }
+  };
+
+  reduceFiltersCounter = (point) => {
+    this.#filtersCounter[Filters.EVERYTHING] --;
+    this.reduceFilters(point);
+  };
+
+  reduceFilters = (point) => {
+    if (point.isFuture) {
+      this.#filtersCounter[Filters.FUTURE] --;
+    }
+    if (point.isPast) {
+      this.#filtersCounter[Filters.PAST] --;
+    }
+  };
+
+  increaseFiltersCounter = (point) => {
+    if (point.isNew) {
+      return;
+    }
+    this.#filtersCounter[Filters.EVERYTHING] ++;
+    this.increaseFilters(point);
+  };
+
+  increaseFilters = (point) => {
+    if (point.isFuture) {
+      this.#filtersCounter[Filters.FUTURE] ++;
+    }
+    if (point.isPast) {
+      this.#filtersCounter[Filters.PAST] ++;
+    }
+  };
+
+  getCount = () => this.#filtersCounter[this.#currentFilterName];
+
+  getFilterName = () => {
+    if (this.#filtersCounter[Filters.EVERYTHING] === 0) {
+      this.#currentFilterName = Filters.EVERYTHING;
+      this.#filtersFormView.init();
+    }
+    return this.#currentFilterName;
+  };
 
   getSortName = () => this.#currentSortName;
 
@@ -54,6 +109,9 @@ export default class СomposePresenter {
   };
 
   renderSortForm = () => {
+    if (this.#filtersCounter[Filters.EVERYTHING] === 0) {
+      return;
+    }
     render(this.#sortFormView, this.#eventsContainer);
     this.#sortFormView.setSortsClickHandler(this.#changeSortHandler);
     return this;
@@ -69,11 +127,14 @@ export default class СomposePresenter {
     this.#sortFormView.setSortsClickHandler(this.#changeSortHandler);
     this.#currentFilterName = filterName;
     this.#currentSortName = Sorts.DAY;
-    this.#callback.updateEvents();
+    this.#callback.updatePointsList();
+    if (this.getCount === 0) {
+      this.removeSortForm();
+    }
   };
 
   #changeSortHandler = (sortName) => {
     this.#currentSortName = sortName;
-    this.#callback.updateEvents();
+    this.#callback.updatePointsList();
   };
 }

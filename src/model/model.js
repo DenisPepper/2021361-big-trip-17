@@ -6,6 +6,8 @@ import Adapter from '../services/adapter';
 
 const modelEvents = {
   DELETE_POINT: 'delete_point',
+  CREATE_POINT: 'create_point',
+  BEFORE_UPDATE_POINT: 'before_update_point',
   UPDATE_POINT: 'update_point',
   UPDATE_FAVORITE: 'update_favorite',
   FAVORITE_ERROR: 'favorite_error',
@@ -150,11 +152,11 @@ export default class Model {
   #addPointHandler = (response, args) => {
     if (!response.ok) {
       this.#notify(modelEvents.LOAD_ERROR, args);
-      this.#notify(modelEvents.AFTER_LOAD, args);
       return;
     }
-    this.#add(this.#convertPointForClient(response.data));
-    this.#notify(modelEvents.UPDATE_POINT, args);
+    const point = this.#convertPointForClient(response.data);
+    this.#add(point);
+    this.#notify(modelEvents.CREATE_POINT, {...args, point});
     this.#notify(modelEvents.AFTER_LOAD, args);
   };
 
@@ -180,11 +182,10 @@ export default class Model {
   #deletePointHandler = (response, args) => {
     if (!response.ok) {
       this.#notify(modelEvents.LOAD_ERROR, args);
-      this.#notify(modelEvents.AFTER_LOAD, args);
       return;
     }
-    this.#delete(response.id);
-    this.#notify(modelEvents.DELETE_POINT, args);
+    this.#delete(response.point.id);
+    this.#notify(modelEvents.DELETE_POINT, {point: response.point});
     this.#notify(modelEvents.AFTER_LOAD, args);
   };
 
@@ -212,11 +213,12 @@ export default class Model {
   #updatePointHandler = (response, args) => {
     if (!response.ok) {
       this.#notify(modelEvents.LOAD_ERROR, args);
-      this.#notify(modelEvents.AFTER_LOAD, args);
       return;
     }
-    this.#update(this.#convertPointForClient(response.data));
-    this.#notify(modelEvents.UPDATE_POINT, args);
+    const point = this.#convertPointForClient(response.data);
+    this.#update(point);
+    this.#notify(modelEvents.BEFORE_UPDATE_POINT, args);
+    this.#notify(modelEvents.UPDATE_POINT, {point});
     this.#notify(modelEvents.AFTER_LOAD, args);
   };
 
@@ -232,7 +234,6 @@ export default class Model {
   #updateFavoriteHandler = (response, args) => {
     if (!response.ok) {
       this.#notify(modelEvents.FAVORITE_ERROR, args);
-      this.#notify(modelEvents.AFTER_LOAD, args);
       return;
     }
     const point = this.#update(this.#convertPointForClient(response.data));
@@ -257,8 +258,14 @@ export default class Model {
   compose = (filterName, sortName) =>
     this.#sorting(this.#filtrate(filterName), sortName);
 
+  addPointCreateListener  = (callback) =>
+    this.#eventManager.add(modelEvents.CREATE_POINT, callback);
+
   addDeletePointListener = (callback) =>
     this.#eventManager.add(modelEvents.DELETE_POINT, callback);
+
+  addBeforePointsUpdatedListener  = (callback) =>
+    this.#eventManager.add(modelEvents.BEFORE_UPDATE_POINT, callback);
 
   addPointsUpdatedListener  = (callback) =>
     this.#eventManager.add(modelEvents.UPDATE_POINT, callback);
@@ -281,9 +288,8 @@ export default class Model {
   addBeforeLoadListener = (callback) =>
     this.#eventManager.add(modelEvents.BEFORE_LOAD, callback);
 
-  addAfterLoadListener= (callback) => {
+  addAfterLoadListener= (callback) =>
     this.#eventManager.add(modelEvents.AFTER_LOAD, callback);
-  };
 
   #notify = (name, args) => this.#eventManager.invoke(name, args);
 }
