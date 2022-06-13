@@ -4,8 +4,7 @@ import { Messages } from '../settings';
 
 export default class Message extends AbstractView {
   get template() {
-    const template = createMessageTemplate();
-    return template;
+    return createMessageTemplate();
   }
 
   get message() {
