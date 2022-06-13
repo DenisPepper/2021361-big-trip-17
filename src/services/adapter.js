@@ -6,11 +6,7 @@ const getTotalPrice = (point, offers) => {
     .filter((element) => element.type === point.type)
     .pop()
     .offers
-    .reduce((i, offer) => {
-      if (point.offers.includes(offer.id)) {
-        i += offer.price;
-      }
-    }, 0);
+    .reduce((i, offer) => point.offers.includes(offer.id) ? i + offer.price : i, 0);
   return point.base_price + cost;
 };
 
