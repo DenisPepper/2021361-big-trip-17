@@ -17,6 +17,7 @@ const TimeLimit = {LOWER_LIMIT: 350, UPPER_LIMIT: 1000};
 
 export default class MainPresenter {
   #model = null;
+  #points = [];
   #pointsListView = null;
   #mainContainer = null;
   #controlsContainer = null;
@@ -95,9 +96,6 @@ export default class MainPresenter {
     this.#newEventButton = newEventButton;
   }
 
-  get points() {
-    return this.#model.points;
-  }
 
   get offers() {
     return this.#model.offers;
@@ -195,11 +193,11 @@ export default class MainPresenter {
     if (this.#eventsContainer.contains(this.#messageView.element)) {
       remove(this.#messageView);
     }
-    const points = this.#model.compose(
+    this.#points = this.#model.compose(
       this.#composePresenter.getFilterName(),
       this.#composePresenter.getSortName()
     );
-    this.#renderPointsList(points);
+    this.#renderPointsList();
   };
 
   #createComposePresenter = () => {
@@ -217,6 +215,7 @@ export default class MainPresenter {
   #runInfoPresenter = () => {
     this.#infoPresenter
       .init(this.#infoView, this.#mainContainer)
+      .updadeInfoView(this.#points)
       .renderInfoView();
   };
 
@@ -252,16 +251,12 @@ export default class MainPresenter {
     render(this.#messageView, this.#eventsContainer);
   };
 
-  /*#showInfo = () => {
-
-  };*/
-
-  #renderPointsList = (points) => {
+  #renderPointsList = () => {
     remove(this.#pointsListView);
     if (this.#eventsContainer.contains(this.#messageView.element)) {
       remove(this.#messageView);
     }
-    points.forEach(this.#renderPoint);
+    this.#points.forEach(this.#renderPoint);
     this.#composePresenter.renderSortForm();
     render(this.#pointsListView, this.#eventsContainer);
   };
@@ -290,6 +285,7 @@ export default class MainPresenter {
     if (this.#useFiltersCounter) {
       this.#composePresenter.increaseFiltersCounter(point);
     }
+    this.#infoPresenter.increaseTotalCost(point.totalPrice);
     return pointPresenter;
   };
 
