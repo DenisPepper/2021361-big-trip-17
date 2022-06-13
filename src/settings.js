@@ -35,3 +35,9 @@ export const SorterRules = {
   [Sorts.TIME]: (a, b) => getDateDiffInMinute(b.dateFrom, b.dateTo) - getDateDiffInMinute(a.dateFrom, a.dateTo),
   [Sorts.DAY]: (a, b) => dayjs(a.dateFrom) - dayjs(b.dateFrom),
 };
+export const RenderPosition = {
+  BEFOREBEGIN: 'beforebegin',
+  AFTERBEGIN: 'afterbegin',
+  BEFOREEND: 'beforeend',
+  AFTEREND: 'afterend',
+};

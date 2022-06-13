@@ -1,4 +1,5 @@
 import { render, replace, remove } from '../framework/render';
+import { RenderPosition } from '../settings';
 
 export default class PointPresenter {
   #model = null;
@@ -125,7 +126,7 @@ export default class PointPresenter {
 
   renderPoint = () => {
     if (this.#point.isNew) {
-      render(this.#pointFormView, this.#pointsListView.element, 'afterbegin');
+      render(this.#pointFormView, this.#pointsListView.element, RenderPosition.AFTERBEGIN);
     } else {
       render(this.#pointRowView, this.#pointsListView.element);
     }
