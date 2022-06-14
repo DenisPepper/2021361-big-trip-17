@@ -32,6 +32,7 @@ export default class MainPresenter {
   #newEventButton = null;
   #uiBlocker = new UiBlocker(TimeLimit.LOWER_LIMIT, TimeLimit.UPPER_LIMIT);
   #useFiltersCounter = true;
+  #useTotalCostCounter = true;
 
   constructor(args) {
     const {
@@ -96,7 +97,6 @@ export default class MainPresenter {
     this.#newEventButton = newEventButton;
   }
 
-
   get offers() {
     return this.#model.offers;
   }
@@ -127,7 +127,6 @@ export default class MainPresenter {
   };
 
   #beforeStartHandler = () => {
-    this.#enableFiltersCounter();
     this.#showMessage();
   };
 
@@ -141,6 +140,7 @@ export default class MainPresenter {
       this.#checkFiltersCounter();
       this.#disableFiltersCounter();
       this.#runInfoPresenter();
+      this.#disableTotalCostCounter();
     } else {
       this.#messageView.message = Messages.RESTART;
     }
@@ -154,6 +154,7 @@ export default class MainPresenter {
     this.#uiBlocker.unblock();
     this.#composePresenter.checkFiltersAbsence();
     this.#checkFiltersCounter();
+    this.#infoPresenter.updadeInfoView(this.#points);
   };
 
   #favoriteUpdateHandler = (args) => {
@@ -176,15 +177,18 @@ export default class MainPresenter {
     const {point} = args;
     this.#composePresenter.increaseFiltersCounter(point);
     this.#composePresenter.checkFiltersAbsence();
+    this.#infoPresenter.increaseTotalCost(args.point.totalPrice);
     this.#updatePointsList();
   };
 
   #beforePointUpdateHandler = () => {
     this.#composePresenter.reduceFilters(this.#currentPointPresenter.point);
+    this.#infoPresenter.reduceTotalCost(this.#currentPointPresenter.point.totalPrice);
   };
 
   #pointUpdateHandler = (args) => {
     this.#composePresenter.increaseFilters(args.point);
+    this.#infoPresenter.increaseTotalCost(args.point.totalPrice);
     this.#updatePointsList(args);
   };
 
@@ -193,12 +197,14 @@ export default class MainPresenter {
     if (this.#eventsContainer.contains(this.#messageView.element)) {
       remove(this.#messageView);
     }
-    this.#points = this.#model.compose(
-      this.#composePresenter.getFilterName(),
-      this.#composePresenter.getSortName()
-    );
+    this.#points = this.composePointsList();
     this.#renderPointsList();
   };
+
+  composePointsList = () => this.#model.compose(
+    this.#composePresenter.getFilterName(),
+    this.#composePresenter.getSortName()
+  );
 
   #createComposePresenter = () => {
     this.#composePresenter = new СomposePresenter({
@@ -235,10 +241,12 @@ export default class MainPresenter {
 
   #pointDeleteHandler = (args) => {
     const { point } = args;
+    this.#points = this.composePointsList();
     this.#currentPointPresenter.removeOnEscClickHandler();
     this.#currentPointPresenter.revomePointForm();
     this.#resetCurrentPointPresenter();
     this.#composePresenter.reduceFiltersCounter(point);
+    this.#infoPresenter.reduceTotalCost(point.totalPrice);
   };
 
   #showMessage = () => {
@@ -285,7 +293,9 @@ export default class MainPresenter {
     if (this.#useFiltersCounter) {
       this.#composePresenter.increaseFiltersCounter(point);
     }
-    this.#infoPresenter.increaseTotalCost(point.totalPrice);
+    if (this.#useTotalCostCounter) {
+      this.#infoPresenter.increaseTotalCost(point.totalPrice);
+    }
     return pointPresenter;
   };
 
@@ -313,13 +323,13 @@ export default class MainPresenter {
     this.#useFiltersCounter = false;
   };
 
-  #enableFiltersCounter = () => {
-    this.#useFiltersCounter = true;
-  };
-
   #checkFiltersCounter = () => {
     if (this.#composePresenter.getCount() === 0) {
       this.#showMessage();
     }
+  };
+
+  #disableTotalCostCounter = () => {
+    this.#useTotalCostCounter = false;
   };
 }

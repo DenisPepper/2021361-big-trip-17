@@ -38,14 +38,15 @@ export default class InfoPresenter {
       title = title.slice(2);
     }
     if (count > 0) {
-      dates = `${getDayOf(points[0].dateFrom)}
-       — ${getDayOf(points[points.length - 1].dateTo)}`;
+      dates = `${getDayOf(points[0].dateFrom)} — ${getDayOf(points[points.length - 1].dateTo)}`;
     }
     this.#title = title;
     this.#dates = dates;
   };
 
   increaseTotalCost = (totalPrice) => {this.#totalCost += totalPrice;};
+
+  reduceTotalCost = (totalPrice) => {this.#totalCost -= totalPrice;};
 
   renderInfoView = () => {
     render(this.#infoView, this.#mainContainer, RenderPosition.AFTERBEGIN);
