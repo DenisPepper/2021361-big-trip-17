@@ -1,4 +1,5 @@
 import { render, replace, remove } from '../framework/render';
+import { RenderPosition } from '../settings';
 
 export default class PointPresenter {
   #model = null;
@@ -9,7 +10,7 @@ export default class PointPresenter {
   #callback = {
     setCurrentPointPresenter: () => {},
     resetCurrentPointPresenter: () => {},
-    pointDeleteHandler: () => {},
+    checkFiltersCounter: () => {},
     closeCurrentPointForm: () => {},
   };
 
@@ -25,12 +26,12 @@ export default class PointPresenter {
   init = (
     setCurrentPointPresenter,
     resetCurrentPointPresenter,
-    pointDeleteHandler,
+    checkFiltersCounter,
     closeCurrentPointForm
   ) => {
     this.#callback.setCurrentPointPresenter = setCurrentPointPresenter;
     this.#callback.resetCurrentPointPresenter = resetCurrentPointPresenter;
-    this.#callback.pointDeleteHandler = pointDeleteHandler;
+    this.#callback.checkFiltersCounter = checkFiltersCounter;
     this.#callback.closeCurrentPointForm = closeCurrentPointForm;
     this.#pointRowView.setEditClickHandler(this.#editClickHandler);
     this.#pointRowView.setFavoriteClickHandler(this.#favoriteClickHandler);
@@ -39,6 +40,10 @@ export default class PointPresenter {
     this.#pointFormView.setResetClickHandler(this.#resetClickHandler);
     return this;
   };
+
+  get point() {
+    return this.#point;
+  }
 
   #editClickHandler = () => {
     this.#callback.closeCurrentPointForm(this);
@@ -84,19 +89,24 @@ export default class PointPresenter {
   #openPointForm = () => replace(this.#pointFormView, this.#pointRowView);
 
   closePointForm = () => {
+    this.#callback.resetCurrentPointPresenter();
     this.removeOnEscClickHandler();
     if (this.#point.isNew) {
-      this.#callback.pointDeleteHandler();
+      this.clear();
+      this.#callback.checkFiltersCounter();
     } else {
-      this.#callback.resetCurrentPointPresenter();
       replace(this.#pointRowView, this.#pointFormView);
     }
+  };
+
+  revomePointForm = () => {
+    remove(this.#pointFormView);
   };
 
   clear = () => {
     this.#pointFormView.removeEventListeners();
     this.#pointRowView.removeEventListeners();
-    remove(this.#pointFormView);
+    this.revomePointForm();
     this.#pointFormView = null;
     this.#pointRowView = null;
   };
@@ -116,7 +126,7 @@ export default class PointPresenter {
 
   renderPoint = () => {
     if (this.#point.isNew) {
-      render(this.#pointFormView, this.#pointsListView.element, 'afterbegin');
+      render(this.#pointFormView, this.#pointsListView.element, RenderPosition.AFTERBEGIN);
     } else {
       render(this.#pointRowView, this.#pointsListView.element);
     }

@@ -3,33 +3,31 @@ import AbstractView from '../framework/view/abstract-view';
 
 export default class SortForm extends AbstractView {
   _callback = {
-    sortsClick: null,
+    sortsClickHandler: () => {},
   };
-
-  constructor() {
-    super();
-    this.init();
-  }
 
   get template() {
     return createSortsFormTemplate();
   }
 
-  init = () => {
-    this.element[0].checked = true;
+  init = (sortsClickHandler) => {
+    this._callback.sortsClickHandler = sortsClickHandler;
+    this.setSortsClickHandler();
+    this.setFirstChecked();
   };
 
-  setSortsClickHandler = (callback) => {
-    this._callback.sortsClick = callback;
+  setSortsClickHandler = () => {
     this.element.addEventListener('input', this.#sortsClickHandler);
   };
 
   #sortsClickHandler = (evt) => {
-    this._callback.sortsClick(evt.target.value);
+    this._callback.sortsClickHandler(evt.target.value);
   };
 
   removeSortsClickHandler = () => {
     this.element.removeEventListener('input', this._callback.setSortsClick);
   };
+
+  setFirstChecked = () => {this.element[0].checked = true;};
 
 }

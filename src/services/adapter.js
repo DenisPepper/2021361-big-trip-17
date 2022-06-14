@@ -1,4 +1,14 @@
 import { DEFAULT_POINT_TYPE } from '../settings';
+import { isFuture, isPast } from './filter';
+
+const getTotalPrice = (point, offers) => {
+  const cost = offers
+    .filter((element) => element.type === point.type)
+    .pop()
+    .offers
+    .reduce((i, offer) => point.offers.includes(offer.id) ? i + offer.price : i, 0);
+  return point.base_price + cost;
+};
 
 export default class Adapter {
   pointForServer = (point) => {
@@ -15,15 +25,18 @@ export default class Adapter {
     };
   };
 
-  PointForClient = (point) => ({
-    basePrice : point.base_price,
+  PointForClient = (point, offers) => ({
+    totalPrice: getTotalPrice(point, offers),
+    basePrice: point.base_price,
     dateFrom: point.date_from,
     dateTo: point.date_to,
     destination: point.destination,
     id: point.id,
     isFavorite: point.is_favorite,
     offers: point.offers,
-    type: point.type
+    type: point.type,
+    isFuture: isFuture({dateFrom: point.date_from, dateTo: point.date_to}),
+    isPast: isPast({dateFrom: point.date_from, dateTo: point.date_to}),
   });
 
   getNewPoint = () => ({

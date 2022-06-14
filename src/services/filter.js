@@ -1,18 +1,43 @@
 import dayjs from 'dayjs';
-import { Filters } from '../settings';
-import { FilterRules } from '../settings';
+
+export const Filters = {
+  EVERYTHING: 'everything',
+  FUTURE: 'future',
+  PAST: 'past',
+};
+
+const CURRENT_DATE = dayjs();
+
+const BasicFilterRules  = {
+  [Filters.FUTURE]: (currentDate) => (point) => currentDate.isBefore(dayjs(point.dateFrom)) || currentDate.isBefore(dayjs(point.dateTo)),
+  [Filters.PAST]: (currentDate) => (point) => currentDate.isAfter(dayjs(point.dateTo)) || currentDate.isAfter(dayjs(point.dateFrom)),
+};
+
+const ReducedFilterRules = {
+  [Filters.FUTURE]: () => (point) => point.isFuture,
+  [Filters.PAST]: () => (point) => point.isPast,
+};
+
+export const isFuture = (point) => {
+  const rule = BasicFilterRules[Filters.FUTURE](CURRENT_DATE);
+  return rule(point);
+};
+
+export const isPast = (point) => {
+  const rule = BasicFilterRules[Filters.PAST](CURRENT_DATE);
+  return rule(point);
+};
 
 const NULL_PREDICATE = () => true;
 
 class Rules {
-  currentDate = dayjs();
 
   get [Filters.FUTURE]() {
-    return FilterRules[Filters.FUTURE](this.currentDate);
+    return ReducedFilterRules[Filters.FUTURE]();
   }
 
   get [Filters.PAST]() {
-    return FilterRules[Filters.PAST](this.currentDate);
+    return ReducedFilterRules[Filters.PAST]();
   }
 }
 
