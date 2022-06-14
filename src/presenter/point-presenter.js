@@ -12,6 +12,7 @@ export default class PointPresenter {
     resetCurrentPointPresenter: () => {},
     checkFiltersCounter: () => {},
     closeCurrentPointForm: () => {},
+    enableNewEventButton: () => {},
   };
 
   constructor(args) {
@@ -27,8 +28,10 @@ export default class PointPresenter {
     setCurrentPointPresenter,
     resetCurrentPointPresenter,
     checkFiltersCounter,
-    closeCurrentPointForm
+    closeCurrentPointForm,
+    enableNewEventButton,
   ) => {
+    this.#callback.enableNewEventButton = enableNewEventButton;
     this.#callback.setCurrentPointPresenter = setCurrentPointPresenter;
     this.#callback.resetCurrentPointPresenter = resetCurrentPointPresenter;
     this.#callback.checkFiltersCounter = checkFiltersCounter;
@@ -94,6 +97,7 @@ export default class PointPresenter {
     if (this.#point.isNew) {
       this.clear();
       this.#callback.checkFiltersCounter();
+      this.#callback.enableNewEventButton();
     } else {
       replace(this.#pointRowView, this.#pointFormView);
     }

@@ -193,10 +193,6 @@ export default class MainPresenter {
   };
 
   #updatePointsList = () => {
-    this.#closeCurrentPointForm();
-    if (this.#eventsContainer.contains(this.#messageView.element)) {
-      remove(this.#messageView);
-    }
     this.#points = this.composePointsList();
     this.#renderPointsList();
   };
@@ -215,6 +211,7 @@ export default class MainPresenter {
       eventsContainer: this.#eventsContainer,
     })
       .init(this.#updatePointsList)
+      .initForms()
       .renderFilterForm();
   };
 
@@ -256,16 +253,18 @@ export default class MainPresenter {
       this.#composePresenter.removeSortForm();
       this.#messageView.message = this.#composePresenter.getFilterName();
     }
+    remove(this.#pointsListView);
     render(this.#messageView, this.#eventsContainer);
   };
 
   #renderPointsList = () => {
+    this.#closeCurrentPointForm();
     remove(this.#pointsListView);
+    this.#points.forEach(this.#renderPoint);
     if (this.#eventsContainer.contains(this.#messageView.element)) {
       remove(this.#messageView);
+      this.#composePresenter.renderSortForm();
     }
-    this.#points.forEach(this.#renderPoint);
-    this.#composePresenter.renderSortForm();
     render(this.#pointsListView, this.#eventsContainer);
   };
 
@@ -274,13 +273,14 @@ export default class MainPresenter {
       this.#model,
       point,
       new PointRow(point, this.offers, this.destinations),
-      new PointForm(point, this.offers, this.destinations)
-    ).init(
-      this.#setCurrentPointPresenter,
-      this.#resetCurrentPointPresenter,
-      this.#checkFiltersCounter,
-      this.#closeCurrentPointForm
-    ).renderPoint();
+      new PointForm(point, this.offers, this.destinations))
+      .init(
+        this.#setCurrentPointPresenter,
+        this.#resetCurrentPointPresenter,
+        this.#checkFiltersCounter,
+        this.#closeCurrentPointForm,
+        this.#enableNewEventButton)
+      .renderPoint();
 
   #createPointPresenter = (model, point, pointRowView, pointFormView) => {
     const pointPresenter = new PointPresenter({
@@ -300,10 +300,12 @@ export default class MainPresenter {
   };
 
   #createNewEvent = () => {
+    this.#disableNewEventButton();
+    this.#composePresenter.setFirstFilterChecked();
+    this.#composePresenter.setFirstSortChecked();
     this.#closeCurrentPointForm();
     if (this.#eventsContainer.contains(this.#messageView.element)) {
       remove(this.#messageView);
-      this.#composePresenter.renderSortForm();
       render(this.#pointsListView, this.#eventsContainer);
     }
     const pointPresenter = this.#renderPoint(this.#model.newPoint);
@@ -326,6 +328,10 @@ export default class MainPresenter {
   #checkFiltersCounter = () => {
     if (this.#composePresenter.getCount() === 0) {
       this.#showMessage();
+    } else if (this.#composePresenter.getCount() === 1) {
+      this.#composePresenter.removeSortForm();
+    } else if (this.#composePresenter.getCount() === 2) {
+      this.#composePresenter.renderSortForm();
     }
   };
 

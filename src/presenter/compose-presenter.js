@@ -3,6 +3,7 @@ import SortForm from '../view/sorts-view';
 import { Sorts } from '../settings';
 import { Filters } from '../services/filter';
 import { render, remove } from '../framework/render';
+import { RenderPosition } from '../settings';
 
 export default class СomposePresenter {
   #filtersFormView = null;
@@ -42,10 +43,17 @@ export default class СomposePresenter {
     this.#eventsContainer = eventsContainer;
     this.#currentFilterName = Filters.EVERYTHING;
     this.#currentSortName = Sorts.DAY;
+    this.init();
   }
 
   init = (updatePointsList) => {
     this.#callback.updatePointsList = updatePointsList;
+    return this;
+  };
+
+  initForms = () => {
+    this.#sortFormView.init(this.#changeSortHandler);
+    this.#filtersFormView.init(this.#changeFilterHandler);
     return this;
   };
 
@@ -94,8 +102,8 @@ export default class СomposePresenter {
 
   getFilterName = () => {
     if (this.#filtersCounter[Filters.EVERYTHING] === 0) {
-      this.#currentFilterName = Filters.EVERYTHING;
-      this.#filtersFormView.init();
+      this.setFirstFilterChecked();
+      this.#filtersFormView.disableAllFilters();
     }
     return this.#currentFilterName;
   };
@@ -104,16 +112,14 @@ export default class СomposePresenter {
 
   renderFilterForm = () => {
     render(this.#filtersFormView, this.#controlsContainer);
-    this.#filtersFormView.setFiltersClickHandler(this.#changeFilterHandler);
+    this.#filtersFormView.setFiltersClickHandler();
     return this;
   };
 
   renderSortForm = () => {
-    if (this.#filtersCounter[Filters.EVERYTHING] === 0) {
-      return;
-    }
-    render(this.#sortFormView, this.#eventsContainer);
-    this.#sortFormView.init(this.#changeSortHandler);
+    render(this.#sortFormView, this.#eventsContainer, RenderPosition.AFTERBEGIN);
+    this.#sortFormView.setSortsClickHandler();
+    this.setFirstSortChecked();
     return this;
   };
 
@@ -123,17 +129,23 @@ export default class СomposePresenter {
   };
 
   #changeFilterHandler = (filterName) => {
-    this.#sortFormView.setFirstChecked();
+    this.setFirstSortChecked();
     this.#currentFilterName = filterName;
-    this.#currentSortName = Sorts.DAY;
     this.#callback.updatePointsList();
-    if (this.getCount === 0) {
-      this.removeSortForm();
-    }
   };
 
   #changeSortHandler = (sortName) => {
     this.#currentSortName = sortName;
     this.#callback.updatePointsList();
+  };
+
+  setFirstFilterChecked = () => {
+    this.#currentFilterName = Filters.EVERYTHING;
+    this.#filtersFormView.setFirstChecked();
+  };
+
+  setFirstSortChecked = () => {
+    this.#sortFormView.setFirstChecked();
+    this.#currentSortName = Sorts.DAY;
   };
 }

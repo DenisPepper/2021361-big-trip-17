@@ -10,15 +10,15 @@ export default class FiltersForm extends AbstractView {
     filterClick: null,
   };
 
-  constructor() {
-    super();
-    this.init();
-  }
-
-  init = () => {
+  init = (callback) => {
+    this._callback.filterClick = callback;
     this.#findElements();
-    this.#elements.get('filterEverithing').checked = true;
+    this.setFirstChecked();
     this.disableAllFilters();
+  };
+
+  setFirstChecked = () => {
+    this.#elements.get('filterEverithing').checked = true;
   };
 
   #findElements = () => {
@@ -56,8 +56,7 @@ export default class FiltersForm extends AbstractView {
     this.#elements.get('filterPast').disabled = predicate;
   };
 
-  setFiltersClickHandler = (callback) => {
-    this._callback.filterClick = callback;
+  setFiltersClickHandler = () => {
     this.element.addEventListener('input', this.#FiltersClickHandler);
   };
 
