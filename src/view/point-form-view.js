@@ -180,7 +180,7 @@ export default class PointForm extends AbstractStatefulView {
       (element) => element.name === evt.target.value
     );
     if (destination) {
-      this.updateElement({ destination, offers:[] });
+      this.updateElement({ destination });
     }
   }, Delay.DEST);
 
