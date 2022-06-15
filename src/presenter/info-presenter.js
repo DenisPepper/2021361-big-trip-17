@@ -25,13 +25,14 @@ export default class InfoPresenter {
   };
 
   #generateState = (points) => {
-    const count = points.length;
-
-    const title = count > 3 ? this.#getTitleIsThreeDot(points) : this.#infoView.defaultTitle;
-    this.#title = count > 0 && count <= 3 ? this.#getTitleIsDash(points) : title;
-
-    this.#dates = count > 0 ? this.#getDates(points) : this.#infoView.defaultDates;
+    const title = this.#isGreaterThenThree(points.length) ? this.#getTitleIsThreeDot(points) : this.#infoView.defaultTitle;
+    this.#title =  this.#isBetweenZeroAndFour(points.length) ? this.#getTitleIsDash(points) : title;
+    this.#dates = points.length > 0 ? this.#getDates(points) : this.#infoView.defaultDates;
   };
+
+  #isGreaterThenThree = (length) => length > 3;
+
+  #isBetweenZeroAndFour = (length) => length > 0 && length < 4;
 
   #getDates = (points) => `${getDayOf(points[0].dateFrom)} — ${getDayOf(points[points.length - 1].dateTo)}`;
 

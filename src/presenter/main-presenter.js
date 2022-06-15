@@ -49,53 +49,22 @@ export default class MainPresenter {
       infoPresenter,
     } = args;
 
-    if (model instanceof Model) {
-      this.#model = model;
-    } else {
-      throw new Error(`IllegalArgumentException! expected: ${Model}`);
-    }
-
-    if (pointsListView instanceof PointsList) {
-      this.#pointsListView = pointsListView;
-    } else {
-      throw new Error(`IllegalArgumentException! expected: ${PointsList}`);
-    }
-
-    if (filtersFormView instanceof FiltersForm) {
-      this.#filtersFormView = filtersFormView;
-    } else {
-      throw new Error(`IllegalArgumentException! expected: ${FiltersForm}`);
-    }
-
-    if (sortFormView instanceof SortForm) {
-      this.#sortFormView = sortFormView;
-    } else {
-      throw new Error(`IllegalArgumentException! expected: ${SortForm}`);
-    }
-
-    if (messageView instanceof Message) {
-      this.#messageView = messageView;
-    } else {
-      throw new Error(`IllegalArgumentException! expected: ${Message}`);
-    }
-
-    if (infoView instanceof Info) {
-      this.#infoView = infoView;
-    } else {
-      throw new Error(`IllegalArgumentException! expected: ${Info}`);
-    }
-
-    if (infoPresenter instanceof InfoPresenter) {
-      this.#infoPresenter = infoPresenter;
-    } else {
-      throw new Error(`IllegalArgumentException! expected: ${InfoPresenter}`);
-    }
-
+    this.#model = this.#isInstanceOf(model, Model);
+    this.#pointsListView = this.#isInstanceOf(pointsListView, PointsList);
+    this.#filtersFormView = this.#isInstanceOf(filtersFormView, FiltersForm);
+    this.#sortFormView = this.#isInstanceOf(sortFormView, SortForm);
+    this.#messageView = this.#isInstanceOf(messageView, Message);
+    this.#infoView = this.#isInstanceOf(infoView, Info);
+    this.#infoPresenter = this.#isInstanceOf(infoPresenter, InfoPresenter);
     this.#mainContainer = mainContainer;
     this.#controlsContainer = controlsContainer;
     this.#eventsContainer = eventsContainer;
     this.#newEventButton = newEventButton;
   }
+
+  #isInstanceOf = (arg, type) => arg instanceof type ? arg : this.#throwTypeError(type);
+
+  #throwTypeError = (type) => {throw new TypeError(`expected: ${type.name}`);};
 
   get offers() {
     return this.#model.offers;
