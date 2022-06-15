@@ -273,13 +273,14 @@ export default class MainPresenter {
       this.#model,
       point,
       new PointRow(point, this.offers, this.destinations),
-      new PointForm(point, this.offers, this.destinations))
+      new PointForm(this.#copyPoint(point), this.offers, this.destinations))
       .init(
         this.#setCurrentPointPresenter,
         this.#resetCurrentPointPresenter,
         this.#checkFiltersCounter,
         this.#closeCurrentPointForm,
-        this.#enableNewEventButton)
+        this.#enableNewEventButton,
+        this.#copyPoint)
       .renderPoint();
 
   #createPointPresenter = (model, point, pointRowView, pointFormView) => {
@@ -338,4 +339,6 @@ export default class MainPresenter {
   #disableTotalCostCounter = () => {
     this.#useTotalCostCounter = false;
   };
+
+  #copyPoint = (point) => ({...point, offers: [...point.offers]});
 }
