@@ -198,8 +198,8 @@ export default class MainPresenter {
   };
 
   composePointsList = () => this.#model.compose(
-    this.#composePresenter.getFilterName(),
-    this.#composePresenter.getSortName()
+    this.#composePresenter.getCurrentFilter(),
+    this.#composePresenter.getCurrentSort()
   );
 
   #createComposePresenter = () => {
@@ -251,7 +251,7 @@ export default class MainPresenter {
       this.#messageView.message = Messages.LOADING;
     } else {
       this.#composePresenter.removeSortForm();
-      this.#messageView.message = this.#composePresenter.getFilterName();
+      this.#messageView.message = this.#composePresenter.getCurrentFilter();
     }
     remove(this.#pointsListView);
     render(this.#messageView, this.#eventsContainer);

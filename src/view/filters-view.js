@@ -34,9 +34,7 @@ export default class FiltersForm extends AbstractView {
   }
 
   disableAllFilters = () => {
-    for (const name in Filters) {
-      this.disableFilter(Filters[name]);
-    }
+    Object.values(Filters).forEach((filter)=> this.disableFilter(filter));
   };
 
   disableFilter = (filterName) => {

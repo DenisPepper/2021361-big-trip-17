@@ -59,14 +59,14 @@ export default class СomposePresenter {
   };
 
   checkFiltersAbsence = () => {
-    for (const key in this.#filtersCounter) {
-      if (this.#filtersCounter[key] === 0) {
-        this.#filtersFormView.disableFilter(key);
-      } else {
-        this.#filtersFormView.enableFilter(key);
-      }
-    }
+    Object.entries(this.#filtersCounter).forEach(this.#callAbsenceMethod);
   };
+
+  #callAbsenceMethod = ([filter, count]) => {
+    this.#filtersFormView[this.#getAbsenceMethod(count)](filter);
+  };
+
+  #getAbsenceMethod = (count) => count === 0 ? 'disableFilter' : 'enableFilter';
 
   reduceFiltersCounter = (point) => {
     this.#filtersCounter[Filters.EVERYTHING] --;
@@ -101,7 +101,7 @@ export default class СomposePresenter {
 
   getCount = () => this.#filtersCounter[this.#currentFilterName];
 
-  getFilterName = () => {
+  getCurrentFilter = () => {
     if (this.#filtersCounter[Filters.EVERYTHING] === 0) {
       this.setFirstFilterChecked();
       this.#filtersFormView.disableAllFilters();
@@ -109,7 +109,7 @@ export default class СomposePresenter {
     return this.#currentFilterName;
   };
 
-  getSortName = () => this.#currentSortName;
+  getCurrentSort = () => this.#currentSortName;
 
   renderFilterForm = () => {
     render(this.#filtersFormView, this.#controlsContainer);
