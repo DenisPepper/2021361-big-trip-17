@@ -19,6 +19,12 @@ export default class SortForm extends AbstractView {
     this.setFirstChecked();
   };
 
+  initElement = () => {
+    this.#findElements();
+    this.setSortsClickHandler();
+    this.setFirstChecked();
+  };
+
   #findElements = () => {
     this.#elements.set(Sorts.DAY, this.element.querySelector('#sort-day'));
     this.#elements.set(Sorts.TIME, this.element.querySelector('#sort-time'));
@@ -40,7 +46,7 @@ export default class SortForm extends AbstractView {
   setFirstChecked = () => this.setChecked(Sorts.DAY);
 
   setChecked = (sort) => {
-    this.#elements.get(sort).checked = true;
+    const elm = this.#elements.get(sort);
+    elm.checked = true;
   };
- 
 }

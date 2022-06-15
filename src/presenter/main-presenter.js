@@ -327,12 +327,15 @@ export default class MainPresenter {
   };
 
   #checkFiltersCounter = () => {
-    if (this.#composePresenter.getCount() === 0) {
+    const count = this.#composePresenter.getCount();
+    if (count === 0) {
       this.#showMessage();
-    } else if (this.#composePresenter.getCount() === 1) {
-      this.#composePresenter.removeSortForm();
-    } else if (this.#composePresenter.getCount() === 2) {
+    }
+    if (count === 2 && !this.#eventsContainer.contains(this.#sortFormView.element)) {
       this.#composePresenter.renderSortForm();
+    }
+    if (count === 1 && this.#eventsContainer.contains(this.#sortFormView.element)) {
+      this.#composePresenter.removeSortForm();
     }
   };
 

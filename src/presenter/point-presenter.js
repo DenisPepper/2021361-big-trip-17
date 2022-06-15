@@ -104,7 +104,6 @@ export default class PointPresenter {
     this.removeOnEscClickHandler();
     if (this.#point.isNew) {
       this.clear();
-      this.#callback.checkFiltersCounter();
       this.#callback.enableNewEventButton();
     } else {
       this.#pointFormView.resetState(this.#callback.copyPoint(this.#point));

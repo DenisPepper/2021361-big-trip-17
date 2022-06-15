@@ -99,7 +99,7 @@ export default class СomposePresenter {
     }
   };
 
-  getCount = () => this.#filtersCounter[this.#currentFilterName];
+  getCount = () => this.#filtersCounter[Filters.EVERYTHING];
 
   getCurrentFilter = () => {
     if (this.#filtersCounter[Filters.EVERYTHING] === 0) {
@@ -118,9 +118,10 @@ export default class СomposePresenter {
   };
 
   renderSortForm = () => {
+    this.#sortFormView.initElement();
     render(this.#sortFormView, this.#eventsContainer, RenderPosition.AFTERBEGIN);
-    this.#sortFormView.setSortsClickHandler();
-    this.setFirstSortChecked();
+    //this.#sortFormView.setSortsClickHandler();
+    //this.#sortFormView.setFirstChecked();
     return this;
   };
 
