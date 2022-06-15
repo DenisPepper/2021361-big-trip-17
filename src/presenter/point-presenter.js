@@ -75,6 +75,9 @@ export default class PointPresenter {
   };
 
   #closeClickHandler = () => {
+    if (this.#point.isNew) {
+      this.#callback.restoreComposeSettings();
+    }
     this.closePointForm();
   };
 
@@ -103,7 +106,6 @@ export default class PointPresenter {
       this.clear();
       this.#callback.checkFiltersCounter();
       this.#callback.enableNewEventButton();
-      this.#callback.restoreComposeSettings();
     } else {
       this.#pointFormView.resetState(this.#callback.copyPoint(this.#point));
       replace(this.#pointRowView, this.#pointFormView);
