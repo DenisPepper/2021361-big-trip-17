@@ -12,6 +12,7 @@ export default class СomposePresenter {
   #eventsContainer = null;
   #currentFilterName = null;
   #currentSortName = null;
+  #save = {filter: null, sort: null};
   #filtersCounter = {
     [Filters.EVERYTHING]: 0,
     [Filters.FUTURE]: 0,
@@ -140,12 +141,30 @@ export default class СomposePresenter {
   };
 
   setFirstFilterChecked = () => {
-    this.#currentFilterName = Filters.EVERYTHING;
-    this.#filtersFormView.setFirstChecked();
+    this.setFilter(Filters.EVERYTHING);
   };
 
   setFirstSortChecked = () => {
-    this.#sortFormView.setFirstChecked();
-    this.#currentSortName = Sorts.DAY;
+    this.setSort(Sorts.DAY);
+  };
+
+  setFilter = (filter) => {
+    this.#currentFilterName = filter;
+    this.#filtersFormView.setChecked(filter);
+  };
+
+  setSort = (sort) => {
+    this.#currentSortName = sort;
+    this.#sortFormView.setChecked(sort);
+  };
+
+  saveCurrentState = () => {
+    this.#save = {filter: this.#currentFilterName, sort: this.#currentSortName};
+  };
+
+  restoreSavedState = () => {
+    const {filter, sort} = this.#save;
+    this.setFilter(filter);
+    this.setSort(sort);
   };
 }

@@ -280,7 +280,8 @@ export default class MainPresenter {
         this.#checkFiltersCounter,
         this.#closeCurrentPointForm,
         this.#enableNewEventButton,
-        this.#copyPoint)
+        this.#copyPoint,
+        this.#restoreComposeSettings)
       .renderPoint();
 
   #createPointPresenter = (model, point, pointRowView, pointFormView) => {
@@ -302,8 +303,7 @@ export default class MainPresenter {
 
   #createNewEvent = () => {
     this.#disableNewEventButton();
-    this.#composePresenter.setFirstFilterChecked();
-    this.#composePresenter.setFirstSortChecked();
+    this.#resetComposeSettings();
     this.#closeCurrentPointForm();
     if (this.#eventsContainer.contains(this.#messageView.element)) {
       remove(this.#messageView);
@@ -341,4 +341,14 @@ export default class MainPresenter {
   };
 
   #copyPoint = (point) => ({...point, offers: [...point.offers]});
+
+  #resetComposeSettings = () => {
+    this.#composePresenter.saveCurrentState();
+    this.#composePresenter.setFirstFilterChecked();
+    this.#composePresenter.setFirstSortChecked();
+  };
+
+  #restoreComposeSettings = () => {
+    this.#composePresenter.restoreSavedState();
+  };
 }

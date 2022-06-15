@@ -18,7 +18,17 @@ export default class FiltersForm extends AbstractView {
   };
 
   setFirstChecked = () => {
-    this.#elements.get('filterEverithing').checked = true;
+    this.setChecked(Filters.EVERYTHING);
+  };
+
+  setChecked = (filter) => {
+    if (filter === Filters.EVERYTHING) {
+      this.#elements.get('filterEverithing').checked = true;
+    } else if (filter === Filters.FUTURE) {
+      this.#elements.get('filterFuture').checked = true;
+    } else if (filter === Filters.PAST) {
+      this.#elements.get('filterPast').checked = true;
+    }
   };
 
   #findElements = () => {
