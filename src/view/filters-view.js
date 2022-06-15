@@ -2,8 +2,6 @@ import { createFiltersFormTemplate } from '../templates/filters-form-templ';
 import AbstractView from '../framework/view/abstract-view';
 import { Filters } from '../services/filter';
 
-const Action = {DISABLE: 'disable', ENABLE: 'enable'};
-
 export default class FiltersForm extends AbstractView {
   #elements = new Map();
   _callback = {
@@ -21,20 +19,14 @@ export default class FiltersForm extends AbstractView {
     this.setChecked(Filters.EVERYTHING);
   };
 
-  setChecked = (filter) => {
-    if (filter === Filters.EVERYTHING) {
-      this.#elements.get('filterEverithing').checked = true;
-    } else if (filter === Filters.FUTURE) {
-      this.#elements.get('filterFuture').checked = true;
-    } else if (filter === Filters.PAST) {
-      this.#elements.get('filterPast').checked = true;
-    }
+  setChecked = (filterName) => {
+    this.#elements.get(filterName).checked = true;
   };
 
   #findElements = () => {
-    this.#elements.set('filterEverithing', this.element.querySelector('#filter-everything'));
-    this.#elements.set('filterFuture', this.element.querySelector('#filter-future'));
-    this.#elements.set('filterPast', this.element.querySelector('#filter-past'));
+    this.#elements.set(Filters.EVERYTHING, this.element.querySelector('#filter-everything'));
+    this.#elements.set(Filters.FUTURE, this.element.querySelector('#filter-future'));
+    this.#elements.set(Filters.PAST, this.element.querySelector('#filter-past'));
   };
 
   get template() {
@@ -42,28 +34,17 @@ export default class FiltersForm extends AbstractView {
   }
 
   disableAllFilters = () => {
-    this.#elements.get('filterEverithing').disabled = true;
-    this.#elements.get('filterFuture').disabled = true;
-    this.#elements.get('filterPast').disabled = true;
+    for (const name in Filters) {
+      this.disableFilter(Filters[name]);
+    }
   };
 
-  disableFilter = (filterName) => this[filterName](Action.DISABLE);
-
-  enableFilter = (filterName) => this[filterName](Action.ENABLE);
-
-  [Filters.EVERYTHING] = (value) => {
-    const predicate = value === Action.DISABLE;
-    this.#elements.get('filterEverithing').disabled = predicate;
+  disableFilter = (filterName) => {
+    this.#elements.get(filterName).disabled = true;
   };
 
-  [Filters.FUTURE] = (value) => {
-    const predicate = value === Action.DISABLE;
-    this.#elements.get('filterFuture').disabled = predicate;
-  };
-
-  [Filters.PAST] = (value) => {
-    const predicate = value === Action.DISABLE;
-    this.#elements.get('filterPast').disabled = predicate;
+  enableFilter = (filterName) => {
+    this.#elements.get(filterName).disabled = false;
   };
 
   setFiltersClickHandler = () => {
