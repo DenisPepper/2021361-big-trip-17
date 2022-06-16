@@ -25,24 +25,20 @@ export default class InfoPresenter {
   };
 
   #generateState = (points) => {
-    const count = points.length;
-    let title = this.#infoView.defaultTitle;
-    let dates = this.#infoView.defaultDates;
-    if (count > 3) {
-      title = `${points[0].destination.name} ... ${points[points.length - 1].destination.name}`;
-    } else if (count > 0 && count < 4) {
-      title = '';
-      for (let i = 0; i < count; i++ ) {
-        title += ` — ${points[i].destination.name}`;
-      }
-      title = title.slice(2);
-    }
-    if (count > 0) {
-      dates = `${getDayOf(points[0].dateFrom)} — ${getDayOf(points[points.length - 1].dateTo)}`;
-    }
-    this.#title = title;
-    this.#dates = dates;
+    const title = this.#isGreaterThenThree(points.length) ? this.#getTitleIsThreeDot(points) : this.#infoView.defaultTitle;
+    this.#title =  this.#isBetweenZeroAndFour(points.length) ? this.#getTitleIsDash(points) : title;
+    this.#dates = points.length > 0 ? this.#getDates(points) : this.#infoView.defaultDates;
   };
+
+  #isGreaterThenThree = (length) => length > 3;
+
+  #isBetweenZeroAndFour = (length) => length > 0 && length < 4;
+
+  #getDates = (points) => `${getDayOf(points[0].dateFrom)} — ${getDayOf(points[points.length - 1].dateTo)}`;
+
+  #getTitleIsThreeDot = (points) => `${points[0].destination.name} ... ${points[points.length - 1].destination.name}`;
+
+  #getTitleIsDash = (points) => points.reduce((i, point) => `${i} — ${point.destination.name}`, '').slice(2);
 
   increaseTotalCost = (totalPrice) => {this.#totalCost += totalPrice;};
 

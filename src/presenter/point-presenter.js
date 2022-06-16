@@ -12,6 +12,9 @@ export default class PointPresenter {
     resetCurrentPointPresenter: () => {},
     checkFiltersCounter: () => {},
     closeCurrentPointForm: () => {},
+    enableNewEventButton: () => {},
+    copyPoint: () => {},
+    restoreComposeSettings: () => {},
   };
 
   constructor(args) {
@@ -27,8 +30,14 @@ export default class PointPresenter {
     setCurrentPointPresenter,
     resetCurrentPointPresenter,
     checkFiltersCounter,
-    closeCurrentPointForm
+    closeCurrentPointForm,
+    enableNewEventButton,
+    copyPoint,
+    restoreComposeSettings,
   ) => {
+    this.#callback.restoreComposeSettings = restoreComposeSettings;
+    this.#callback.copyPoint = copyPoint;
+    this.#callback.enableNewEventButton = enableNewEventButton;
     this.#callback.setCurrentPointPresenter = setCurrentPointPresenter;
     this.#callback.resetCurrentPointPresenter = resetCurrentPointPresenter;
     this.#callback.checkFiltersCounter = checkFiltersCounter;
@@ -66,7 +75,9 @@ export default class PointPresenter {
   };
 
   #closeClickHandler = () => {
-    this.#pointFormView.resetState(this.#point);
+    if (this.#point.isNew) {
+      this.#callback.restoreComposeSettings();
+    }
     this.closePointForm();
   };
 
@@ -93,8 +104,9 @@ export default class PointPresenter {
     this.removeOnEscClickHandler();
     if (this.#point.isNew) {
       this.clear();
-      this.#callback.checkFiltersCounter();
+      this.#callback.enableNewEventButton();
     } else {
+      this.#pointFormView.resetState(this.#callback.copyPoint(this.#point));
       replace(this.#pointRowView, this.#pointFormView);
     }
   };

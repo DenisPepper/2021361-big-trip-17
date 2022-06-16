@@ -3,6 +3,7 @@ import SortForm from '../view/sorts-view';
 import { Sorts } from '../settings';
 import { Filters } from '../services/filter';
 import { render, remove } from '../framework/render';
+import { RenderPosition } from '../settings';
 
 export default class СomposePresenter {
   #filtersFormView = null;
@@ -11,6 +12,7 @@ export default class СomposePresenter {
   #eventsContainer = null;
   #currentFilterName = null;
   #currentSortName = null;
+  #save = {filter: null, sort: null};
   #filtersCounter = {
     [Filters.EVERYTHING]: 0,
     [Filters.FUTURE]: 0,
@@ -42,6 +44,7 @@ export default class СomposePresenter {
     this.#eventsContainer = eventsContainer;
     this.#currentFilterName = Filters.EVERYTHING;
     this.#currentSortName = Sorts.DAY;
+    this.init();
   }
 
   init = (updatePointsList) => {
@@ -49,15 +52,21 @@ export default class СomposePresenter {
     return this;
   };
 
-  checkFiltersAbsence = () => {
-    for (const key in this.#filtersCounter) {
-      if (this.#filtersCounter[key] === 0) {
-        this.#filtersFormView.disableFilter(key);
-      } else {
-        this.#filtersFormView.enableFilter(key);
-      }
-    }
+  initForms = () => {
+    this.#sortFormView.init(this.#changeSortHandler);
+    this.#filtersFormView.init(this.#changeFilterHandler);
+    return this;
   };
+
+  checkFiltersAbsence = () => {
+    Object.entries(this.#filtersCounter).forEach(this.#callAbsenceMethod);
+  };
+
+  #callAbsenceMethod = ([filter, count]) => {
+    this.#filtersFormView[this.#getAbsenceMethod(count)](filter);
+  };
+
+  #getAbsenceMethod = (count) => count === 0 ? 'disableFilter' : 'enableFilter';
 
   reduceFiltersCounter = (point) => {
     this.#filtersCounter[Filters.EVERYTHING] --;
@@ -90,30 +99,29 @@ export default class СomposePresenter {
     }
   };
 
-  getCount = () => this.#filtersCounter[this.#currentFilterName];
+  getCount = () => this.#filtersCounter[Filters.EVERYTHING];
 
-  getFilterName = () => {
+  getCurrentFilter = () => {
     if (this.#filtersCounter[Filters.EVERYTHING] === 0) {
-      this.#currentFilterName = Filters.EVERYTHING;
-      this.#filtersFormView.init();
+      this.setFirstFilterChecked();
+      this.#filtersFormView.disableAllFilters();
     }
     return this.#currentFilterName;
   };
 
-  getSortName = () => this.#currentSortName;
+  getCurrentSort = () => this.#currentSortName;
 
   renderFilterForm = () => {
     render(this.#filtersFormView, this.#controlsContainer);
-    this.#filtersFormView.setFiltersClickHandler(this.#changeFilterHandler);
+    this.#filtersFormView.setFiltersClickHandler();
     return this;
   };
 
   renderSortForm = () => {
-    if (this.#filtersCounter[Filters.EVERYTHING] === 0) {
-      return;
-    }
-    render(this.#sortFormView, this.#eventsContainer);
-    this.#sortFormView.init(this.#changeSortHandler);
+    this.#sortFormView.initElement();
+    render(this.#sortFormView, this.#eventsContainer, RenderPosition.AFTERBEGIN);
+    //this.#sortFormView.setSortsClickHandler();
+    //this.#sortFormView.setFirstChecked();
     return this;
   };
 
@@ -123,17 +131,41 @@ export default class СomposePresenter {
   };
 
   #changeFilterHandler = (filterName) => {
-    this.#sortFormView.setFirstChecked();
+    this.setFirstSortChecked();
     this.#currentFilterName = filterName;
-    this.#currentSortName = Sorts.DAY;
     this.#callback.updatePointsList();
-    if (this.getCount === 0) {
-      this.removeSortForm();
-    }
   };
 
   #changeSortHandler = (sortName) => {
     this.#currentSortName = sortName;
     this.#callback.updatePointsList();
+  };
+
+  setFirstFilterChecked = () => {
+    this.setFilter(Filters.EVERYTHING);
+  };
+
+  setFirstSortChecked = () => {
+    this.setSort(Sorts.DAY);
+  };
+
+  setFilter = (filter) => {
+    this.#currentFilterName = filter;
+    this.#filtersFormView.setChecked(filter);
+  };
+
+  setSort = (sort) => {
+    this.#currentSortName = sort;
+    this.#sortFormView.setChecked(sort);
+  };
+
+  saveCurrentState = () => {
+    this.#save = {filter: this.#currentFilterName, sort: this.#currentSortName};
+  };
+
+  restoreSavedState = () => {
+    const {filter, sort} = this.#save;
+    this.setFilter(filter);
+    this.setSort(sort);
   };
 }

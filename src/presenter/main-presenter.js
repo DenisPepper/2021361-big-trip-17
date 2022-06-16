@@ -49,53 +49,22 @@ export default class MainPresenter {
       infoPresenter,
     } = args;
 
-    if (model instanceof Model) {
-      this.#model = model;
-    } else {
-      throw new Error(`IllegalArgumentException! expected: ${Model}`);
-    }
-
-    if (pointsListView instanceof PointsList) {
-      this.#pointsListView = pointsListView;
-    } else {
-      throw new Error(`IllegalArgumentException! expected: ${PointsList}`);
-    }
-
-    if (filtersFormView instanceof FiltersForm) {
-      this.#filtersFormView = filtersFormView;
-    } else {
-      throw new Error(`IllegalArgumentException! expected: ${FiltersForm}`);
-    }
-
-    if (sortFormView instanceof SortForm) {
-      this.#sortFormView = sortFormView;
-    } else {
-      throw new Error(`IllegalArgumentException! expected: ${SortForm}`);
-    }
-
-    if (messageView instanceof Message) {
-      this.#messageView = messageView;
-    } else {
-      throw new Error(`IllegalArgumentException! expected: ${Message}`);
-    }
-
-    if (infoView instanceof Info) {
-      this.#infoView = infoView;
-    } else {
-      throw new Error(`IllegalArgumentException! expected: ${Info}`);
-    }
-
-    if (infoPresenter instanceof InfoPresenter) {
-      this.#infoPresenter = infoPresenter;
-    } else {
-      throw new Error(`IllegalArgumentException! expected: ${InfoPresenter}`);
-    }
-
+    this.#model = this.#isInstanceOf(model, Model);
+    this.#pointsListView = this.#isInstanceOf(pointsListView, PointsList);
+    this.#filtersFormView = this.#isInstanceOf(filtersFormView, FiltersForm);
+    this.#sortFormView = this.#isInstanceOf(sortFormView, SortForm);
+    this.#messageView = this.#isInstanceOf(messageView, Message);
+    this.#infoView = this.#isInstanceOf(infoView, Info);
+    this.#infoPresenter = this.#isInstanceOf(infoPresenter, InfoPresenter);
     this.#mainContainer = mainContainer;
     this.#controlsContainer = controlsContainer;
     this.#eventsContainer = eventsContainer;
     this.#newEventButton = newEventButton;
   }
+
+  #isInstanceOf = (arg, type) => arg instanceof type ? arg : this.#throwTypeError(type);
+
+  #throwTypeError = (type) => {throw new TypeError(`expected: ${type.name}`);};
 
   get offers() {
     return this.#model.offers;
@@ -193,17 +162,13 @@ export default class MainPresenter {
   };
 
   #updatePointsList = () => {
-    this.#closeCurrentPointForm();
-    if (this.#eventsContainer.contains(this.#messageView.element)) {
-      remove(this.#messageView);
-    }
     this.#points = this.composePointsList();
     this.#renderPointsList();
   };
 
   composePointsList = () => this.#model.compose(
-    this.#composePresenter.getFilterName(),
-    this.#composePresenter.getSortName()
+    this.#composePresenter.getCurrentFilter(),
+    this.#composePresenter.getCurrentSort()
   );
 
   #createComposePresenter = () => {
@@ -215,6 +180,7 @@ export default class MainPresenter {
       eventsContainer: this.#eventsContainer,
     })
       .init(this.#updatePointsList)
+      .initForms()
       .renderFilterForm();
   };
 
@@ -254,18 +220,20 @@ export default class MainPresenter {
       this.#messageView.message = Messages.LOADING;
     } else {
       this.#composePresenter.removeSortForm();
-      this.#messageView.message = this.#composePresenter.getFilterName();
+      this.#messageView.message = this.#composePresenter.getCurrentFilter();
     }
+    remove(this.#pointsListView);
     render(this.#messageView, this.#eventsContainer);
   };
 
   #renderPointsList = () => {
+    this.#closeCurrentPointForm();
     remove(this.#pointsListView);
+    this.#points.forEach(this.#renderPoint);
     if (this.#eventsContainer.contains(this.#messageView.element)) {
       remove(this.#messageView);
+      this.#composePresenter.renderSortForm();
     }
-    this.#points.forEach(this.#renderPoint);
-    this.#composePresenter.renderSortForm();
     render(this.#pointsListView, this.#eventsContainer);
   };
 
@@ -274,13 +242,16 @@ export default class MainPresenter {
       this.#model,
       point,
       new PointRow(point, this.offers, this.destinations),
-      new PointForm(point, this.offers, this.destinations)
-    ).init(
-      this.#setCurrentPointPresenter,
-      this.#resetCurrentPointPresenter,
-      this.#checkFiltersCounter,
-      this.#closeCurrentPointForm
-    ).renderPoint();
+      new PointForm(this.#copyPoint(point), this.offers, this.destinations))
+      .init(
+        this.#setCurrentPointPresenter,
+        this.#resetCurrentPointPresenter,
+        this.#checkFiltersCounter,
+        this.#closeCurrentPointForm,
+        this.#enableNewEventButton,
+        this.#copyPoint,
+        this.#restoreComposeSettings)
+      .renderPoint();
 
   #createPointPresenter = (model, point, pointRowView, pointFormView) => {
     const pointPresenter = new PointPresenter({
@@ -300,10 +271,11 @@ export default class MainPresenter {
   };
 
   #createNewEvent = () => {
+    this.#disableNewEventButton();
+    this.#resetComposeSettings();
     this.#closeCurrentPointForm();
     if (this.#eventsContainer.contains(this.#messageView.element)) {
       remove(this.#messageView);
-      this.#composePresenter.renderSortForm();
       render(this.#pointsListView, this.#eventsContainer);
     }
     const pointPresenter = this.#renderPoint(this.#model.newPoint);
@@ -324,12 +296,31 @@ export default class MainPresenter {
   };
 
   #checkFiltersCounter = () => {
-    if (this.#composePresenter.getCount() === 0) {
+    const count = this.#composePresenter.getCount();
+    if (count === 0) {
       this.#showMessage();
+    }
+    if (count === 2 && !this.#eventsContainer.contains(this.#sortFormView.element)) {
+      this.#composePresenter.renderSortForm();
+    }
+    if (count === 1 && this.#eventsContainer.contains(this.#sortFormView.element)) {
+      this.#composePresenter.removeSortForm();
     }
   };
 
   #disableTotalCostCounter = () => {
     this.#useTotalCostCounter = false;
+  };
+
+  #copyPoint = (point) => ({...point, offers: [...point.offers]});
+
+  #resetComposeSettings = () => {
+    this.#composePresenter.saveCurrentState();
+    this.#composePresenter.setFirstFilterChecked();
+    this.#composePresenter.setFirstSortChecked();
+  };
+
+  #restoreComposeSettings = () => {
+    this.#composePresenter.restoreSavedState();
   };
 }
