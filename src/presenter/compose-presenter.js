@@ -5,7 +5,7 @@ import { Filters } from '../services/filter';
 import { render, remove } from '../framework/render';
 import { RenderPosition } from '../settings';
 
-export default class СomposePresenter {
+export default class ComposePresenter {
   #filtersFormView = null;
   #sortFormView = null;
   #controlsContainer = null;
@@ -120,8 +120,6 @@ export default class СomposePresenter {
   renderSortForm = () => {
     this.#sortFormView.initElement();
     render(this.#sortFormView, this.#eventsContainer, RenderPosition.AFTERBEGIN);
-    //this.#sortFormView.setSortsClickHandler();
-    //this.#sortFormView.setFirstChecked();
     return this;
   };
 

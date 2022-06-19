@@ -1,5 +1,5 @@
 import PointPresenter from './point-presenter';
-import СomposePresenter from './compose-presenter';
+import ComposePresenter from './compose-presenter';
 import InfoPresenter from './info-presenter';
 import Model from '../model/model';
 import PointsList from '..//view/points-list-view';
@@ -172,7 +172,7 @@ export default class MainPresenter {
   );
 
   #createComposePresenter = () => {
-    this.#composePresenter = new СomposePresenter({
+    this.#composePresenter = new ComposePresenter({
       model: this.#model,
       filtersFormView: this.#filtersFormView,
       sortFormView: this.#sortFormView,

@@ -7,7 +7,7 @@ const DefaultState = {
   cost: 0,
 };
 
-export default class Info extends AbstractStatefulView {
+export default class InfoView extends AbstractStatefulView {
   #elements = new Map();
   _state;
 
@@ -40,15 +40,6 @@ export default class Info extends AbstractStatefulView {
   get defaultDates() {
     return DefaultState.dates;
   }
-
-  /*get state() {
-    const data = { ...this._state };
-    return data;
-  }
-
-  set state(data) {
-    this._state = { ...data };
-  }*/
 
   update = (data) => this.updateElement({ ... data});
 

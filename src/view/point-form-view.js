@@ -26,7 +26,7 @@ const flatpickrSettings = {
   defaultHour: 8,
 };
 
-export default class PointForm extends AbstractStatefulView {
+export default class PointFormView extends AbstractStatefulView {
   #offers = null;
   #destinations = null;
   #elements = new Map();

@@ -49,7 +49,7 @@ export default class Filter {
   }
 
   #getrRule = (filterName) => {
-    const storage = new this.#ruleStorage();
+    const storage = new this.#ruleStorage;
     return storage[filterName] || NULL_PREDICATE;
   };
 

@@ -2,7 +2,7 @@ import { createSortsFormTemplate } from '../templates/sorts-form-templ';
 import AbstractView from '../framework/view/abstract-view';
 import { Sorts } from '../settings';
 
-export default class SortForm extends AbstractView {
+export default class SortsView extends AbstractView {
   #elements = new Map();
   _callback = {
     sortsClickHandler: () => {},

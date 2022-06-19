@@ -4,7 +4,7 @@ import { debounce } from '../util';
 
 const DELAY = 500;
 
-export default class PointRow extends AbstractStatefulView {
+export default class PointRowView extends AbstractStatefulView {
   _state;
   #offers = null;
   #destinations = null;

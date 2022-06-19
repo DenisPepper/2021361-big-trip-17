@@ -2,6 +2,8 @@ import { render } from '../framework/render';
 import { RenderPosition } from '../settings';
 import { getDayOf } from '../util';
 
+const TRIP_FROM_THREE_POINTS_COUNT = 3;
+
 export default class InfoPresenter {
   #infoView;
   #mainContainer;
@@ -30,9 +32,9 @@ export default class InfoPresenter {
     this.#dates = points.length > 0 ? this.#getDates(points) : this.#infoView.defaultDates;
   };
 
-  #isGreaterThenThree = (length) => length > 3;
+  #isGreaterThenThree = (length) => length > TRIP_FROM_THREE_POINTS_COUNT;
 
-  #isBetweenZeroAndFour = (length) => length > 0 && length < 4;
+  #isBetweenZeroAndFour = (length) => length > 0 && length <= TRIP_FROM_THREE_POINTS_COUNT;
 
   #getDates = (points) => `${getDayOf(points[0].dateFrom)} — ${getDayOf(points[points.length - 1].dateTo)}`;
 

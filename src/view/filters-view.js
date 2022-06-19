@@ -2,7 +2,7 @@ import { createFiltersFormTemplate } from '../templates/filters-form-templ';
 import AbstractView from '../framework/view/abstract-view';
 import { Filters } from '../services/filter';
 
-export default class FiltersForm extends AbstractView {
+export default class FiltersView extends AbstractView {
   #elements = new Map();
   _callback = {
     filterClick: null,
