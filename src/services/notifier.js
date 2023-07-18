@@ -13,7 +13,7 @@ export default class EventManager {
    * @param {String} name - ключ для нового пула функций
    * @returns {Map<String, EventPool>} элемент карты событий
    */
-  #newEventPool = (name) => {
+  #createEventPool = (name) => {
     const pool = new EventPool();
     this.#events.set(name, pool);
     return pool;
@@ -29,7 +29,7 @@ export default class EventManager {
     if (pool) {
       return pool;
     }
-    return this.#newEventPool(name);
+    return this.#createEventPool(name);
   };
 
   /**
